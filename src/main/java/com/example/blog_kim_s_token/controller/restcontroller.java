@@ -34,16 +34,11 @@ public class restcontroller {
     public JSONObject insertUser(@RequestBody loginDto loginDto) {
         return userService.insertUser(loginDto);
     }
-    @RequestMapping("/index")
-    public String hello(HttpServletRequest request,HttpServletResponse response) {
-        System.out.println("index");
-        return "home2.jsp";
-    }
     @RequestMapping("/auth/index2")
     public String hello2(@CookieValue(value = "refreshToken", required = false) Cookie rCookie,HttpServletResponse response) {
         System.out.println("index2");
         System.out.println(rCookie.getValue());
-        return "home2.jsp";
+        return "index2";
     }
     @RequestMapping("/auth/naver")
     public String naverLogin() {

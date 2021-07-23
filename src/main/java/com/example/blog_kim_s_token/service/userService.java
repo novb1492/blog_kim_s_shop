@@ -29,7 +29,7 @@ public class userService {
         System.out.println("findEmail 조회 이메일 "+email);
         return userDao.findByEmail(email);
     }
-    public JSONObject  insertUser(loginDto loginDto) {
+    public JSONObject insertUser(loginDto loginDto) {
         if(confrimEmail(loginDto.getEmail())){
             if(loginDto.getPwd().equals(loginDto.getPwd2())){
                 userDto userDto=new userDto(0, loginDto.getEmail(), loginDto.getName(),security.pwdEncoder().encode(loginDto.getPwd()), "ROLE_USER");
