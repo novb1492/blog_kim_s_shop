@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <input type="button"onclick="goNaverLogin()"value="naverlogin"> 
+    <script>
+
+        function goNaverLogin(){
+            var xhr = new XMLHttpRequest(); //new로 생성
+            xhr.open('POST', '/auth/naver', true); //j쿼리 $ajax.({type,url},true가 비동기)
+            xhr.send(); /// ajax data부분
+            xhr.onload = function() { 
+                if(xhr.status==200){
+                    location.href=xhr.response;
+                }else{
+                    alert('통신에 실패했습니다');
+                }
+            }  
+        }
+        </script>
+</body>
+</html>
