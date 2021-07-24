@@ -2,6 +2,7 @@ package com.example.blog_kim_s_token.service;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.Random;
 
 import com.nimbusds.jose.shaded.json.JSONObject;
 
@@ -28,6 +29,14 @@ public class utillService {
         jsonObject.put("bool",bool);
         jsonObject.put("messege", messege);
         return jsonObject;
+    }
+    public String GetRandomNum(int end) {
+        String num="";
+        Random random=new Random();
+        for(int i=0;i<end;i++){
+            num+=Integer.toString(random.nextInt(10));
+        }
+        return num;
     } 
 
 }
