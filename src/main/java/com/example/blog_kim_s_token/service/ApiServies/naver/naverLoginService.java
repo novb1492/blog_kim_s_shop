@@ -1,4 +1,4 @@
-package com.example.blog_kim_s_token.service.oauthLogin.naver;
+package com.example.blog_kim_s_token.service.ApiServies.naver;
 
 
 import java.io.UnsupportedEncodingException;

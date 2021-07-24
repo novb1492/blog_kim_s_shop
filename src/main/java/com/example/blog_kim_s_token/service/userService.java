@@ -1,5 +1,7 @@
 package com.example.blog_kim_s_token.service;
 
+import javax.servlet.http.HttpSession;
+
 import com.example.blog_kim_s_token.config.security;
 import com.example.blog_kim_s_token.enums.role;
 import com.example.blog_kim_s_token.enums.userEnums;
@@ -30,14 +32,27 @@ public class userService {
         System.out.println("findEmail 조회 이메일 "+email);
         return userDao.findByEmail(email);
     }
-    public JSONObject insertUser(singupDto singupDto) {
-        if(confrimEmail(singupDto.getEmail())){
-            if(singupDto.getPwd().equals(singupDto.getPwd2())){
-                userDto userDto=new userDto(0, singupDto.getEmail(), singupDto.getName(),security.pwdEncoder().encode(singupDto.getPwd()),role.USER.getValue(),singupDto.getPostcode(),singupDto.getAddress(),singupDto.getDetailAddress(),singupDto.getExtraAddress(),singupDto.getPhoneNum());
-                userDao.save(userDto);
-                return utillService.makeJson(userEnums.sucSingUp.getBool(), userEnums.sucSingUp.getMessege());
+    public boolean confrimPhone(String phoneNum) {
+            if(userDao.findByPhoneNum(phoneNum)==null){
+                return true;
             }
-            return utillService.makeJson(userEnums.notEqualsPwd.getBool(), userEnums.notEqualsPwd.getMessege());
+            return false;
+    }
+    public JSONObject insertUser(singupDto singupDto,HttpSession httpSession) {
+        if(confrimEmail(singupDto.getEmail())){
+            if(confrimPhone(singupDto.getPhoneNum())){
+                if(httpSession.getAttribute("insertPhone").equals(singupDto.getPhoneNum())){
+                    if(singupDto.getPwd().equals(singupDto.getPwd2())){
+                        userDto userDto=new userDto(0, singupDto.getEmail(), singupDto.getName(),security.pwdEncoder().encode(singupDto.getPwd()),role.USER.getValue(),singupDto.getPostcode(),singupDto.getAddress(),singupDto.getDetailAddress(),singupDto.getExtraAddress(),singupDto.getPhoneNum());
+                        userDao.save(userDto);
+                        httpSession.removeAttribute("insertPhone");
+                        return utillService.makeJson(userEnums.sucSingUp.getBool(), userEnums.sucSingUp.getMessege());
+                    }
+                    return utillService.makeJson(userEnums.notEqualsPwd.getBool(), userEnums.notEqualsPwd.getMessege());
+                }
+              return utillService.makeJson(userEnums.notEqualsPhone.getBool(),userEnums.notEqualsPhone.getMessege());
+            }
+           return utillService.makeJson(userEnums.alreadyPhone.getBool(),userEnums.alreadyPhone.getMessege());
         }
         return utillService.makeJson(userEnums.alreadyEmail.getBool(), userEnums.alreadyEmail.getMessege());
     }

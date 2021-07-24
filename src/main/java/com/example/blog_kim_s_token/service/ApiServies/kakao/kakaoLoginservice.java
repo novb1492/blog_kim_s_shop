@@ -1,4 +1,4 @@
-package com.example.blog_kim_s_token.service.oauthLogin.kakao;
+package com.example.blog_kim_s_token.service.ApiServies.kakao;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;

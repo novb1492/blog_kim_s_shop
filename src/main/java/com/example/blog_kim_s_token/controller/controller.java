@@ -3,7 +3,7 @@ package com.example.blog_kim_s_token.controller;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.example.blog_kim_s_token.service.oauthLogin.naver.naverLoginService;
+import com.example.blog_kim_s_token.service.ApiServies.naver.naverLoginService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

@@ -3,11 +3,15 @@ package com.example.blog_kim_s_token.controller;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
+import com.example.blog_kim_s_token.model.coolSms.coolSmsDto;
 import com.example.blog_kim_s_token.model.user.singupDto;
+import com.example.blog_kim_s_token.service.coolSmsService;
 import com.example.blog_kim_s_token.service.userService;
-import com.example.blog_kim_s_token.service.oauthLogin.kakao.kakaoLoginservice;
-import com.example.blog_kim_s_token.service.oauthLogin.naver.naverLoginService;
+import com.example.blog_kim_s_token.service.utillService;
+import com.example.blog_kim_s_token.service.ApiServies.kakao.kakaoLoginservice;
+import com.example.blog_kim_s_token.service.ApiServies.naver.naverLoginService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +26,10 @@ public class restcontroller {
     @Autowired
     private userService userService;
     @Autowired
+    private coolSmsService coolSmsService;
+    @Autowired
+    private utillService utillService;
+    @Autowired
     private naverLoginService naverLoingService;
     @Autowired
     private kakaoLoginservice kakaoLoginservice;
@@ -30,9 +38,20 @@ public class restcontroller {
     public boolean confrimEmail(HttpServletRequest request,HttpServletResponse response) {
         return userService.confrimEmail((String)request.getParameter("email"));
     }
+    @RequestMapping("/auth/confrimPhoneNum")
+    public boolean confrimPhoneNum(HttpServletRequest request,HttpServletResponse response) {
+        return userService.confrimPhone((String)request.getParameter("phoneNum"));
+    }
+    @RequestMapping("/auth/sendSms")
+    public boolean sendSms(@RequestBody coolSmsDto coolSmsDto,HttpServletResponse response,HttpSession httpSession) {
+        String SmsNum=utillService.GetRandomNum(6);
+        httpSession.setAttribute("insertPhone", coolSmsDto.getPhoneNum());
+        httpSession.setAttribute("insertRandNum", SmsNum);
+        return coolSmsService.sendMessege(coolSmsDto.getPhoneNum(),"인증번호는 "+SmsNum+"입니다");
+    }
     @RequestMapping("/auth/insertUser")
-    public JSONObject insertUser(@RequestBody singupDto singupDto) {
-        return userService.insertUser(singupDto);
+    public JSONObject insertUser(@RequestBody singupDto singupDto,HttpSession httpSession) {
+        return userService.insertUser(singupDto,httpSession);
     }
     @RequestMapping("/auth/index2")
     public String hello2(@CookieValue(value = "refreshToken", required = false) Cookie rCookie,HttpServletResponse response) {
