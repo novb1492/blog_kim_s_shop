@@ -49,4 +49,11 @@ public class userDto {
     
     @Column(name="phoneNum",nullable = false,length = 15)
     private String phoneNum;
+
+    @Column(name="emailcheck",nullable = false,length = 4)
+    private boolean emailCheck;
+
+    @Column(name="phonecheck",nullable = false,length = 4)
+    private boolean phoneCheck;
+
 }

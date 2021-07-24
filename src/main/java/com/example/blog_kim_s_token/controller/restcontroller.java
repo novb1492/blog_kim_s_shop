@@ -5,6 +5,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.example.blog_kim_s_token.enums.userEnums;
 import com.example.blog_kim_s_token.model.coolSms.coolSmsDto;
 import com.example.blog_kim_s_token.model.user.singupDto;
 import com.example.blog_kim_s_token.service.coolSmsService;
@@ -26,8 +27,6 @@ public class restcontroller {
     @Autowired
     private userService userService;
     @Autowired
-    private coolSmsService coolSmsService;
-    @Autowired
     private utillService utillService;
     @Autowired
     private naverLoginService naverLoingService;
@@ -43,11 +42,18 @@ public class restcontroller {
         return userService.confrimPhone((String)request.getParameter("phoneNum"));
     }
     @RequestMapping("/auth/sendSms")
-    public boolean sendSms(@RequestBody coolSmsDto coolSmsDto,HttpServletResponse response,HttpSession httpSession) {
+    public JSONObject sendSms(@RequestBody coolSmsDto coolSmsDto,HttpServletResponse response,HttpSession httpSession) {
         String SmsNum=utillService.GetRandomNum(6);
+        System.out.println("인증번호 발송"+SmsNum);
         httpSession.setAttribute("insertPhone", coolSmsDto.getPhoneNum());
         httpSession.setAttribute("insertRandNum", SmsNum);
-        return coolSmsService.sendMessege(coolSmsDto.getPhoneNum(),"인증번호는 "+SmsNum+"입니다");
+        httpSession.setAttribute("pheonCheck", false);
+        return utillService.makeJson(userEnums.sendSmsNum.getBool(), userEnums.sendSmsNum.getMessege());//coolSmsService.sendMessege(coolSmsDto.getPhoneNum(),"인증번호는 "+SmsNum+"입니다");
+    }
+    @RequestMapping("/auth/cofrimSmsNum")
+    public JSONObject cofrimSmsNum(HttpServletRequest request,HttpSession httpSession) {
+        System.out.println(httpSession.getAttribute("insertRandNum"));
+        return utillService.cofrimSmsNum((String)request.getParameter("randNum"),(String)httpSession.getAttribute("insertRandNum"), httpSession);
     }
     @RequestMapping("/auth/insertUser")
     public JSONObject insertUser(@RequestBody singupDto singupDto,HttpSession httpSession) {

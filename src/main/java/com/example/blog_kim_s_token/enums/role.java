@@ -5,6 +5,7 @@ public enum role {
     ADMIN("ROLE_ADMIN"),
     failEmailSmsCheck("false"),
     sucEmailSmsCheck("true");
+
     
     private final String value;
     

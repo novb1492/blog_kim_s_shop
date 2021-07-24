@@ -7,5 +7,4 @@ import lombok.NoArgsConstructor;
 @Data
 public class coolSmsDto {
     private String phoneNum;
-    private String messege;
 }

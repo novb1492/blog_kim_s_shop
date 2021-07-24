@@ -42,11 +42,16 @@ public class userService {
         if(confrimEmail(singupDto.getEmail())){
             if(confrimPhone(singupDto.getPhoneNum())){
                 if(httpSession.getAttribute("insertPhone").equals(singupDto.getPhoneNum())){
-                    if(singupDto.getPwd().equals(singupDto.getPwd2())){
-                        userDto userDto=new userDto(0, singupDto.getEmail(), singupDto.getName(),security.pwdEncoder().encode(singupDto.getPwd()),role.USER.getValue(),singupDto.getPostcode(),singupDto.getAddress(),singupDto.getDetailAddress(),singupDto.getExtraAddress(),singupDto.getPhoneNum());
-                        userDao.save(userDto);
-                        httpSession.removeAttribute("insertPhone");
-                        return utillService.makeJson(userEnums.sucSingUp.getBool(), userEnums.sucSingUp.getMessege());
+                    if((boolean)httpSession.getAttribute("phoneCheck")){
+                        if(singupDto.getPwd().equals(singupDto.getPwd2())){
+                            userDto userDto=new userDto(0, singupDto.getEmail(), singupDto.getName(),security.pwdEncoder().encode(singupDto.getPwd()),role.USER.getValue(),singupDto.getPostcode(),singupDto.getAddress(),singupDto.getDetailAddress(),singupDto.getExtraAddress(),singupDto.getPhoneNum(),false,false);
+                            userDao.save(userDto);
+                            httpSession.removeAttribute("insertPhone");
+                            httpSession.removeAttribute("insertRandNum");
+                            httpSession.removeAttribute("phoneCheck");
+                            return utillService.makeJson(userEnums.sucSingUp.getBool(), userEnums.sucSingUp.getMessege());
+                        }
+                        return utillService.makeJson(userEnums.notConfrimPhone.getBool(), userEnums.notConfrimPhone.getMessege());
                     }
                     return utillService.makeJson(userEnums.notEqualsPwd.getBool(), userEnums.notEqualsPwd.getMessege());
                 }
