@@ -34,4 +34,19 @@ public class userDto {
 
     @Column(name="role",nullable = false,length = 10)
     private String role;
+
+    @Column(name="postcode",nullable = false,length = 10)
+    private String postCode;
+
+    @Column(name="address",nullable = false,length = 40)
+    private String address;
+
+    @Column(name="detailaddress",nullable = false,length = 20)
+    private String detailAddress;
+    
+    @Column(name="extraaddress",nullable = false,length = 10)
+    private String extraAddress;
+    
+    @Column(name="phoneNum",nullable = false,length = 15)
+    private String phoneNum;
 }

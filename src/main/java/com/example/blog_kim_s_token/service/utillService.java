@@ -23,9 +23,9 @@ public class utillService {
         }
         return false;
     }
-    public JSONObject makeJson(boolean result,String messege) {
+    public JSONObject makeJson(boolean bool,String messege) {
         JSONObject jsonObject=new JSONObject();
-        jsonObject.put("result",result);
+        jsonObject.put("bool",bool);
         jsonObject.put("messege", messege);
         return jsonObject;
     } 

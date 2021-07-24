@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.example.blog_kim_s_token.config.security;
+import com.example.blog_kim_s_token.enums.role;
 import com.example.blog_kim_s_token.jwt.jwtService;
 import com.example.blog_kim_s_token.model.jwt.jwtDto;
 import com.example.blog_kim_s_token.model.oauth.naver.naverDto;
@@ -80,10 +81,10 @@ public class naverLoginService   {
                userDto dto=dao.findByEmail(email);
                if(dto==null){
                BCryptPasswordEncoder bCryptPasswordEncoder=security.pwdEncoder();
-                dto=new userDto(0, email,(String)naverDto.getResponse().get("name"),bCryptPasswordEncoder.encode(oauthPwd), "ROLE_USER");  
+                dto=new userDto(0, email,(String)naverDto.getResponse().get("name"),bCryptPasswordEncoder.encode(oauthPwd),role.USER.getValue(),"우편번호","서울 00동","00아파트","00동","01000001111");  
                 dao.save(dto);
                }
-               userDto userDto=new userDto(dto.getId(), dto.getEmail(), dto.getName(),oauthPwd, dto.getRole());
+               userDto userDto=new userDto(dto.getId(), dto.getEmail(), dto.getName(),oauthPwd, dto.getRole(),dto.getPostCode(),dto.getAddress(),dto.getDetailAddress(),dto.getExtraAddress(),dto.getPhoneNum());
                Authentication authentication=jwtService.confrimAuthenticate(userDto);
                jwtService.setSecuritySession(authentication);
 

@@ -4,7 +4,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.example.blog_kim_s_token.model.user.loginDto;
+import com.example.blog_kim_s_token.model.user.singupDto;
 import com.example.blog_kim_s_token.service.userService;
 import com.example.blog_kim_s_token.service.oauthLogin.kakao.kakaoLoginservice;
 import com.example.blog_kim_s_token.service.oauthLogin.naver.naverLoginService;
@@ -31,8 +31,8 @@ public class restcontroller {
         return userService.confrimEmail((String)request.getParameter("email"));
     }
     @RequestMapping("/auth/insertUser")
-    public JSONObject insertUser(@RequestBody loginDto loginDto) {
-        return userService.insertUser(loginDto);
+    public JSONObject insertUser(@RequestBody singupDto singupDto) {
+        return userService.insertUser(singupDto);
     }
     @RequestMapping("/auth/index2")
     public String hello2(@CookieValue(value = "refreshToken", required = false) Cookie rCookie,HttpServletResponse response) {
