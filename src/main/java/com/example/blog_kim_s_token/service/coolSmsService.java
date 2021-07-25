@@ -43,10 +43,10 @@ public class coolSmsService {
     public JSONObject sendMessege(HttpServletRequest request) {
         HttpSession httpSession=request.getSession(true);
         String SmsNum=utillService.GetRandomNum(6);
-        System.out.println("인증번호 발송"+SmsNum+request.getParameter("phoneNum"));
-        httpSession.setAttribute("insertPhone", request.getParameter("phoneNum"));
+        httpSession.setAttribute("insertPhone",request.getParameter("phoneNum"));
         httpSession.setAttribute("insertRandNum", SmsNum);
         httpSession.setAttribute("pheonCheck", false);
+        System.out.println("인증번호 발송"+SmsNum+request.getParameter("phoneNum")+"세션 "+httpSession.getAttribute("insertRandNum"));
         return utillService.makeJson(userEnums.sendSmsNum.getBool(), userEnums.sendSmsNum.getMessege());//sendMessege(coolSmsDto.getPhoneNum(),"인증번호는 "+SmsNum+"입니다");
     }
 }
