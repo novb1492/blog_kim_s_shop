@@ -6,7 +6,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 
-import com.example.blog_kim_s_token.model.coolSms.coolSmsDto;
+
 import com.example.blog_kim_s_token.model.user.singupDto;
 import com.example.blog_kim_s_token.service.coolSmsService;
 import com.example.blog_kim_s_token.service.userService;
@@ -44,14 +44,12 @@ public class restcontroller {
         return userService.confrimPhone((String)request.getParameter("phoneNum"));
     }
     @RequestMapping("/auth/sendSms")
-    public JSONObject sendSms(@RequestBody coolSmsDto coolSmsDto,HttpServletResponse response,HttpSession httpSession) {
-    
-        return coolSmsService.sendMessege(httpSession, coolSmsDto);
+    public JSONObject sendSms(HttpServletRequest request,HttpServletResponse response) {
+        return coolSmsService.sendMessege(request);
     }
     @RequestMapping("/auth/cofrimSmsNum")
-    public JSONObject cofrimSmsNum(HttpServletRequest request,HttpSession httpSession) {
-        System.out.println(httpSession.getAttribute("insertRandNum"));
-        return utillService.cofrimSmsNum((String)request.getParameter("randNum"),(String)httpSession.getAttribute("insertRandNum"), httpSession);
+    public JSONObject cofrimSmsNum(HttpServletRequest request,HttpServletResponse response) {
+        return utillService.cofrimSmsNum(request);
     }
     @RequestMapping("/auth/insertUser")
     public JSONObject insertUser(@RequestBody singupDto singupDto,HttpSession httpSession) {

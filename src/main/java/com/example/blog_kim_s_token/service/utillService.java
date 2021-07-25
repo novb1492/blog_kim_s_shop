@@ -4,6 +4,8 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Random;
 
+
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import com.example.blog_kim_s_token.enums.userEnums;
@@ -41,15 +43,16 @@ public class utillService {
         }
         return num;
     } 
-    public JSONObject cofrimSmsNum(String requestNum,String sessionNum,HttpSession httpSession) {
-        System.out.println("cofrimSmsNum 제출 "+requestNum+"세션"+sessionNum);
-        if(requestNum!=null){
+    public JSONObject cofrimSmsNum(HttpServletRequest request) {
+        HttpSession httpSession=request.getSession();
+        System.out.println("cofrimSmsNum 제출 "+httpSession.getAttribute("insertPhone")+"세션"+httpSession.getAttribute("insertRandNum"));
+       /* if(requestNum!=null){
             if(requestNum.equals(sessionNum)){
                 httpSession.setAttribute("phoneCheck", true);
                 return makeJson(userEnums.EqualsNum.getBool(), userEnums.EqualsNum.getMessege());
             }
             return makeJson(userEnums.notEqualsNum.getBool(), userEnums.notEqualsNum.getMessege());
-        }
+        }*/
         return makeJson(userEnums.nullRequestNum.getBool(), userEnums.nullRequestNum.getMessege());
     }
 

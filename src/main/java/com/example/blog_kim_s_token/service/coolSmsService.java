@@ -2,10 +2,10 @@ package com.example.blog_kim_s_token.service;
 
 import java.util.HashMap;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import com.example.blog_kim_s_token.enums.userEnums;
-import com.example.blog_kim_s_token.model.coolSms.coolSmsDto;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,10 +40,11 @@ public class coolSmsService {
         }
        return utillService.makeJson(userEnums.failSendSmsNum.getBool(), userEnums.failSendSmsNum.getMessege());
     }
-    public JSONObject sendMessege(HttpSession httpSession,coolSmsDto coolSmsDto) {
+    public JSONObject sendMessege(HttpServletRequest request) {
+        HttpSession httpSession=request.getSession(true);
         String SmsNum=utillService.GetRandomNum(6);
-        System.out.println("인증번호 발송"+SmsNum);
-        httpSession.setAttribute("insertPhone", coolSmsDto.getPhoneNum());
+        System.out.println("인증번호 발송"+SmsNum+request.getParameter("phoneNum"));
+        httpSession.setAttribute("insertPhone", request.getParameter("phoneNum"));
         httpSession.setAttribute("insertRandNum", SmsNum);
         httpSession.setAttribute("pheonCheck", false);
         return utillService.makeJson(userEnums.sendSmsNum.getBool(), userEnums.sendSmsNum.getMessege());//sendMessege(coolSmsDto.getPhoneNum(),"인증번호는 "+SmsNum+"입니다");
