@@ -8,7 +8,7 @@ import javax.servlet.http.HttpSession;
 
 
 import com.example.blog_kim_s_token.model.user.singupDto;
-import com.example.blog_kim_s_token.service.coolSmsService;
+
 import com.example.blog_kim_s_token.service.userService;
 import com.example.blog_kim_s_token.service.utillService;
 import com.example.blog_kim_s_token.service.ApiServies.kakao.kakaoLoginservice;
@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import com.example.blog_kim_s_token.service.cofrimService;
 
 @RestController
 public class restcontroller {
@@ -29,7 +30,7 @@ public class restcontroller {
     @Autowired
     private utillService utillService;
     @Autowired
-    private coolSmsService coolSmsService;
+    private cofrimService cofrimService;
     @Autowired
     private naverLoginService naverLoingService;
     @Autowired
@@ -45,7 +46,7 @@ public class restcontroller {
     }
     @RequestMapping("/auth/sendSms")
     public JSONObject sendSms(HttpServletRequest request,HttpServletResponse response) {
-        return coolSmsService.sendMessege(request);
+        return cofrimService.sendMessege(request);
     }
     @RequestMapping("/auth/cofrimSmsNum")
     public JSONObject cofrimSmsNum(HttpServletRequest request,HttpServletResponse response) {

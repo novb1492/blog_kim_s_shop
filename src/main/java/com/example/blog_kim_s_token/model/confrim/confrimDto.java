@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-@Table(name="authentication")
+@Table(name="confrim")
 @Entity
 public class confrimDto {
     @Id

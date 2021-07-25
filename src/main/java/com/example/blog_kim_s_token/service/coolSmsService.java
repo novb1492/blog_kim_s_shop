@@ -2,12 +2,10 @@ package com.example.blog_kim_s_token.service;
 
 import java.util.HashMap;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
+
 
 import com.example.blog_kim_s_token.enums.userEnums;
 import com.nimbusds.jose.shaded.json.JSONObject;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +20,7 @@ public class coolSmsService {
     @Autowired
     private utillService utillService;
 
-    public JSONObject sendMessege(String phoneNum,String messege) {
+    public boolean sendMessege(String phoneNum,String messege) {
        System.out.println(phoneNum+" 문자전송번호");
         Message coolsms = new Message(apikey, apiSecret);
         HashMap<String, String> params = new HashMap<String, String>();
@@ -33,20 +31,11 @@ public class coolSmsService {
         try {
             coolsms.send(params);
             System.out.println("문자 전송 완료");
-            return utillService.makeJson(userEnums.sendSmsNum.getBool(), userEnums.sendSmsNum.getMessege());
+            return true;
         } catch (CoolsmsException e) {
             e.printStackTrace();
             System.out.println("sendMessege 전송 실패");
         }
-       return utillService.makeJson(userEnums.failSendSmsNum.getBool(), userEnums.failSendSmsNum.getMessege());
-    }
-    public JSONObject sendMessege(HttpServletRequest request) {
-        HttpSession httpSession=request.getSession(true);
-        String SmsNum=utillService.GetRandomNum(6);
-        httpSession.setAttribute("insertPhone",request.getParameter("phoneNum"));
-        httpSession.setAttribute("insertRandNum", SmsNum);
-        httpSession.setAttribute("pheonCheck", false);
-        System.out.println("인증번호 발송"+SmsNum+request.getParameter("phoneNum")+"세션 "+httpSession.getAttribute("insertRandNum"));
-        return utillService.makeJson(userEnums.sendSmsNum.getBool(), userEnums.sendSmsNum.getMessege());//sendMessege(coolSmsDto.getPhoneNum(),"인증번호는 "+SmsNum+"입니다");
+       return false;
     }
 }
