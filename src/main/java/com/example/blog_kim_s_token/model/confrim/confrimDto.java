@@ -1,4 +1,6 @@
-package com.example.blog_kim_s_token.model.authentication;
+package com.example.blog_kim_s_token.model.confrim;
+
+import java.sql.Timestamp;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -6,6 +8,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.CreationTimestamp;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,7 +21,7 @@ import lombok.NoArgsConstructor;
 @Data
 @Table(name="authentication")
 @Entity
-public class authenticationDto {
+public class confrimDto {
     @Id
     @Column(name="id",nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,15 +33,25 @@ public class authenticationDto {
     @Column(name="phoneNum",length = 15)
     private String phoneNum;
 
-    @Column(name="emailtempnum",nullable = false,length = 6)
+    @Column(name="emailtempnum",length = 6)
     private String emailTempNum;
 
-    @Column(name="phoneTempNum",nullable = false,length = 6)
+    @Column(name="phoneTempNum",length = 6)
     private String phoneTempNum;
 
-    @Column(name="emailcheck",nullable = false,length = 4)
-    private String emailCheck;
+    @Column(name="emailcheck",length = 1)
+    @ColumnDefault("0")
+    private int emailCheck;
 
-    @Column(name="phonecheck",nullable = false,length = 4)
-    private String phoneCheck;
+    @Column(name="phonecheck",length = 1)
+    @ColumnDefault("0")
+    private int phoneCheck;
+
+    @Column(name="requesttime",nullable = false,length = 4)
+    @ColumnDefault("0")
+    private int requestTime;
+
+    @Column(name="created")
+    @CreationTimestamp  
+    private Timestamp created;
 }
