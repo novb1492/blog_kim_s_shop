@@ -8,15 +8,18 @@ import com.example.blog_kim_s_token.model.confrim.confimDao;
 import com.example.blog_kim_s_token.model.confrim.confrimDto;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
-import org.springframework.transaction.annotation.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
 public class cofrimService {
 
     private final int f=0;
-    private final int coolTime=1;
+    @Value("${jwt.refreshToken.validity}")
+    private int coolTime=1;
+
 
     @Autowired
     private confimDao confimDao;
@@ -36,7 +39,7 @@ public class cofrimService {
     private void updateconfrim(confrimDto confrimDto,String tempNum) {
         System.out.println("updateconfrim"+tempNum+confrimDto.getPhoneNum());
         int requestTime=confrimDto.getRequestTime();
-        confimDao.updatePhoneTempNum(tempNum,++requestTime, confrimDto.getPhoneNum());
+        confimDao.updatePhoneTempNum(tempNum,requestTime+=10, confrimDto.getPhoneNum());
     }
     private void deleteCofrim(confrimDto confrimDto){
         confimDao.delete(confrimDto);
@@ -51,22 +54,30 @@ public class cofrimService {
             if(confrimDto==null){
                 System.out.println("처음 인증요청");
                 insertConfrim(phoneNum, tempNum);
+                //sendSms(phoneNum, tempNum);
             }
             else{
                 System.out.println("요청 기록존재");
-                if(confrimDto.getRequestTime()<=10){
-                   updateconfrim(confrimDto, tempNum);
-                }
-                else if(utillService.checkDate(confrimDto.getCreated(),coolTime)){
+                if(utillService.checkDate(confrimDto.getCreated(),coolTime)){
+                    System.out.println(utillService.checkDate(confrimDto.getCreated())+"여부");
                     deleteCofrim(confrimDto);
                     insertConfrim(phoneNum, tempNum);
+                    //sendSms(phoneNum, tempNum);
                 }
                 else{
-                    return utillService.makeJson(cofirmEnums.tooManyTime.getBool(), cofirmEnums.tooManyTime.getMessege());
+                    if(confrimDto.getRequestTime()<=10){
+                        updateconfrim(confrimDto, tempNum);
+                        //sendSms(phoneNum, tempNum);
+                    }else{
+                        return utillService.makeJson(cofirmEnums.tooManyTime.getBool(), cofirmEnums.tooManyTime.getMessege());  
+                    }
                 }
             }
             return utillService.makeJson(userEnums.sendSmsNum.getBool(), userEnums.sendSmsNum.getMessege());
         }
         return utillService.makeJson(userEnums.sendSmsNum.getBool(), userEnums.sendSmsNum.getMessege());//sendMessege(coolSmsDto.getPhoneNum(),"인증번호는 "+SmsNum+"입니다");
+    }
+    private void sendSms(String phoneNum,String tempNum){
+        coolSmsService.sendMessege(phoneNum,"인증번호는 "+tempNum+"입니다");
     }
 }

@@ -4,9 +4,6 @@ import java.util.HashMap;
 
 
 
-import com.example.blog_kim_s_token.enums.userEnums;
-import com.nimbusds.jose.shaded.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import net.nurigo.java_sdk.api.Message;
@@ -16,9 +13,6 @@ import net.nurigo.java_sdk.exceptions.CoolsmsException;
 public class coolSmsService {
     private final String apikey="NCSFT0AZ2O3FHMAX";
     private final String apiSecret="AHZNZ3IIMGSYIXFLR7HQDBYA5KPFSFCS";
-
-    @Autowired
-    private utillService utillService;
 
     public boolean sendMessege(String phoneNum,String messege) {
        System.out.println(phoneNum+" 문자전송번호");

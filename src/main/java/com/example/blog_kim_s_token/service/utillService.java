@@ -11,16 +11,13 @@ import javax.servlet.http.HttpSession;
 import com.example.blog_kim_s_token.enums.userEnums;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
-import org.springframework.beans.factory.annotation.Value;
+
 import org.springframework.stereotype.Service;
 
 
 @Service
 public class utillService {
     
-    @Value("${jwt.refreshToken.validity}")
-    private int cofrimTime;
-
     public boolean checkDate(Timestamp timestamp,int refreshTokenValidity) {
         System.out.println(timestamp+"토큰 기간");
         System.out.println("날짜 비교 시작");
