@@ -5,7 +5,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import com.example.blog_kim_s_token.enums.userEnums;
+
 import com.example.blog_kim_s_token.model.coolSms.coolSmsDto;
 import com.example.blog_kim_s_token.model.user.singupDto;
 import com.example.blog_kim_s_token.service.coolSmsService;
@@ -29,6 +29,8 @@ public class restcontroller {
     @Autowired
     private utillService utillService;
     @Autowired
+    private coolSmsService coolSmsService;
+    @Autowired
     private naverLoginService naverLoingService;
     @Autowired
     private kakaoLoginservice kakaoLoginservice;
@@ -43,12 +45,8 @@ public class restcontroller {
     }
     @RequestMapping("/auth/sendSms")
     public JSONObject sendSms(@RequestBody coolSmsDto coolSmsDto,HttpServletResponse response,HttpSession httpSession) {
-        String SmsNum=utillService.GetRandomNum(6);
-        System.out.println("인증번호 발송"+SmsNum);
-        httpSession.setAttribute("insertPhone", coolSmsDto.getPhoneNum());
-        httpSession.setAttribute("insertRandNum", SmsNum);
-        httpSession.setAttribute("pheonCheck", false);
-        return utillService.makeJson(userEnums.sendSmsNum.getBool(), userEnums.sendSmsNum.getMessege());//coolSmsService.sendMessege(coolSmsDto.getPhoneNum(),"인증번호는 "+SmsNum+"입니다");
+    
+        return coolSmsService.sendMessege(httpSession, coolSmsDto);
     }
     @RequestMapping("/auth/cofrimSmsNum")
     public JSONObject cofrimSmsNum(HttpServletRequest request,HttpSession httpSession) {
@@ -91,5 +89,6 @@ public class restcontroller {
         System.out.println("admin 입장");
         return "admin";
     }
+
     
 }
