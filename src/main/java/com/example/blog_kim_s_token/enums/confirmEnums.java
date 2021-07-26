@@ -1,6 +1,5 @@
 package com.example.blog_kim_s_token.enums;
 
-import org.aspectj.weaver.ast.Not;
 
 public enum confirmEnums {
 
