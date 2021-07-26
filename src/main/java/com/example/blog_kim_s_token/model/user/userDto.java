@@ -51,9 +51,9 @@ public class userDto {
     private String phoneNum;
 
     @Column(name="emailcheck",nullable = false,length = 4)
-    private boolean emailCheck;
+    private int emailCheck;
 
     @Column(name="phonecheck",nullable = false,length = 4)
-    private boolean phoneCheck;
+    private int phoneCheck;
 
 }

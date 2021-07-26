@@ -12,6 +12,7 @@ public enum confirmEnums {
     notEqulsPhoneNum("핸드폰번호가 변조 되었습니다",false),
     notEqulsTempNum("인증번호가 일치 하지 않습니다",false),
     overTime("인증시간이 초과되었습니다",false),
+    notTruePhoneCheck("인증되지 않은 핸드폰 번호입니다",false),
     EqulsTempNum("인증 되었습니다",true);
 
     private final String messege;

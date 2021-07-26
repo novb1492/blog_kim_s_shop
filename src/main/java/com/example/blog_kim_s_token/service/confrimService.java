@@ -34,7 +34,7 @@ public class confrimService {
     @Autowired
     private userService userService;
 
-    private confrimDto findConfrim(String phoneNum) {
+    public confrimDto findConfrim(String phoneNum) {
         return confimDao.findByPhoneNum(phoneNum);
     }
     private void insertConfrim(String phoneNum,String tempNum){
@@ -45,7 +45,7 @@ public class confrimService {
         int requestTime=confrimDto.getRequestTime();
         confimDao.updatePhoneTempNum(tempNum,requestTime+=1,utillService.getNowTimestamp(),confrimDto.getPhoneNum());
     }
-    private void deleteCofrim(confrimDto confrimDto){
+    public void deleteCofrim(confrimDto confrimDto){
         confimDao.delete(confrimDto);
     }
     private void sendSms(String phoneNum,String tempNum){
@@ -89,7 +89,7 @@ public class confrimService {
         if(confrimDto!=null){
             if(confrimDto.getPhoneNum().equals(phoneCofrimDto.getPhoneNum())){
                 if(utillService.checkTime(confrimDto.getCreated(),overTime)==false){
-                    if(confrimDto.getPhoneTempNum().equals(phoneCofrimDto.getTempNum())){
+                    if(confrimDto.getPhoneTempNum().equals(phoneCofrimDto.getTempNum().trim())){
                         confimDao.updatePhoneCheckTrue(t, phoneCofrimDto.getPhoneNum());
                         return utillService.makeJson(confirmEnums.EqulsTempNum.getBool(), confirmEnums.EqulsTempNum.getMessege());
                     }
