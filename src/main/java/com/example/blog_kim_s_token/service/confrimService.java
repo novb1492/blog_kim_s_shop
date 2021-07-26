@@ -2,10 +2,10 @@ package com.example.blog_kim_s_token.service;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.example.blog_kim_s_token.enums.cofirmEnums;
-import com.example.blog_kim_s_token.enums.userEnums;
+import com.example.blog_kim_s_token.enums.confirmEnums;
 import com.example.blog_kim_s_token.model.confrim.confimDao;
 import com.example.blog_kim_s_token.model.confrim.confrimDto;
+import com.example.blog_kim_s_token.model.confrim.phoneCofrimDto;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
 
@@ -14,12 +14,16 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
-public class cofrimService {
+public class confrimService {
 
-    private final int f=0;
     @Value("${confrim.coolTime}")
     private int coolTime;
+    
+    @Value("${confrim.overTime}")
+    private int overTime;
 
+    private final int f=0;
+    private final int t=1;
 
     @Autowired
     private confimDao confimDao;
@@ -51,13 +55,12 @@ public class cofrimService {
         System.out.println("sendMessege 입장"+request.getParameter("phoneNum"));
         String phoneNum=request.getParameter("phoneNum");
         String tempNum=utillService.GetRandomNum(6);
-
         if(userService.confrimPhone(phoneNum)){
             confrimDto confrimDto=findConfrim(phoneNum);
             if(confrimDto==null){
                 System.out.println("처음 인증요청"); 
                 insertConfrim(phoneNum, tempNum);
-                sendSms(phoneNum, tempNum);
+                //sendSms(phoneNum, tempNum);
             }
             else{
                 System.out.println("요청 기록존재");
@@ -65,19 +68,37 @@ public class cofrimService {
                     System.out.println(utillService.checkDate(confrimDto.getCreated())+"여부");
                     deleteCofrim(confrimDto);
                     insertConfrim(phoneNum, tempNum);
-                    sendSms(phoneNum, tempNum);
+                    //sendSms(phoneNum, tempNum);
                 }
                 else{
                     if(confrimDto.getRequestTime()<=10){
                         updateconfrim(confrimDto, tempNum);
-                        sendSms(phoneNum, tempNum);
+                        //sendSms(phoneNum, tempNum);
                     }else{
-                        return utillService.makeJson(cofirmEnums.tooManyTime.getBool(), cofirmEnums.tooManyTime.getMessege());  
+                        return utillService.makeJson(confirmEnums.tooManyTime.getBool(), confirmEnums.tooManyTime.getMessege());  
                     }
                 }
             }
-            return utillService.makeJson(userEnums.sendSmsNum.getBool(), userEnums.sendSmsNum.getMessege());
+            return utillService.makeJson(confirmEnums.sendSmsNum.getBool(), confirmEnums.sendSmsNum.getMessege());
         }
-        return utillService.makeJson(userEnums.sendSmsNum.getBool(), userEnums.sendSmsNum.getMessege());//sendMessege(coolSmsDto.getPhoneNum(),"인증번호는 "+SmsNum+"입니다");
+        return utillService.makeJson(confirmEnums.alreadyPhone.getBool(), confirmEnums.alreadyPhone.getMessege());//sendMessege(coolSmsDto.getPhoneNum(),"인증번호는 "+SmsNum+"입니다");
+    }
+    public JSONObject cofrimSmsNum(phoneCofrimDto phoneCofrimDto) {
+        System.out.println("cofrimSmsNum 제출 "+phoneCofrimDto.getTempNum()+phoneCofrimDto.getPhoneNum());
+        confrimDto confrimDto=confimDao.findByPhoneNum(phoneCofrimDto.getPhoneNum());
+        if(confrimDto!=null){
+            if(confrimDto.getPhoneNum().equals(phoneCofrimDto.getPhoneNum())){
+                if(utillService.checkTime(confrimDto.getCreated(),overTime)==false){
+                    if(confrimDto.getPhoneTempNum().equals(phoneCofrimDto.getTempNum())){
+                        confimDao.updatePhoneCheckTrue(t, phoneCofrimDto.getPhoneNum());
+                        return utillService.makeJson(confirmEnums.EqulsTempNum.getBool(), confirmEnums.EqulsTempNum.getMessege());
+                    }
+                    return utillService.makeJson(confirmEnums.notEqulsTempNum.getBool(), confirmEnums.notEqulsTempNum.getMessege());
+                }
+               return utillService.makeJson(confirmEnums.overTime.getBool(), confirmEnums.overTime.getMessege());
+            }
+           return utillService.makeJson(confirmEnums.notEqulsPhoneNum.getBool(), confirmEnums.notEqulsPhoneNum.getMessege());
+        }
+        return utillService.makeJson(confirmEnums.nullPhoneNumInDb.getBool(),confirmEnums.nullPhoneNumInDb.getMessege());
     }
 }

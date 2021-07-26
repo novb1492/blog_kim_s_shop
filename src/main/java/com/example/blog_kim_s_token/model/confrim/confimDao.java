@@ -17,4 +17,9 @@ public interface confimDao extends JpaRepository<confrimDto,Integer> {
     @Transactional
     @Query(value = "UPDATE confrim c SET phone_temp_num=?1,requesttime=?2,created=?3 WHERE c.phone_num=?4",nativeQuery = true)
     void updatePhoneTempNum(String tempNum,int requestTime,Timestamp timestamp,String phoneNum);
+
+    @Modifying
+    @Transactional
+    @Query(value = "UPDATE confrim c SET c.phonecheck=?1  WHERE c.phone_num=?2",nativeQuery = true)
+    void updatePhoneCheckTrue(int one,String phoneNum);
 }

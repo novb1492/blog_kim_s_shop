@@ -5,12 +5,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-
-
+import com.example.blog_kim_s_token.model.confrim.phoneCofrimDto;
 import com.example.blog_kim_s_token.model.user.singupDto;
-
+import com.example.blog_kim_s_token.service.confrimService;
 import com.example.blog_kim_s_token.service.userService;
-import com.example.blog_kim_s_token.service.utillService;
 import com.example.blog_kim_s_token.service.ApiServies.kakao.kakaoLoginservice;
 import com.example.blog_kim_s_token.service.ApiServies.naver.naverLoginService;
 import com.nimbusds.jose.shaded.json.JSONObject;
@@ -20,7 +18,7 @@ import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.example.blog_kim_s_token.service.cofrimService;
+
 
 @RestController
 public class restcontroller {
@@ -28,9 +26,7 @@ public class restcontroller {
     @Autowired
     private userService userService;
     @Autowired
-    private utillService utillService;
-    @Autowired
-    private cofrimService cofrimService;
+    private confrimService confrimService;
     @Autowired
     private naverLoginService naverLoingService;
     @Autowired
@@ -46,11 +42,11 @@ public class restcontroller {
     }
     @RequestMapping("/auth/sendSms")
     public JSONObject sendSms(HttpServletRequest request,HttpServletResponse response) {
-        return cofrimService.sendMessege(request);
+        return confrimService.sendMessege(request);
     }
     @RequestMapping("/auth/cofrimSmsNum")
-    public JSONObject cofrimSmsNum(HttpServletRequest request,HttpServletResponse response) {
-        return utillService.cofrimSmsNum(request);
+    public JSONObject cofrimSmsNum(@RequestBody phoneCofrimDto phoneCofrimDto,HttpServletResponse response) {
+        return confrimService.cofrimSmsNum(phoneCofrimDto);
     }
     @RequestMapping("/auth/insertUser")
     public JSONObject insertUser(@RequestBody singupDto singupDto,HttpSession httpSession) {

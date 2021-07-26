@@ -3,6 +3,7 @@ package com.example.blog_kim_s_token.service;
 import javax.servlet.http.HttpSession;
 
 import com.example.blog_kim_s_token.config.security;
+import com.example.blog_kim_s_token.enums.confirmEnums;
 import com.example.blog_kim_s_token.enums.role;
 import com.example.blog_kim_s_token.enums.userEnums;
 import com.example.blog_kim_s_token.model.user.singupDto;
@@ -57,8 +58,8 @@ public class userService {
                 }
               return utillService.makeJson(userEnums.notEqualsPhone.getBool(),userEnums.notEqualsPhone.getMessege());
             }
-           return utillService.makeJson(userEnums.alreadyPhone.getBool(),userEnums.alreadyPhone.getMessege());
+           return utillService.makeJson(confirmEnums.alreadyPhone.getBool(),confirmEnums.alreadyPhone.getMessege());
         }
-        return utillService.makeJson(userEnums.alreadyEmail.getBool(), userEnums.alreadyEmail.getMessege());
+        return utillService.makeJson(confirmEnums.alreadyEmail.getBool(), confirmEnums.alreadyEmail.getMessege());
     }
 }

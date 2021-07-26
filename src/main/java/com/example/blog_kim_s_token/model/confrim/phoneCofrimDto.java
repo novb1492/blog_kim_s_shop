@@ -8,6 +8,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 public class phoneCofrimDto {
-    private int phoneNum;
+    private String phoneNum;
     private String tempNum;
 }

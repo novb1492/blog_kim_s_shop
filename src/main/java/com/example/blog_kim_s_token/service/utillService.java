@@ -5,10 +5,7 @@ import java.time.LocalDateTime;
 import java.util.Random;
 
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
-import com.example.blog_kim_s_token.enums.userEnums;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
 
@@ -26,6 +23,18 @@ public class utillService {
         LocalDateTime today= LocalDateTime.now(); 
         if(timestamp2.isBefore(today)){
             System.out.println("날짜가 지났습니다");
+           return true;
+        }
+        return false;
+    }
+    public boolean checkTime(Timestamp timestamp,int totalTokenTime) {
+        System.out.println(timestamp+"인증시간");
+        System.out.println("날짜 비교 시작");
+        LocalDateTime timestamp2=timestamp.toLocalDateTime();
+        timestamp2=timestamp2.plusMinutes(totalTokenTime);
+        LocalDateTime today= LocalDateTime.now(); 
+        if(timestamp2.isBefore(today)){
+            System.out.println("시간이 지났습니다");
            return true;
         }
         return false;
@@ -60,17 +69,6 @@ public class utillService {
         }
         return num;
     } 
-    public JSONObject cofrimSmsNum(HttpServletRequest request) {
-        HttpSession httpSession=request.getSession();
-        System.out.println("cofrimSmsNum 제출 "+httpSession.getAttribute("insertPhone")+"세션"+httpSession.getAttribute("insertRandNum"));
-       /* if(requestNum!=null){
-            if(requestNum.equals(sessionNum)){
-                httpSession.setAttribute("phoneCheck", true);
-                return makeJson(userEnums.EqualsNum.getBool(), userEnums.EqualsNum.getMessege());
-            }
-            return makeJson(userEnums.notEqualsNum.getBool(), userEnums.notEqualsNum.getMessege());
-        }*/
-        return makeJson(userEnums.nullRequestNum.getBool(), userEnums.nullRequestNum.getMessege());
-    }
+
 
 }
