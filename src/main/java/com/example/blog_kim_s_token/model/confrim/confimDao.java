@@ -1,5 +1,7 @@
 package com.example.blog_kim_s_token.model.confrim;
 
+import java.sql.Timestamp;
+
 import javax.transaction.Transactional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,6 +15,6 @@ public interface confimDao extends JpaRepository<confrimDto,Integer> {
 
     @Modifying
     @Transactional
-    @Query(value = "UPDATE confrim c SET phone_temp_num=?1,requesttime=?2 WHERE c.phone_num=?3",nativeQuery = true)
-    void updatePhoneTempNum(String tempNum,int requestTime,String phoneNum);
+    @Query(value = "UPDATE confrim c SET phone_temp_num=?1,requesttime=?2,created=?3 WHERE c.phone_num=?4",nativeQuery = true)
+    void updatePhoneTempNum(String tempNum,int requestTime,Timestamp timestamp,String phoneNum);
 }
