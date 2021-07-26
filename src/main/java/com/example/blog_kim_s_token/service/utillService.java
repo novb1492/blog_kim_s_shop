@@ -34,7 +34,7 @@ public class utillService {
         System.out.println(timestamp+"인증시간");
         System.out.println("날짜 비교 시작");
         LocalDateTime timestamp2=timestamp.toLocalDateTime();
-        timestamp2=timestamp2.plusSeconds(1);
+        timestamp2=timestamp2.plusSeconds(10);
         LocalDateTime today= LocalDateTime.now(); 
         if(timestamp2.isBefore(today)){
             System.out.println("시간이 지났습니다");

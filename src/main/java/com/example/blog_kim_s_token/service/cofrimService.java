@@ -17,8 +17,8 @@ import org.springframework.stereotype.Service;
 public class cofrimService {
 
     private final int f=0;
-    @Value("${jwt.refreshToken.validity}")
-    private int coolTime=1;
+    @Value("${confrim.coolTime}")
+    private int coolTime;
 
 
     @Autowired
@@ -44,6 +44,9 @@ public class cofrimService {
     private void deleteCofrim(confrimDto confrimDto){
         confimDao.delete(confrimDto);
     }
+    private void sendSms(String phoneNum,String tempNum){
+        coolSmsService.sendMessege(phoneNum,"인증번호는 "+tempNum+"입니다");
+    }
     public JSONObject sendMessege(HttpServletRequest request) {
         System.out.println("sendMessege 입장"+request.getParameter("phoneNum"));
         String phoneNum=request.getParameter("phoneNum");
@@ -52,9 +55,9 @@ public class cofrimService {
         if(userService.confrimPhone(phoneNum)){
             confrimDto confrimDto=findConfrim(phoneNum);
             if(confrimDto==null){
-                System.out.println("처음 인증요청");
+                System.out.println("처음 인증요청"); 
                 insertConfrim(phoneNum, tempNum);
-                //sendSms(phoneNum, tempNum);
+                sendSms(phoneNum, tempNum);
             }
             else{
                 System.out.println("요청 기록존재");
@@ -62,12 +65,12 @@ public class cofrimService {
                     System.out.println(utillService.checkDate(confrimDto.getCreated())+"여부");
                     deleteCofrim(confrimDto);
                     insertConfrim(phoneNum, tempNum);
-                    //sendSms(phoneNum, tempNum);
+                    sendSms(phoneNum, tempNum);
                 }
                 else{
                     if(confrimDto.getRequestTime()<=10){
                         updateconfrim(confrimDto, tempNum);
-                        //sendSms(phoneNum, tempNum);
+                        sendSms(phoneNum, tempNum);
                     }else{
                         return utillService.makeJson(cofirmEnums.tooManyTime.getBool(), cofirmEnums.tooManyTime.getMessege());  
                     }
@@ -76,8 +79,5 @@ public class cofrimService {
             return utillService.makeJson(userEnums.sendSmsNum.getBool(), userEnums.sendSmsNum.getMessege());
         }
         return utillService.makeJson(userEnums.sendSmsNum.getBool(), userEnums.sendSmsNum.getMessege());//sendMessege(coolSmsDto.getPhoneNum(),"인증번호는 "+SmsNum+"입니다");
-    }
-    private void sendSms(String phoneNum,String tempNum){
-        coolSmsService.sendMessege(phoneNum,"인증번호는 "+tempNum+"입니다");
     }
 }
