@@ -44,9 +44,7 @@ public class utillService {
     }
     public Timestamp getNowTimestamp() {
         System.out.println("getNowTimestamp 현재 시간 가져오기");
-        Timestamp timestamp=new Timestamp(System.currentTimeMillis());
-        System.out.println(timestamp);
-        return timestamp;
+        return new Timestamp(System.currentTimeMillis());
     }
     public JSONObject makeJson(boolean bool,String messege) {
         JSONObject jsonObject=new JSONObject();
