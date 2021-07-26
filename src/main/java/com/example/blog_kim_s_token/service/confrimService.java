@@ -81,7 +81,7 @@ public class confrimService {
             }
             return utillService.makeJson(confirmEnums.sendSmsNum.getBool(), confirmEnums.sendSmsNum.getMessege());
         }
-        return utillService.makeJson(confirmEnums.alreadyPhone.getBool(), confirmEnums.alreadyPhone.getMessege());//sendMessege(coolSmsDto.getPhoneNum(),"인증번호는 "+SmsNum+"입니다");
+        return utillService.makeJson(confirmEnums.alreadyPhone.getBool(), confirmEnums.alreadyPhone.getMessege());
     }
     public JSONObject cofrimSmsNum(phoneCofrimDto phoneCofrimDto) {
         System.out.println("cofrimSmsNum 제출 "+phoneCofrimDto.getTempNum()+phoneCofrimDto.getPhoneNum());
