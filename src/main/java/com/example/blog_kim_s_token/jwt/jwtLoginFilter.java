@@ -3,6 +3,7 @@ package com.example.blog_kim_s_token.jwt;
 import java.io.IOException;
 
 import javax.servlet.FilterChain;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -67,7 +68,9 @@ public class jwtLoginFilter extends UsernamePasswordAuthenticationFilter {
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,AuthenticationException failed) throws IOException, ServletException {
         System.out.println("로그인 실패");
-        request.getRequestDispatcher("/login").forward(request, response);
+        System.out.println(failed.getCause()+failed.getLocalizedMessage()+failed.getStackTrace()+failed.getSuppressed());
+        RequestDispatcher dp=request.getRequestDispatcher("/login");
+		dp.forward(request, response);
 
     }
 }

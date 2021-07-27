@@ -66,20 +66,11 @@ public class userService {
     }
     public JSONObject doLogin() {
         try {
-            if(SecurityContextHolder.getContext().getAuthentication().getName()!=null){
-                return sucLogin();
-            }else{
-                throw new Exception();
-            }
+            String email=SecurityContextHolder.getContext().getAuthentication().getName();
+            System.out.println("시큐리티 확인"+email);
+            return utillService.makeJson(userEnums.sucLogin.getBool(),userEnums.sucLogin.getMessege());
         } catch (Exception e) {
-            System.out.println("로그인 실패");
-            return failLogin();
+            return utillService.makeJson(userEnums.failLogin.getBool(),userEnums.failLogin.getMessege());
         }
-    }
-    private JSONObject sucLogin() {
-        return utillService.makeJson(userEnums.sucLogin.getBool(),userEnums.sucLogin.getMessege());
-    }
-    private JSONObject failLogin() {
-        return utillService.makeJson(userEnums.failLogin.getBool(),userEnums.failLogin.getMessege());
     }
 }
