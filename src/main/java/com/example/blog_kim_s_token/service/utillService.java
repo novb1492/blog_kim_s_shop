@@ -2,6 +2,7 @@ package com.example.blog_kim_s_token.service;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Random;
 
 
@@ -59,6 +60,13 @@ public class utillService {
         JSONObject jsonObject=new JSONObject();
         jsonObject.put("bool",bool);
         jsonObject.put("messege", messege);
+        return jsonObject;
+    }
+    public JSONObject makeJson(boolean bool,String messege,List<String>list) {
+        JSONObject jsonObject=new JSONObject();
+        jsonObject.put("bool",bool);
+        jsonObject.put("messege", messege);
+        jsonObject.put("errorPart",list);
         return jsonObject;
     }
     public String GetRandomNum(int end) {

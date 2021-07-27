@@ -1,5 +1,8 @@
 package com.example.blog_kim_s_token.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.example.blog_kim_s_token.service.utillService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
@@ -19,12 +22,14 @@ public class errorRestController {
     public JSONObject processValidationError(MethodArgumentNotValidException exception) {
         System.out.println("processValidationError 유효성 검사 실패");
         BindingResult bindingResult = exception.getBindingResult();
-
         StringBuilder builder = new StringBuilder();
+        List<String>list=new ArrayList<>();
+        
         for (FieldError fieldError : bindingResult.getFieldErrors()) {
             builder.append(fieldError.getDefaultMessage());
+            list.add(fieldError.getField());
         }
 
-        return utillService.makeJson(false, builder.toString());
+        return utillService.makeJson(false, builder.toString(),list);
     }
 }
