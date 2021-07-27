@@ -19,8 +19,7 @@ import org.springframework.stereotype.Service;
 public class userService {
 
     private final int yes=1;
-    private final int no=0;
-
+ 
     @Autowired
     private userDao userDao;
     @Autowired
@@ -52,7 +51,7 @@ public class userService {
             if(confrimDto.getPhoneNum().equals(singupDto.getPhoneNum())){
                 if(confrimDto.getPhoneCheck()==yes){
                     if(confrimEmail(singupDto.getEmail())){
-                        userDao.save(new userDto(0, singupDto.getEmail(), singupDto.getName(),security.pwdEncoder().encode(singupDto.getPwd()), role.USER.getValue(),singupDto.getPostcode(),singupDto.getAddress(), singupDto.getDetailAddress(), singupDto.getExtraAddress(), singupDto.getPhoneNum(),no, yes));
+                        userDao.save(new userDto(singupDto.getEmail(), singupDto.getName(),security.pwdEncoder().encode(singupDto.getPwd()), role.USER.getValue(),singupDto.getPostcode(),singupDto.getAddress(), singupDto.getDetailAddress(), singupDto.getExtraAddress(), singupDto.getPhoneNum()));
                         confrimService.deleteCofrim(confrimDto);
                         return utillService.makeJson(userEnums.sucSingUp.getBool(),userEnums.sucSingUp.getMessege());
                     }

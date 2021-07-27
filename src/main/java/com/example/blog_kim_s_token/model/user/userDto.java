@@ -7,12 +7,14 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.ColumnDefault;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Data
 @Table(name="user")
 @Entity
@@ -50,10 +52,32 @@ public class userDto {
     @Column(name="phoneNum",nullable = false,length = 15)
     private String phoneNum;
 
-    @Column(name="emailcheck",nullable = false,length = 4)
+    @Column(name="emailcheck")
+    @ColumnDefault("0")
     private int emailCheck;
 
-    @Column(name="phonecheck",nullable = false,length = 4)
+    @Column(name="phonecheck")
+    @ColumnDefault("0")
     private int phoneCheck;
+
+    @Column(name="failLoginTime")
+    @ColumnDefault("0")
+    private int failLoginTime;
+
+    @Column(name="failLogin")
+    @ColumnDefault("0")
+    private int failLogin;
+
+    public userDto(String email,String name,String pwd,String role,String postCode,String address,String detailAddress,String extraAddress,String phoneNum){
+        this.email=email;
+        this.name=name;
+        this.pwd=pwd;
+        this.role=role;
+        this.postCode=postCode;
+        this.address=address;
+        this.detailAddress=detailAddress;
+        this.extraAddress=extraAddress;
+        this.phoneNum=phoneNum;
+    }
 
 }
