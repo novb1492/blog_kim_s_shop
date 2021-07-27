@@ -3,6 +3,7 @@ package com.example.blog_kim_s_token.controller;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 
 import com.example.blog_kim_s_token.model.confrim.phoneCofrimDto;
 import com.example.blog_kim_s_token.model.user.singupDto;
@@ -44,11 +45,11 @@ public class restcontroller {
         return confrimService.sendMessege(request);
     }
     @RequestMapping("/auth/cofrimSmsNum")
-    public JSONObject cofrimSmsNum(@RequestBody phoneCofrimDto phoneCofrimDto,HttpServletResponse response) {
+    public JSONObject cofrimSmsNum(@Valid @RequestBody phoneCofrimDto phoneCofrimDto,HttpServletResponse response) {
         return confrimService.cofrimSmsNum(phoneCofrimDto);
     }
     @RequestMapping("/auth/insertUser")
-    public JSONObject insertUser(@RequestBody singupDto singupDto) {
+    public JSONObject insertUser(@Valid @RequestBody singupDto singupDto) {
         return userService.insertUser(singupDto);
     }
     @RequestMapping("/auth/index2")

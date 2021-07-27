@@ -55,33 +55,36 @@ public class confrimService {
         System.out.println("sendMessege 입장"+request.getParameter("phoneNum"));
         String phoneNum=request.getParameter("phoneNum");
         String tempNum=utillService.GetRandomNum(6);
-        if(userService.confrimPhone(phoneNum)){
-            confrimDto confrimDto=findConfrim(phoneNum);
-            if(confrimDto==null){
-                System.out.println("처음 인증요청"); 
-                insertConfrim(phoneNum, tempNum);
-                //sendSms(phoneNum, tempNum);
-            }
-            else{
-                System.out.println("요청 기록존재");
-                if(utillService.checkDate(confrimDto.getCreated(),coolTime)){
-                    System.out.println(utillService.checkDate(confrimDto.getCreated())+"여부");
-                    deleteCofrim(confrimDto);
+        if(phoneNum!=null){
+            if(userService.confrimPhone(phoneNum)){
+                confrimDto confrimDto=findConfrim(phoneNum);
+                if(confrimDto==null){
+                    System.out.println("처음 인증요청"); 
                     insertConfrim(phoneNum, tempNum);
                     //sendSms(phoneNum, tempNum);
                 }
                 else{
-                    if(confrimDto.getRequestTime()<=10){
-                        updateconfrim(confrimDto, tempNum);
+                    System.out.println("요청 기록존재");
+                    if(utillService.checkDate(confrimDto.getCreated(),coolTime)){
+                        System.out.println(utillService.checkDate(confrimDto.getCreated())+"여부");
+                        deleteCofrim(confrimDto);
+                        insertConfrim(phoneNum, tempNum);
                         //sendSms(phoneNum, tempNum);
-                    }else{
-                        return utillService.makeJson(confirmEnums.tooManyTime.getBool(), confirmEnums.tooManyTime.getMessege());  
+                    }
+                    else{
+                        if(confrimDto.getRequestTime()<=10){
+                            updateconfrim(confrimDto, tempNum);
+                            //sendSms(phoneNum, tempNum);
+                        }else{
+                            return utillService.makeJson(confirmEnums.tooManyTime.getBool(), confirmEnums.tooManyTime.getMessege());  
+                        }
                     }
                 }
+                return utillService.makeJson(confirmEnums.sendSmsNum.getBool(), confirmEnums.sendSmsNum.getMessege());
             }
-            return utillService.makeJson(confirmEnums.sendSmsNum.getBool(), confirmEnums.sendSmsNum.getMessege());
+            return utillService.makeJson(confirmEnums.alreadyPhone.getBool(), confirmEnums.alreadyPhone.getMessege());
         }
-        return utillService.makeJson(confirmEnums.alreadyPhone.getBool(), confirmEnums.alreadyPhone.getMessege());
+        return utillService.makeJson(confirmEnums.nullPhoneNum.getBool(), confirmEnums.nullPhoneNum.getMessege());
     }
     public JSONObject cofrimSmsNum(phoneCofrimDto phoneCofrimDto) {
         System.out.println("cofrimSmsNum 제출 "+phoneCofrimDto.getTempNum()+phoneCofrimDto.getPhoneNum());

@@ -8,6 +8,7 @@ public enum confirmEnums {
     sendSmsNum("인증번호가 발송되었습니다",true),
     timeOut("인증시간이 만료되었습니다",false),
     tooManyTime("하루 10회 제한입니다",false),
+    nullPhoneNum("핸드폰 번호가 입력되지 않았습니다",false),
     nullPhoneNumInDb("인증번호 요청기록이 존재하지 않습니다",false),
     notEqulsPhoneNum("핸드폰번호가 변조 되었습니다",false),
     notEqulsTempNum("인증번호가 일치 하지 않습니다",false),
