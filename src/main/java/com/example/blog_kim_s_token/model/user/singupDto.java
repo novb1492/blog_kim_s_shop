@@ -12,23 +12,23 @@ import lombok.NoArgsConstructor;
 @Data
 public class singupDto {
 
-    @Email
-    @NotBlank
+    @Email(message = "이메일 형식으로 적어주세요")
+    @NotBlank(message = "이메일이 공백입니다")
     private String email;
-    @NotBlank
+    @NotBlank(message = "이름이 공백입니다")
     private String name;
-    @Size(min = 4,max = 10)
+    @Size(min = 4,max = 10,message = "비밀번호는 최소 4자 최대 10자입니다")
     private String pwd;
-    @Size(min = 4,max = 10)
+    @Size(min = 4,max = 10,message = "비밀번호는 최소 4자 최대 10자입니다")
     private String pwd2; 
-    @NotBlank
+    @NotBlank(message = "우편번호가 공백입니다")
     private String postcode;
-    @NotBlank
+    @NotBlank(message = "주소가 공백입니다")
     private String address;
-    @NotBlank
+    @NotBlank(message = "상세주소가 공백입니다")
     private String detailAddress;
-    @NotBlank
+    @NotBlank(message = "참고항목이 공백입니다")
     private String extraAddress;
-    @Positive
+    @Positive(message = "전화번호가  공백입니다")
     private String phoneNum;
 }
