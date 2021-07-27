@@ -33,6 +33,7 @@ public class naverLoginService   {
     private final String id="DrqDuzgTpM_sfreaZMly";
     private final String pwd="wCLQZ1kaQT";
     private final String callBackUrl="http://localhost:8080/auth/navercallback";
+    private final int t=1;
     @Value("${oauth.pwd}")
     private String oauthPwd;
 
@@ -81,10 +82,10 @@ public class naverLoginService   {
                userDto dto=dao.findByEmail(email);
                if(dto==null){
                BCryptPasswordEncoder bCryptPasswordEncoder=security.pwdEncoder();
-                dto=new userDto(0, email,(String)naverDto.getResponse().get("name"),bCryptPasswordEncoder.encode(oauthPwd),role.USER.getValue(),"우편번호","서울 00동","00아파트","00동","01000001111",true,true);  
+                dto=new userDto(0, email,(String)naverDto.getResponse().get("name"),bCryptPasswordEncoder.encode(oauthPwd),role.USER.getValue(),"우편번호","서울 00동","00아파트","00동","01000001111",t,t);  
                 dao.save(dto);
                }
-               userDto userDto=new userDto(dto.getId(), dto.getEmail(), dto.getName(),oauthPwd, dto.getRole(),dto.getPostCode(),dto.getAddress(),dto.getDetailAddress(),dto.getExtraAddress(),dto.getPhoneNum(),true,true);
+               userDto userDto=new userDto(dto.getId(), dto.getEmail(), dto.getName(),oauthPwd, dto.getRole(),dto.getPostCode(),dto.getAddress(),dto.getDetailAddress(),dto.getExtraAddress(),dto.getPhoneNum(),t,t);
                Authentication authentication=jwtService.confrimAuthenticate(userDto);
                jwtService.setSecuritySession(authentication);
 
