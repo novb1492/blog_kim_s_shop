@@ -3,6 +3,7 @@ package com.example.blog_kim_s_token.enums;
 
 public enum confirmEnums {
 
+    notEqualsPwd("비밀번호가 일치하지 않습니다",false),
     alreadyPhone("이미 존재하는 전화번호 입니다",false),
     alreadyEmail("이미 존재하는 이메일 입니다",false),
     sendSmsNum("인증번호가 발송되었습니다",true),

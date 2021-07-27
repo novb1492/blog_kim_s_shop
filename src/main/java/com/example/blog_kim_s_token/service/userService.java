@@ -51,9 +51,12 @@ public class userService {
             if(confrimDto.getPhoneNum().equals(singupDto.getPhoneNum())){
                 if(confrimDto.getPhoneCheck()==yes){
                     if(confrimEmail(singupDto.getEmail())){
-                        userDao.save(new userDto(singupDto.getEmail(), singupDto.getName(),security.pwdEncoder().encode(singupDto.getPwd()), role.USER.getValue(),singupDto.getPostcode(),singupDto.getAddress(), singupDto.getDetailAddress(), singupDto.getExtraAddress(), singupDto.getPhoneNum()));
-                        confrimService.deleteCofrim(confrimDto);
-                        return utillService.makeJson(userEnums.sucSingUp.getBool(),userEnums.sucSingUp.getMessege());
+                        if(singupDto.getPwd().equals(singupDto.getPwd2())){
+                            userDao.save(new userDto(singupDto.getEmail(), singupDto.getName(),security.pwdEncoder().encode(singupDto.getPwd()), role.USER.getValue(),singupDto.getPostcode(),singupDto.getAddress(), singupDto.getDetailAddress(), singupDto.getExtraAddress(), singupDto.getPhoneNum()));
+                            confrimService.deleteCofrim(confrimDto);
+                            return utillService.makeJson(userEnums.sucSingUp.getBool(),userEnums.sucSingUp.getMessege());
+                        }
+                        return utillService.makeJson(confirmEnums.notEqualsPwd.getBool(),confirmEnums.notEqualsPwd.getMessege());
                     }
                     return utillService.makeJson(confirmEnums.alreadyEmail.getBool(),confirmEnums.alreadyEmail.getMessege());
                 }

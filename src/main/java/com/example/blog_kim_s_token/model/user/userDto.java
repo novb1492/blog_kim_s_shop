@@ -43,21 +43,21 @@ public class userDto {
     @Column(name="address",nullable = false,length = 40)
     private String address;
 
-    @Column(name="detailaddress",nullable = false,length = 20)
+    @Column(name="detailAddress",nullable = false,length = 20)
     private String detailAddress;
     
-    @Column(name="extraaddress",nullable = false,length = 10)
+    @Column(name="extraAddress",nullable = false,length = 10)
     private String extraAddress;
     
     @Column(name="phoneNum",nullable = false,length = 15)
     private String phoneNum;
 
-    @Column(name="emailcheck")
+    @Column(name="emailCheck")
     @ColumnDefault("0")
     private int emailCheck;
 
-    @Column(name="phonecheck")
-    @ColumnDefault("0")
+    @Column(name="phoneCheck")
+    @ColumnDefault("1")
     private int phoneCheck;
 
     @Column(name="failLoginTime")
