@@ -52,6 +52,10 @@ public class restcontroller {
     public JSONObject insertUser(@Valid @RequestBody singupDto singupDto) {
         return userService.insertUser(singupDto);
     }
+    @RequestMapping("/login")
+    public JSONObject login(HttpServletRequest request,HttpServletResponse response) {
+        return userService.doLogin();
+    }
     @RequestMapping("/auth/index2")
     public String hello2(@CookieValue(value = "refreshToken", required = false) Cookie rCookie,HttpServletResponse response) {
         System.out.println("index2");

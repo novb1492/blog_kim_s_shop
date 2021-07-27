@@ -12,6 +12,7 @@ import com.example.blog_kim_s_token.model.user.userDto;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -62,5 +63,23 @@ public class userService {
             return utillService.makeJson(confirmEnums.notEqulsPhoneNum.getBool(), confirmEnums.notEqulsPhoneNum.getMessege());
        }
        return utillService.makeJson(confirmEnums.nullPhoneNumInDb.getBool(),confirmEnums.nullPhoneNumInDb.getMessege());
+    }
+    public JSONObject doLogin() {
+        try {
+            if(SecurityContextHolder.getContext().getAuthentication().getName()!=null){
+                return sucLogin();
+            }else{
+                throw new Exception();
+            }
+        } catch (Exception e) {
+            System.out.println("로그인 실패");
+            return failLogin();
+        }
+    }
+    private JSONObject sucLogin() {
+        return utillService.makeJson(userEnums.sucLogin.getBool(),userEnums.sucLogin.getMessege());
+    }
+    private JSONObject failLogin() {
+        return utillService.makeJson(userEnums.failLogin.getBool(),userEnums.failLogin.getMessege());
     }
 }

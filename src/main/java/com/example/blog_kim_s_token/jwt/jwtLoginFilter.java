@@ -60,10 +60,14 @@ public class jwtLoginFilter extends UsernamePasswordAuthenticationFilter {
     
         response.addCookie(cookie);
         response.setHeader("Authorization", "Bearer "+jwtToken);
+
+        chain.doFilter(request, response);
     }
 
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,AuthenticationException failed) throws IOException, ServletException {
         System.out.println("로그인 실패");
+        request.getRequestDispatcher("/login").forward(request, response);
+
     }
 }
