@@ -15,7 +15,9 @@ public enum confirmEnums {
     notEqulsTempNum("인증번호가 일치 하지 않습니다",false),
     overTime("인증시간이 초과되었습니다",false),
     notTruePhoneCheck("인증되지 않은 핸드폰 번호입니다",false),
-    EqulsTempNum("인증 되었습니다",true);
+    EqulsTempNum("인증 되었습니다",true),
+    notFindEmail("없는 이메일 입니다",false),
+    sendEmail("이메일을 전송했습니다",true);
 
     private final String messege;
     private final boolean bool;

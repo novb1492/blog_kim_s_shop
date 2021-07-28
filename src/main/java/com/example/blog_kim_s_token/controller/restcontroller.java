@@ -46,7 +46,7 @@ public class restcontroller {
     }
     @RequestMapping("/auth/cofrimSmsNum")
     public JSONObject cofrimSmsNum(@Valid @RequestBody phoneCofrimDto phoneCofrimDto,HttpServletResponse response) {
-        return confrimService.cofrimSmsNum(phoneCofrimDto);
+        return confrimService.cofrimTempNum(phoneCofrimDto);
     }
     @RequestMapping("/auth/insertUser")
     public JSONObject insertUser(@Valid @RequestBody singupDto singupDto) {
@@ -59,6 +59,10 @@ public class restcontroller {
     @RequestMapping("/auth/findEmail")
     public JSONObject findEmail(HttpServletRequest request,HttpServletResponse response) {
         return userService.findLostEmail(request.getParameter("phoneNum"));
+    }
+    @RequestMapping("/auth/sendEmail")
+    public JSONObject sendEmail(HttpServletRequest request,HttpServletResponse response) {
+        return confrimService.sendEmail(request.getParameter("email"));
     }
     @RequestMapping("/auth/index2")
     public String hello2(@CookieValue(value = "refreshToken", required = false) Cookie rCookie,HttpServletResponse response) {

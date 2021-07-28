@@ -77,10 +77,10 @@ public class userService {
     }
     public JSONObject findLostEmail(String phoneNum) {
         userDto userDto=userDao.findByPhoneNum(phoneNum);
+        confrimService.deleteCofrim(phoneNum);
         if(userDto==null){
             return utillService.makeJson(userEnums.failFindEmailByPheon.getBool(),userEnums.failFindEmailByPheon.getMessege());
         }
-        confrimService.deleteCofrim(phoneNum);
         return utillService.makeJson(true, userDto.getEmail());
     }
 }
