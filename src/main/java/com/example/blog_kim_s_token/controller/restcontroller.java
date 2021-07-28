@@ -56,6 +56,10 @@ public class restcontroller {
     public JSONObject login(HttpServletRequest request,HttpServletResponse response) {
         return userService.doLogin();
     }
+    @RequestMapping("/auth/findEmail")
+    public JSONObject findEmail(HttpServletRequest request,HttpServletResponse response) {
+        return userService.findLostEmail(request.getParameter("phoneNum"));
+    }
     @RequestMapping("/auth/index2")
     public String hello2(@CookieValue(value = "refreshToken", required = false) Cookie rCookie,HttpServletResponse response) {
         System.out.println("index2");

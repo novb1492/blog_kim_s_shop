@@ -7,7 +7,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.ColumnDefault;
+
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -53,19 +53,15 @@ public class userDto {
     private String phoneNum;
 
     @Column(name="emailCheck")
-    @ColumnDefault("0")
     private int emailCheck;
 
     @Column(name="phoneCheck")
-    @ColumnDefault("1")
     private int phoneCheck;
 
     @Column(name="failLoginTime")
-    @ColumnDefault("0")
     private int failLoginTime;
 
     @Column(name="failLogin")
-    @ColumnDefault("0")
     private int failLogin;
 
     public userDto(String email,String name,String pwd,String role,String postCode,String address,String detailAddress,String extraAddress,String phoneNum){
@@ -78,6 +74,7 @@ public class userDto {
         this.detailAddress=detailAddress;
         this.extraAddress=extraAddress;
         this.phoneNum=phoneNum;
+        this.phoneCheck=1;
     }
 
 }

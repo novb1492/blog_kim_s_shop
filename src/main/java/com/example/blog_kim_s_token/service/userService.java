@@ -75,4 +75,11 @@ public class userService {
             return utillService.makeJson(userEnums.failLogin.getBool(),userEnums.failLogin.getMessege());
         }
     }
+    public JSONObject findLostEmail(String phoneNum) {
+        userDto userDto=userDao.findByPhoneNum(phoneNum);
+        if(userDto==null){
+            return utillService.makeJson(userEnums.failFindEmailByPheon.getBool(),userEnums.failFindEmailByPheon.getMessege());
+        }
+        return utillService.makeJson(true, userDto.getEmail());
+    }
 }
