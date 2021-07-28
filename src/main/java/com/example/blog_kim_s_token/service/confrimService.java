@@ -48,6 +48,9 @@ public class confrimService {
     public void deleteCofrim(confrimDto confrimDto){
         confimDao.delete(confrimDto);
     }
+    public void deleteCofrim(String phoneNum){
+        confimDao.deleteByPhoneNum(phoneNum);
+    }
     private void sendSms(String phoneNum,String tempNum){
         coolSmsService.sendMessege(phoneNum,"인증번호는 "+tempNum+"입니다");
     }
@@ -56,7 +59,6 @@ public class confrimService {
         String phoneNum=request.getParameter("phoneNum");
         String tempNum=utillService.GetRandomNum(6);
         if(phoneNum!=null){
-            if(userService.confrimPhone(phoneNum)){
                 confrimDto confrimDto=findConfrim(phoneNum);
                 if(confrimDto==null){
                     System.out.println("처음 인증요청"); 
@@ -81,8 +83,6 @@ public class confrimService {
                     }
                 }
                 return utillService.makeJson(confirmEnums.sendSmsNum.getBool(), confirmEnums.sendSmsNum.getMessege());
-            }
-            return utillService.makeJson(confirmEnums.alreadyPhone.getBool(), confirmEnums.alreadyPhone.getMessege());
         }
         return utillService.makeJson(confirmEnums.nullPhoneNum.getBool(), confirmEnums.nullPhoneNum.getMessege());
     }

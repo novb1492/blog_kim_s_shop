@@ -80,6 +80,7 @@ public class userService {
         if(userDto==null){
             return utillService.makeJson(userEnums.failFindEmailByPheon.getBool(),userEnums.failFindEmailByPheon.getMessege());
         }
+        confrimService.deleteCofrim(phoneNum);
         return utillService.makeJson(true, userDto.getEmail());
     }
 }
