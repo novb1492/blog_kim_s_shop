@@ -31,8 +31,7 @@ public class confrimService {
     private coolSmsService coolSmsService;
     @Autowired
     private utillService utillService;
-    @Autowired
-    private userService userService;
+
 
     public confrimDto findConfrim(String phoneNum) {
         return confimDao.findByPhoneNum(phoneNum);
