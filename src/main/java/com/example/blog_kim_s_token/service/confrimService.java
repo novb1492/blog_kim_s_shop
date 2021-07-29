@@ -6,6 +6,7 @@ import com.example.blog_kim_s_token.enums.confirmEnums;
 import com.example.blog_kim_s_token.model.confrim.confimDao;
 import com.example.blog_kim_s_token.model.confrim.confrimDto;
 import com.example.blog_kim_s_token.model.confrim.phoneCofrimDto;
+import com.example.blog_kim_s_token.model.user.userDao;
 import com.example.blog_kim_s_token.model.user.userDto;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
@@ -42,6 +43,9 @@ public class confrimService {
     public confrimDto findConfrim(String phoneNum) {
         return confimDao.findByPhoneNum(phoneNum);
     }
+    private confrimDto findConfrimEmai(String email){
+        return confimDao.findByEmail(email);
+    }
     private void insertConfrim(String phoneNum,String email,String emailTempNum,String phoneTempNum){
         confimDao.save(new confrimDto(0,email, phoneNum,emailTempNum,phoneTempNum,f,f,1,null));
     }
@@ -49,6 +53,11 @@ public class confrimService {
         System.out.println("updateconfrim"+tempNum+confrimDto.getPhoneNum());
         int requestTime=confrimDto.getRequestTime();
         confimDao.updatePhoneTempNum(tempNum,requestTime+=1,utillService.getNowTimestamp(),confrimDto.getPhoneNum());
+    }
+    private void updateconfrimEmail(confrimDto confrimDto,String tempNum) {
+        System.out.println("updateconfrimEmail"+tempNum+confrimDto.getEmail());
+        int requestTime=confrimDto.getRequestTime();
+        confimDao.updateEmailTempNum(tempNum,requestTime+=1,utillService.getNowTimestamp(),confrimDto.getEmail());
     }
     public void deleteCofrim(confrimDto confrimDto){
         confimDao.delete(confrimDto);
@@ -111,9 +120,16 @@ public class confrimService {
     }
     public JSONObject sendEmail(String email) {
         userDto userDto=userService.findEmail(email);
+        String tempNum=utillService.GetRandomNum(tempNumLength);
         if(userDto!=null){
-            String tempNum=utillService.GetRandomNum(tempNumLength);
-            insertConfrim(null, email,tempNum,null);
+            confrimDto confrimDto=findConfrimEmai(email);
+            if(confrimDto==null){
+                System.out.println("처음 인증요청"); 
+                insertConfrim(null, email,tempNum,null);
+            }else{
+                System.out.println("요청기록 존재"); 
+                updateconfrimEmail(confrimDto, tempNum);
+            }
             sendEmailService.sendEmail(email,"안녕하세요 kim's Shop입니다","인증번호는 "+tempNum+" 입니다.");
             return utillService.makeJson(confirmEnums.sendEmail.getBool(), confirmEnums.sendEmail.getMessege());
         }
