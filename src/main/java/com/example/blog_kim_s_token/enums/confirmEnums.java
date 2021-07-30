@@ -17,6 +17,7 @@ public enum confirmEnums {
     notTruePhoneCheck("인증되지 않은 핸드폰 번호입니다",false),
     EqulsTempNum("인증 되었습니다",true),
     notFindEmail("없는 이메일 입니다",false),
+    notReuestConfrim("인증번호 요청부터 해주세요",false),
     sendEmail("이메일을 전송했습니다",true);
 
     private final String messege;

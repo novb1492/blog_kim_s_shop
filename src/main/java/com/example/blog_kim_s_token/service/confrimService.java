@@ -158,7 +158,7 @@ public class confrimService {
                 }
                 return utillService.makeJson(confirmEnums.overTime.getBool(), confirmEnums.overTime.getMessege());
             }
-            return utillService.makeJson(confirmEnums.notFindEmail.getBool(), confirmEnums.notFindEmail.getMessege());
+            return utillService.makeJson(confirmEnums.notReuestConfrim.getBool(), confirmEnums.notReuestConfrim.getMessege());
     }
     
 }
