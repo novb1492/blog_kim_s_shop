@@ -71,7 +71,7 @@ public class userService {
         try {
             String email=SecurityContextHolder.getContext().getAuthentication().getName();
             System.out.println("시큐리티 확인"+email);
-            return utillService.makeJson(userEnums.sucLogin.getBool(),userEnums.sucLogin.getMessege());
+            return utillService.makeJson(userEnums.sucLogin.getBool(),email);
         } catch (Exception e) {
             return utillService.makeJson(userEnums.failLogin.getBool(),userEnums.failLogin.getMessege());
         }
