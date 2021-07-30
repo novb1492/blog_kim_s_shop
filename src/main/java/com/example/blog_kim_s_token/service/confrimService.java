@@ -148,8 +148,10 @@ public class confrimService {
             if(confrimDto!=null){
                 if(utillService.checkTime(confrimDto.getCreated(),overTime)==false){
                     if(emailCofrimDto.getTempNum().trim().equals(confrimDto.getEmailTempNum())){
-
-                        sendEmailService.sendEmail(confrimDto.getEmail(),"안녕하세요 kim's Shop입니다","임시비밀번호는 "+utillService.GetRandomNum(tempPwdLength)+" 입니다.");
+                        String tempPwd=utillService.GetRandomNum(tempPwdLength);
+                        userService.updatePwd(confrimDto.getEmail(),tempPwd);
+                        deleteCofrim(confrimDto);
+                        sendEmailService.sendEmail(confrimDto.getEmail(),"안녕하세요 kim's Shop입니다","임시비밀번호는 "+tempPwd+" 입니다.");
                         return utillService.makeJson(confirmEnums.EqulsTempNum.getBool(),"임시비밀번호를 발송해 드렸습니다");
                     }
                     return utillService.makeJson(confirmEnums.notEqulsTempNum.getBool(), confirmEnums.notEqulsTempNum.getMessege());

@@ -86,7 +86,6 @@ public class userService {
     }
     public void updatePwd(String email,String pwd) {
         System.out.println("updatePwd 입장 비밀번호 변경");
-        userDto userDto=userDao.findByEmail(email);
-        userDto.setPwd(security.pwdEncoder().encode(pwd));
+        userDao.updatePwd(security.pwdEncoder().encode(pwd), email);
     }
 }
