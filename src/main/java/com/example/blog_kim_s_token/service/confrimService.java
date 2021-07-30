@@ -3,10 +3,10 @@ package com.example.blog_kim_s_token.service;
 import javax.servlet.http.HttpServletRequest;
 
 import com.example.blog_kim_s_token.enums.confirmEnums;
-import com.example.blog_kim_s_token.model.confrim.confimDao;
+import com.example.blog_kim_s_token.model.confrim.confrimDao;
 import com.example.blog_kim_s_token.model.confrim.confrimDto;
+import com.example.blog_kim_s_token.model.confrim.emailCofrimDto;
 import com.example.blog_kim_s_token.model.confrim.phoneCofrimDto;
-import com.example.blog_kim_s_token.model.user.userDao;
 import com.example.blog_kim_s_token.model.user.userDto;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
@@ -14,6 +14,7 @@ import com.nimbusds.jose.shaded.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
 
 @Service
 public class confrimService {
@@ -27,9 +28,10 @@ public class confrimService {
     private final int f=0;
     private final int t=1;
     private final int tempNumLength=6;
+    private final int tempPwdLength=8;
 
     @Autowired
-    private confimDao confimDao;
+    private confrimDao confimDao;
     @Autowired
     private coolSmsService coolSmsService;
     @Autowired
@@ -136,4 +138,25 @@ public class confrimService {
         return utillService.makeJson(confirmEnums.notFindEmail.getBool(), confirmEnums.notFindEmail.getMessege());
 
     }
+    public void updateconfrimEmail(String email){
+            System.out.println("updateconfrimEmail 입장 이메일인증 완료");
+            confimDao.updateEmailCheckTrue(t, email);
+    }
+    public JSONObject confrimTempNum(emailCofrimDto emailCofrimDto) {
+        System.out.println("confrimTempNum Email 입장");
+            confrimDto confrimDto=confimDao.findByEmail(emailCofrimDto.getEmail());
+            if(confrimDto!=null){
+                if(utillService.checkTime(confrimDto.getCreated(),overTime)==false){
+                    if(emailCofrimDto.getTempNum().trim().equals(confrimDto.getEmailTempNum())){
+
+                        sendEmailService.sendEmail(confrimDto.getEmail(),"안녕하세요 kim's Shop입니다","임시비밀번호는 "+utillService.GetRandomNum(tempPwdLength)+" 입니다.");
+                        return utillService.makeJson(confirmEnums.EqulsTempNum.getBool(),"임시비밀번호를 발송해 드렸습니다");
+                    }
+                    return utillService.makeJson(confirmEnums.notEqulsTempNum.getBool(), confirmEnums.notEqulsTempNum.getMessege());
+                }
+                return utillService.makeJson(confirmEnums.overTime.getBool(), confirmEnums.overTime.getMessege());
+            }
+            return utillService.makeJson(confirmEnums.notFindEmail.getBool(), confirmEnums.notFindEmail.getMessege());
+    }
+    
 }

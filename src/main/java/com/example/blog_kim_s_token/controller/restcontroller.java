@@ -5,6 +5,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import com.example.blog_kim_s_token.model.confrim.emailCofrimDto;
 import com.example.blog_kim_s_token.model.confrim.phoneCofrimDto;
 import com.example.blog_kim_s_token.model.user.singupDto;
 import com.example.blog_kim_s_token.service.confrimService;
@@ -63,6 +64,10 @@ public class restcontroller {
     @RequestMapping("/auth/sendEmail")
     public JSONObject sendEmail(HttpServletRequest request,HttpServletResponse response) {
         return confrimService.sendEmail(request.getParameter("email"));
+    }
+    @RequestMapping("/auth/cofrimEmailNum")
+    public JSONObject cofrimEmailNum(@Valid @RequestBody emailCofrimDto emailCofrimDto,HttpServletResponse response) {
+        return confrimService.confrimTempNum(emailCofrimDto);
     }
     @RequestMapping("/auth/index2")
     public String hello2(@CookieValue(value = "refreshToken", required = false) Cookie rCookie,HttpServletResponse response) {

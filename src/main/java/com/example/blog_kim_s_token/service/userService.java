@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+
 @Service
 public class userService {
 
@@ -82,5 +83,10 @@ public class userService {
             return utillService.makeJson(userEnums.failFindEmailByPheon.getBool(),userEnums.failFindEmailByPheon.getMessege());
         }
         return utillService.makeJson(true, userDto.getEmail());
+    }
+    public void updatePwd(String email,String pwd) {
+        System.out.println("updatePwd 입장 비밀번호 변경");
+        userDto userDto=userDao.findByEmail(email);
+        userDto.setPwd(security.pwdEncoder().encode(pwd));
     }
 }
