@@ -22,13 +22,14 @@ public class controller {
     public String naverRollback(HttpServletRequest request,HttpServletResponse response) {
         System.out.println("naverlogin요청");
         String[] naverArray=naverLoingService.LoginNaver(naverLoingService.getNaverToken(request.getParameter("code"), request.getParameter("state")),request,response);
-        return "redirect:http://localhost:3030/kim_s_Shop/index.jsp?token="+naverArray[0]+"&email="+naverArray[1];
+        return "redirect:http://localhost:3030/index?token="+naverArray[0]+"&email="+naverArray[1];
     }
     @RequestMapping("/auth/kakaocallback")
     public String kakaoRollback(HttpServletRequest request,HttpServletResponse response) {
         System.out.println("kakaologin요청");   
        String[] kakaoArray=kakaoLoginservice.kakaoLogin(kakaoLoginservice.kakaoGetToken(request.getParameter("code")),response);
-       return "redirect:http://localhost:3030/kim_s_Shop/index.jsp?token="+kakaoArray[0]+"&email="+kakaoArray[1];
+       return "redirect:http://localhost:3030/index?token="+kakaoArray[0]+"&email="+kakaoArray[1];
 
     }
+    
 }

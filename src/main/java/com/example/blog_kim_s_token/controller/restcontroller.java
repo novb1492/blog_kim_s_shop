@@ -16,6 +16,7 @@ import com.example.blog_kim_s_token.service.ApiServies.naver.naverLoginService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -81,8 +82,9 @@ public class restcontroller {
     @RequestMapping("/api/mypage")
     public void myPage(@CookieValue(value = "refreshToken", required = false) Cookie rCookie,HttpServletRequest request,HttpServletResponse response) {
         System.out.println("mypage");
-        System.out.println(request.getHeader("Authorization"));
-        System.out.println(rCookie.getValue());
+        String email=SecurityContextHolder.getContext().getAuthentication().getName();
+        request.setAttribute("userdto", userService.findEmail(email));
+        response.addHeader("userdto", "ht");
     }
     @RequestMapping("/auth/index2")
     public String hello2(@CookieValue(value = "refreshToken", required = false) Cookie rCookie,HttpServletResponse response) {
