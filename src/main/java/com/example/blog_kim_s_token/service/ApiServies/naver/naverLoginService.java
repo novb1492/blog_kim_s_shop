@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.example.blog_kim_s_token.config.security;
+import com.example.blog_kim_s_token.enums.confrimTrue;
 import com.example.blog_kim_s_token.enums.role;
 import com.example.blog_kim_s_token.jwt.jwtService;
 import com.example.blog_kim_s_token.model.jwt.jwtDto;
@@ -83,23 +84,35 @@ public class naverLoginService   {
                split=naverDto.getResponse().get("mobile_e164").toString().split("2");
                userDto dto=dao.findByEmail(email);
                if(dto==null){
-               BCryptPasswordEncoder bCryptPasswordEncoder=security.pwdEncoder();
-                String phoneNum=(String)naverDto.getResponse().get("mobile");
-                dto=new userDto(0, email,(String)naverDto.getResponse().get("name"),bCryptPasswordEncoder.encode(oauthPwd),role.USER.getValue(),"우편번호","서울 00동","00아파트","00동",phoneNum.replace("-", ""),t,t,zero,zero,naver);  
-                dao.save(dto);
+                dto=userDto.builder().email(email)
+                                    .name((String)naverDto.getResponse().get("name"))
+                                    .pwd(security.pwdEncoder().encode(oauthPwd))
+                                    .postCode("111111")
+                                    .address("address")
+                                    .detailAddress("detailAddress")
+                                    .extraAddress("exa")
+                                    .phoneNum((String)naverDto.getResponse().get("mobile"))
+                                    .phoneCheck(confrimTrue.yes.getValue())
+                                    .emailCheck(confrimTrue.yes.getValue())
+                                    .role(role.USER.getValue())
+                                    .provider(naver).build();
+                                    dao.save(dto);
                }
-               userDto userDto=new userDto(dto.getId(), dto.getEmail(), dto.getName(),oauthPwd, dto.getRole(),dto.getPostCode(),dto.getAddress(),dto.getDetailAddress(),dto.getExtraAddress(),dto.getPhoneNum(),t,t,zero,zero,naver);
-               Authentication authentication=jwtService.confrimAuthenticate(userDto);
+               Authentication authentication=jwtService.confrimAuthenticate(dto);
                jwtService.setSecuritySession(authentication);
-
-               jwtDto jwtDto=jwtService.getRefreshToken(userDto.getId());
-               String jwt="Bearer "+jwtService.getJwtToken(dto.getId());
-               Cookie cookie=new Cookie("refreshToken", jwtService.getRefreshToken(jwtDto, userDto.getId()));
+   
+               String jwtToken=jwtService.getJwtToken(dto.getId());
+               jwtDto jwtDto=jwtService.getRefreshToken(dto.getId());
+               String refreshToken=jwtService.getRefreshToken(jwtDto,dto.getId());
+               
+               Cookie cookie=new Cookie("refreshToken",refreshToken);
                cookie.setHttpOnly(true);
                cookie.setPath("/");
-
+           
                response.addCookie(cookie);
-               return jwt;
+               response.setHeader("Authorization", "Bearer "+jwtToken);
+
+               return jwtToken;
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("LoginNaver 오류가 발생 했습니다");

@@ -2,6 +2,8 @@ package com.example.blog_kim_s_token.service.ApiServies.kakao;
 
 import com.example.blog_kim_s_token.config.principaldetail;
 import com.example.blog_kim_s_token.config.security;
+import com.example.blog_kim_s_token.enums.confirmEnums;
+import com.example.blog_kim_s_token.enums.confrimTrue;
 import com.example.blog_kim_s_token.enums.role;
 import com.example.blog_kim_s_token.jwt.jwtService;
 import com.example.blog_kim_s_token.model.jwt.jwtDto;
@@ -89,25 +91,22 @@ public class kakaoLoginservice {
             String email=kakaoAccountDto.getEmail();
             System.out.println(email);
 
-            userDto dto=null;
+            userDto dto=userDao.findByEmail(email);
             if(userDao.findByEmail(email)==null){
-                BCryptPasswordEncoder bCryptPasswordEncoder=security.pwdEncoder();
                     dto=userDto.builder().email(email)
                                         .name(kakaoAccountDto
                                         .getProfile().get("nickname"))
-                                        .pwd(bCryptPasswordEncoder.encode(oauthPwd))
+                                        .pwd(security.pwdEncoder().encode(oauthPwd))
                                         .role(role.USER.getValue())
                                         .postCode("111111")
                                         .address("address")
                                         .detailAddress("detailAddress")
                                         .extraAddress("exa")
                                         .phoneNum("phoneNum")
-                                        .phoneCheck(1)
-                                        .emailCheck(1)
-                                        .provider(kakao).build(); //(email,kakaoAccountDto.getProfile().get("nickname"), security.pwdEncoder().encode(oauthPwd),role.USER.getValue(), "111111", "address", "detailAddress", "exa", "phoneNum", kakao);
+                                        .phoneCheck(confrimTrue.yes.getValue())
+                                        .emailCheck(confrimTrue.yes.getValue())
+                                        .provider(kakao).build(); 
                                         userDao.save(dto);
-            }else{
-                dto=userDao.findByEmail(email);
             }
             Authentication authentication=jwtService.confrimAuthenticate(dto);
             jwtService.setSecuritySession(authentication);
