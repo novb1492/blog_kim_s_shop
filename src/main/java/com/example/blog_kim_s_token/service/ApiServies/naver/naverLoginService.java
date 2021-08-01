@@ -63,7 +63,7 @@ public class naverLoginService   {
          System.out.println(jsonObject+" token"); 
          return jsonObject;
      }
-     public String LoginNaver(JSONObject jsonObject,HttpServletRequest request,HttpServletResponse response) {
+     public String[] LoginNaver(JSONObject jsonObject,HttpServletRequest request,HttpServletResponse response) {
         headers.add("Authorization", "Bearer "+jsonObject.get("access_token"));
         HttpEntity<JSONObject>entity=new HttpEntity<JSONObject>(headers);
         try {
@@ -109,7 +109,7 @@ public class naverLoginService   {
                response.addCookie(cookie);
                response.setHeader("Authorization", "Bearer "+jwtToken);
 
-               return jwtToken;
+               return new String[]{jwtToken,email};
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("LoginNaver 오류가 발생 했습니다");
