@@ -12,7 +12,7 @@ import com.example.blog_kim_s_token.model.oauth.kakao.kakaoLoginDto;
 import com.example.blog_kim_s_token.model.oauth.kakao.kakaoTokenDto;
 import com.example.blog_kim_s_token.model.user.userDao;
 import com.example.blog_kim_s_token.model.user.userDto;
-import com.example.blog_kim_s_token.service.userService;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,10 +20,8 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -31,7 +29,6 @@ import org.springframework.web.client.RestTemplate;
 import java.util.LinkedHashMap;
 
 import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletResponse;
 
 @Service
@@ -52,8 +49,7 @@ public class kakaoLoginservice {
     private security security;
     @Autowired
     private jwtService jwtService;
-    @Autowired
-    private AuthenticationManager authenticationManager;
+
 
     public String kakaoGetCode() {
         return "https://kauth.kakao.com/oauth/authorize?response_type=code&client_id="+apikey+"&redirect_uri="+callBackUrl+"";
@@ -78,7 +74,7 @@ public class kakaoLoginservice {
             body.clear();
         }
     }
-    public void kakaoLogin(kakaoTokenDto kakaoTokenDto,HttpServletResponse response) {
+    public String[] kakaoLogin(kakaoTokenDto kakaoTokenDto,HttpServletResponse response) {
         headers.add("Authorization", "Bearer "+kakaoTokenDto.getAccess_token());
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         try {
@@ -92,7 +88,7 @@ public class kakaoLoginservice {
             System.out.println(email);
 
             userDto dto=userDao.findByEmail(email);
-            if(userDao.findByEmail(email)==null){
+            if(dto==null){
                     dto=userDto.builder().email(email)
                                         .name(kakaoAccountDto
                                         .getProfile().get("nickname"))
@@ -122,11 +118,14 @@ public class kakaoLoginservice {
             response.addCookie(cookie);
             response.setHeader("Authorization", "Bearer "+jwtToken);
 
+            return new String[]{jwtToken,email};
+
         } catch (Exception e) {
            e.printStackTrace();
         }finally{
             headers.clear();
         }
+        return null;
     }
 
 }

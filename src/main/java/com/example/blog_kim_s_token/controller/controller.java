@@ -25,9 +25,10 @@ public class controller {
         return "redirect:http://localhost:3030/kim_s_Shop/index.jsp?token="+token;
     }
     @RequestMapping("/auth/kakaocallback")
-    public void kakaoRollback(HttpServletRequest request,HttpServletResponse response) {
+    public String kakaoRollback(HttpServletRequest request,HttpServletResponse response) {
         System.out.println("kakaologin요청");   
-        kakaoLoginservice.kakaoLogin(kakaoLoginservice.kakaoGetToken(request.getParameter("code")),response);
+       String[]kakaoArray=kakaoLoginservice.kakaoLogin(kakaoLoginservice.kakaoGetToken(request.getParameter("code")),response);
+       return "redirect:http://localhost:3030/kim_s_Shop/index.jsp?token="+kakaoArray[0]+"&email="+kakaoArray[1];
 
     }
 }

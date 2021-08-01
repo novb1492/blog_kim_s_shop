@@ -22,7 +22,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -34,8 +33,6 @@ public class naverLoginService   {
     private final String id="DrqDuzgTpM_sfreaZMly";
     private final String pwd="wCLQZ1kaQT";
     private final String callBackUrl="http://localhost:8080/auth/navercallback";
-    private final int t=1;
-    private final int zero=0;
     private final String naver="naver";
     @Value("${oauth.pwd}")
     private String oauthPwd;
