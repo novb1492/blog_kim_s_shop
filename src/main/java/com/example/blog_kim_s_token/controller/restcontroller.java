@@ -69,12 +69,6 @@ public class restcontroller {
     public JSONObject cofrimEmailNum(@Valid @RequestBody emailCofrimDto emailCofrimDto,HttpServletResponse response) {
         return confrimService.confrimTempNum(emailCofrimDto);
     }
-    @RequestMapping("/auth/index2")
-    public String hello2(@CookieValue(value = "refreshToken", required = false) Cookie rCookie,HttpServletResponse response) {
-        System.out.println("index2");
-        System.out.println(rCookie.getValue());
-        return "index2";
-    }
     @RequestMapping("/auth/naver")
     public String naverLogin() {
         return  naverLoingService.naverLogin();
@@ -83,6 +77,13 @@ public class restcontroller {
     public String kakaoLogin(HttpServletRequest request,HttpServletResponse response) {
         return kakaoLoginservice.kakaoGetCode();
     }
+    @RequestMapping("/auth/index2")
+    public String hello2(@CookieValue(value = "refreshToken", required = false) Cookie rCookie,HttpServletResponse response) {
+        System.out.println("index2");
+        System.out.println(rCookie.getValue());
+        return "index2";
+    }
+
     @RequestMapping("/api/v1/user/test")
     public JSONObject  user(HttpServletRequest request,HttpServletResponse response) {
         System.out.println("user 입장");
