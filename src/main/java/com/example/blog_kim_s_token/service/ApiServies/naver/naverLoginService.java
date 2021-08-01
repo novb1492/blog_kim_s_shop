@@ -98,7 +98,7 @@ public class naverLoginService   {
                Authentication authentication=jwtService.confrimAuthenticate(dto);
                jwtService.setSecuritySession(authentication);
    
-               String jwtToken=jwtService.getJwtToken(dto.getId());
+               String jwtToken="Bearer "+jwtService.getJwtToken(dto.getId());
                jwtDto jwtDto=jwtService.getRefreshToken(dto.getId());
                String refreshToken=jwtService.getRefreshToken(jwtDto,dto.getId());
                
@@ -107,8 +107,7 @@ public class naverLoginService   {
                cookie.setPath("/");
            
                response.addCookie(cookie);
-               response.setHeader("Authorization", "Bearer "+jwtToken);
-
+               
                return new String[]{jwtToken,email};
         } catch (Exception e) {
             e.printStackTrace();

@@ -8,6 +8,7 @@ import javax.validation.Valid;
 import com.example.blog_kim_s_token.model.confrim.emailCofrimDto;
 import com.example.blog_kim_s_token.model.confrim.phoneCofrimDto;
 import com.example.blog_kim_s_token.model.user.singupDto;
+import com.example.blog_kim_s_token.model.user.userDto;
 import com.example.blog_kim_s_token.service.confrimService;
 import com.example.blog_kim_s_token.service.userService;
 import com.example.blog_kim_s_token.service.ApiServies.kakao.kakaoLoginservice;
@@ -76,6 +77,12 @@ public class restcontroller {
     @RequestMapping("/auth/kakao")
     public String kakaoLogin(HttpServletRequest request,HttpServletResponse response) {
         return kakaoLoginservice.kakaoGetCode();
+    }
+    @RequestMapping("/api/mypage")
+    public void myPage(@CookieValue(value = "refreshToken", required = false) Cookie rCookie,HttpServletRequest request,HttpServletResponse response) {
+        System.out.println("mypage");
+        System.out.println(request.getHeader("Authorization"));
+        System.out.println(rCookie.getValue());
     }
     @RequestMapping("/auth/index2")
     public String hello2(@CookieValue(value = "refreshToken", required = false) Cookie rCookie,HttpServletResponse response) {
