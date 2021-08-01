@@ -30,6 +30,8 @@ public class jwtService {
     private String jwtTokenName;
     @Value("${jwt.refreshToken.validity}")
     private int refreshTokenValidity;
+    @Value("${oauth.pwd}")
+    private String oauthPwd;
 
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -59,8 +61,11 @@ public class jwtService {
         return JWT.require(Algorithm.HMAC512(jwtSing)).build().verify(jwtToken).getClaim("id").asInt();
     }
     public Authentication confrimAuthenticate(userDto dto) {
+        //dto.setPwd("1111");
         principaldetail principaldetail=new principaldetail(dto);
-        return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(dto.getEmail(),dto.getPwd(),principaldetail.getAuthorities()));
+        System.out.println(dto.getPwd()+"오스 비밀번호");
+        Authentication authentication=authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(dto.getEmail(),dto.getPwd(),principaldetail.getAuthorities()));
+        return authentication;
     }
     public Authentication makeAuthentication(userDto userDto) {
         System.out.println(userDto.getEmail()+" makeAuthentication 강제로그인");

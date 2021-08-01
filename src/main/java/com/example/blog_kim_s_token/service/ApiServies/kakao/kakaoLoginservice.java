@@ -1,23 +1,52 @@
 package com.example.blog_kim_s_token.service.ApiServies.kakao;
 
+import com.example.blog_kim_s_token.config.principaldetail;
+import com.example.blog_kim_s_token.config.security;
+import com.example.blog_kim_s_token.enums.role;
+import com.example.blog_kim_s_token.jwt.jwtService;
+import com.example.blog_kim_s_token.model.oauth.kakao.kakaoAccountDto;
 import com.example.blog_kim_s_token.model.oauth.kakao.kakaoLoginDto;
 import com.example.blog_kim_s_token.model.oauth.kakao.kakaoTokenDto;
+import com.example.blog_kim_s_token.model.user.userDao;
+import com.example.blog_kim_s_token.model.user.userDto;
+import com.example.blog_kim_s_token.service.userService;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import java.util.LinkedHashMap;
 
 @Service
 public class kakaoLoginservice {
     private final String apikey="2b8214590890931fb474d08986898680";
     private final String callBackUrl="http://localhost:8080/auth/kakaocallback";
+    private final String kakao="kakao";
     private RestTemplate restTemplate=new RestTemplate();
     private HttpHeaders headers=new HttpHeaders();
     private MultiValueMap<String,String> body=new LinkedMultiValueMap<>();
+
+    @Value("${oauth.pwd}")
+    private String oauthPwd;
+
+    @Autowired
+    private userDao userDao;
+    @Autowired
+    private security security;
+    @Autowired
+    private jwtService jwtService;
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
     public String kakaoGetCode() {
         return "https://kauth.kakao.com/oauth/authorize?response_type=code&client_id="+apikey+"&redirect_uri="+callBackUrl+"";
@@ -49,6 +78,37 @@ public class kakaoLoginservice {
             HttpEntity<MultiValueMap<String,String>>entity=new HttpEntity<>(headers);
             kakaoLoginDto kakaoLoginDto =restTemplate.postForObject("https://kapi.kakao.com/v2/user/me",entity,kakaoLoginDto.class);
             System.out.println(kakaoLoginDto+"카카오 로그인정보");
+
+
+            kakaoAccountDto kakaoAccountDto =new kakaoAccountDto((boolean)kakaoLoginDto.getKakao_account().get("email_needs_agreement"),(boolean)kakaoLoginDto.getKakao_account().get("profile_nickname_needs_agreement"),(LinkedHashMap<String,String>)kakaoLoginDto.getKakao_account().get("profile"),(boolean)kakaoLoginDto.getKakao_account().get("is_email_valid"),(boolean)kakaoLoginDto.getKakao_account().get("is_email_verified"),(boolean)kakaoLoginDto.getKakao_account().get("has_email"),(String)kakaoLoginDto.getKakao_account().get("email"));
+            String email=kakaoAccountDto.getEmail();
+            System.out.println(email);
+
+            userDto dto=null;
+            if(userDao.findByEmail(email)==null){
+                BCryptPasswordEncoder bCryptPasswordEncoder=security.pwdEncoder();
+                    dto=userDto.builder().email(email)
+                                        .name(kakaoAccountDto
+                                        .getProfile().get("nickname"))
+                                        .pwd(bCryptPasswordEncoder.encode(oauthPwd))
+                                        .role(role.USER.getValue())
+                                        .postCode("111111")
+                                        .address("address")
+                                        .detailAddress("detailAddress")
+                                        .extraAddress("exa")
+                                        .phoneNum("phoneNum")
+                                        .phoneCheck(1)
+                                        .emailCheck(1)
+                                        .provider(kakao).build(); //(email,kakaoAccountDto.getProfile().get("nickname"), security.pwdEncoder().encode(oauthPwd),role.USER.getValue(), "111111", "address", "detailAddress", "exa", "phoneNum", kakao);
+                                        userDao.save(dto);
+            }else{
+                dto=userDao.findByEmail(email);
+            }
+            dto.setPwd(oauthPwd);
+            System.out.println(dto.getPwd());
+            Authentication authentication=jwtService.confrimAuthenticate(dto);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
         } catch (Exception e) {
            e.printStackTrace();
         }finally{

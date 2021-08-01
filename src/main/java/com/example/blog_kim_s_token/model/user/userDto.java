@@ -10,12 +10,14 @@ import javax.persistence.Table;
 
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
+@Builder
 @Table(name="user")
 @Entity
 public class userDto {
@@ -64,6 +66,9 @@ public class userDto {
     @Column(name="failLogin")
     private int failLogin;
 
+    @Column(name="provider")
+    private String provider;
+
     public userDto(String email,String name,String pwd,String role,String postCode,String address,String detailAddress,String extraAddress,String phoneNum){
         this.email=email;
         this.name=name;
@@ -76,5 +81,6 @@ public class userDto {
         this.phoneNum=phoneNum;
         this.phoneCheck=1;
     }
+
 
 }
