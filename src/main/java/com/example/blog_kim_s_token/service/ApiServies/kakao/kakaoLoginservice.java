@@ -4,6 +4,7 @@ import com.example.blog_kim_s_token.config.principaldetail;
 import com.example.blog_kim_s_token.config.security;
 import com.example.blog_kim_s_token.enums.role;
 import com.example.blog_kim_s_token.jwt.jwtService;
+import com.example.blog_kim_s_token.model.jwt.jwtDto;
 import com.example.blog_kim_s_token.model.oauth.kakao.kakaoAccountDto;
 import com.example.blog_kim_s_token.model.oauth.kakao.kakaoLoginDto;
 import com.example.blog_kim_s_token.model.oauth.kakao.kakaoTokenDto;
@@ -26,6 +27,10 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import java.util.LinkedHashMap;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletResponse;
 
 @Service
 public class kakaoLoginservice {
@@ -71,7 +76,7 @@ public class kakaoLoginservice {
             body.clear();
         }
     }
-    public void kakaoLogin(kakaoTokenDto kakaoTokenDto) {
+    public void kakaoLogin(kakaoTokenDto kakaoTokenDto,HttpServletResponse response) {
         headers.add("Authorization", "Bearer "+kakaoTokenDto.getAccess_token());
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         try {
@@ -104,10 +109,19 @@ public class kakaoLoginservice {
             }else{
                 dto=userDao.findByEmail(email);
             }
-            dto.setPwd(oauthPwd);
-            System.out.println(dto.getPwd());
             Authentication authentication=jwtService.confrimAuthenticate(dto);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            jwtService.setSecuritySession(authentication);
+
+            String jwtToken=jwtService.getJwtToken(dto.getId());
+            jwtDto jwtDto=jwtService.getRefreshToken(dto.getId());
+            String refreshToken=jwtService.getRefreshToken(jwtDto,dto.getId());
+            
+            Cookie cookie=new Cookie("refreshToken",refreshToken);
+            cookie.setHttpOnly(true);
+            cookie.setPath("/");
+        
+            response.addCookie(cookie);
+            response.setHeader("Authorization", "Bearer "+jwtToken);
 
         } catch (Exception e) {
            e.printStackTrace();

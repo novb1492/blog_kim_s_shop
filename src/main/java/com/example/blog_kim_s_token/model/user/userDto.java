@@ -33,7 +33,7 @@ public class userDto {
     @Column(name = "name",nullable = false,length = 20)
     private String name;
 
-    @Column(name = "pwd",nullable = false,length = 100)
+    @Column(name = "pwd",nullable = false,length = 200)
     private String pwd;
 
     @Column(name="role",nullable = false,length = 10)

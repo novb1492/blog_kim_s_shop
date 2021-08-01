@@ -27,7 +27,7 @@ public class controller {
     @RequestMapping("/auth/kakaocallback")
     public void kakaoRollback(HttpServletRequest request,HttpServletResponse response) {
         System.out.println("kakaologin요청");   
-        kakaoLoginservice.kakaoLogin(kakaoLoginservice.kakaoGetToken(request.getParameter("code")));
+        kakaoLoginservice.kakaoLogin(kakaoLoginservice.kakaoGetToken(request.getParameter("code")),response);
 
     }
 }

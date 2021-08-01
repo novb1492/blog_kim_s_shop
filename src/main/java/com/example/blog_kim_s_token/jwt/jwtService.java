@@ -61,11 +61,14 @@ public class jwtService {
         return JWT.require(Algorithm.HMAC512(jwtSing)).build().verify(jwtToken).getClaim("id").asInt();
     }
     public Authentication confrimAuthenticate(userDto dto) {
-        //dto.setPwd("1111");
         principaldetail principaldetail=new principaldetail(dto);
-        System.out.println(dto.getPwd()+"오스 비밀번호");
-        Authentication authentication=authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(dto.getEmail(),dto.getPwd(),principaldetail.getAuthorities()));
-        return authentication;
+        String pwd="";
+        if(dto.getProvider()!=null){
+            pwd=oauthPwd;
+        }else{
+            pwd=dto.getPwd();
+        }
+        return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(dto.getEmail(),pwd,principaldetail.getAuthorities()));
     }
     public Authentication makeAuthentication(userDto userDto) {
         System.out.println(userDto.getEmail()+" makeAuthentication 강제로그인");
@@ -103,6 +106,7 @@ public class jwtService {
         }
     }
     public String getRefreshToken(jwtDto jwtDto,int userid) {
+        System.out.println("getRefreshToken입장 기존 리프레시토큰 기간확인");
         String refreshToken="";
         if(jwtDto==null){
             refreshToken=getJwtToken();
