@@ -3,6 +3,13 @@ package com.example.blog_kim_s_token.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import com.auth0.jwt.exceptions.TokenExpiredException;
+import com.example.blog_kim_s_token.jwt.jwtService;
+import com.example.blog_kim_s_token.model.jwt.jwtDto;
 import com.example.blog_kim_s_token.service.utillService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
@@ -17,6 +24,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class errorRestController {
     @Autowired
     private utillService utillService;
+    @Autowired
+    private jwtService jwtService;
     
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public JSONObject processValidationError(MethodArgumentNotValidException exception) {
@@ -31,5 +40,11 @@ public class errorRestController {
         }
 
         return utillService.makeJson(false, builder.toString(),list);
+    }
+    @ExceptionHandler(TokenExpiredException.class)
+    public void TokenExpiredException(TokenExpiredException exception,HttpServletRequest request,HttpServletResponse response) {
+        System.out.println("TokenExpiredException 토큰 재발급시작");
+        System.out.println(request.getHeader("refreshToken"));
+        
     }
 }

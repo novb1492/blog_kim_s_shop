@@ -5,6 +5,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.example.blog_kim_s_token.model.confrim.emailCofrimDto;
 import com.example.blog_kim_s_token.model.confrim.phoneCofrimDto;
 import com.example.blog_kim_s_token.model.user.singupDto;
@@ -82,6 +83,11 @@ public class restcontroller {
     @RequestMapping("/api/userInfor")
     public userDto myPage(HttpServletRequest request,HttpServletResponse response) {
         return userService.findEmail(SecurityContextHolder.getContext().getAuthentication().getName());
+    }
+    @RequestMapping("/auth/jwtex")
+    public void name(HttpServletRequest request,HttpServletResponse response) {
+        System.out.println("auth/jwtex");
+        throw new TokenExpiredException(null);
     }
     @RequestMapping("/auth/index2")
     public String hello2(@CookieValue(value = "refreshToken", required = false) Cookie rCookie,HttpServletResponse response) {
