@@ -3,15 +3,13 @@ package com.example.blog_kim_s_token.controller;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.http.Cookie;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.example.blog_kim_s_token.jwt.jwtService;
 import com.example.blog_kim_s_token.model.jwt.jwtDto;
-import com.example.blog_kim_s_token.model.user.userDao;
-import com.example.blog_kim_s_token.model.user.userDto;
 import com.example.blog_kim_s_token.service.utillService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
@@ -28,8 +26,6 @@ public class errorRestController {
     private utillService utillService;
     @Autowired
     private jwtService jwtService;
-    @Autowired
-    private userDao userDao;
     
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public JSONObject processValidationError(MethodArgumentNotValidException exception) {
