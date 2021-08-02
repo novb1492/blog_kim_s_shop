@@ -49,23 +49,20 @@ public class jwtAuthorizationFilter  extends BasicAuthenticationFilter {
                     e.printStackTrace();
                     System.out.println("토큰이 만료 되었습니다");
                 
-                        String refreshToken="";
-                        for(Cookie c:request.getCookies()){
-                            if(c.getName().equals("refreshToken")){
-                                refreshToken=c.getValue();
-                            }
-                        }
+                        String refreshToken=request.getHeader("refreshToken");
                         System.out.println(refreshToken+" 리프레시 토큰");
-
-                        jwtDto jwtDto=jwtService.getRefreshToken(refreshToken);
-                        String newJwtToken=jwtService.getNewJwtToken(jwtDto);
-                        System.out.println(newJwtToken+" 새 토큰");
-
-                        userDto userDto=dao.findById(jwtDto.getUserid()).orElseThrow(()->new RuntimeException("존재하지 않는 사용자입니다"));
-                        jwtService.setSecuritySession(jwtService.makeAuthentication(userDto));
-                        
-                        response.setHeader("Authorization","Bearer "+newJwtToken);
-                        response.setHeader("refreshToken", refreshToken);
+                        if(refreshToken.startsWith("Bearer")){
+                            refreshToken=refreshToken.replace("Bearer ", "");
+                            jwtDto jwtDto=jwtService.getRefreshToken(refreshToken);
+                            String newJwtToken=jwtService.getNewJwtToken(jwtDto);
+                            System.out.println(newJwtToken+" 새 토큰");
+    
+                            userDto userDto=dao.findById(jwtDto.getUserid()).orElseThrow(()->new RuntimeException("존재하지 않는 사용자입니다"));
+                            jwtService.setSecuritySession(jwtService.makeAuthentication(userDto));
+                            
+                            response.setHeader("Authorization","Bearer "+newJwtToken);
+                            response.setHeader("refreshToken", "Bearer "+refreshToken);
+                        }
                         chain.doFilter(request, response);  
                 }
             }else{
