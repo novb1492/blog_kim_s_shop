@@ -79,12 +79,11 @@ public class restcontroller {
     public String kakaoLogin(HttpServletRequest request,HttpServletResponse response) {
         return kakaoLoginservice.kakaoGetCode();
     }
-    @RequestMapping("/api/mypage")
-    public void myPage(@CookieValue(value = "refreshToken", required = false) Cookie rCookie,HttpServletRequest request,HttpServletResponse response) {
+    @RequestMapping("/api/userInfor")
+    public userDto myPage(@CookieValue(value = "refreshToken", required = false) Cookie rCookie,HttpServletRequest request,HttpServletResponse response) {
         System.out.println("mypage");
         String email=SecurityContextHolder.getContext().getAuthentication().getName();
-        request.setAttribute("userdto", userService.findEmail(email));
-        response.addHeader("userdto", "ht");
+        return userService.findEmail(email);
     }
     @RequestMapping("/auth/index2")
     public String hello2(@CookieValue(value = "refreshToken", required = false) Cookie rCookie,HttpServletResponse response) {
