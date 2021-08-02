@@ -32,6 +32,7 @@ public class jwtService {
     private int refreshTokenValidity;
     @Value("${oauth.pwd}")
     private String oauthPwd;
+    
 
     @Autowired
     private AuthenticationManager authenticationManager;
