@@ -1,5 +1,7 @@
 package com.example.blog_kim_s_token.model.user;
 
+import java.sql.Timestamp;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -7,7 +9,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-
+import org.hibernate.annotations.CreationTimestamp;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -68,6 +70,10 @@ public class userDto {
 
     @Column(name="provider")
     private String provider;
+
+    @Column(name="created")
+    @CreationTimestamp
+    private Timestamp created;
 
     public userDto(String email,String name,String pwd,String role,String postCode,String address,String detailAddress,String extraAddress,String phoneNum){
         this.email=email;

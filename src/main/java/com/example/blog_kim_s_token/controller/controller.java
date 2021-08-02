@@ -1,5 +1,6 @@
 package com.example.blog_kim_s_token.controller;
 
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -27,9 +28,10 @@ public class controller {
     @RequestMapping("/auth/kakaocallback")
     public String kakaoRollback(HttpServletRequest request,HttpServletResponse response) {
         System.out.println("kakaologin요청");   
-       String[] kakaoArray=kakaoLoginservice.kakaoLogin(kakaoLoginservice.kakaoGetToken(request.getParameter("code")),response);
-       return "redirect:http://localhost:3030/index?token="+kakaoArray[0]+"&email="+kakaoArray[1];
+       String email=kakaoLoginservice.kakaoLogin(kakaoLoginservice.kakaoGetToken(request.getParameter("code")),response);
+       return "redirect:http://localhost:3030/index?&email="+email;
 
     }
+
     
 }

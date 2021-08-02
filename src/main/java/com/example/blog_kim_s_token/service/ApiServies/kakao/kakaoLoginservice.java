@@ -74,7 +74,7 @@ public class kakaoLoginservice {
             body.clear();
         }
     }
-    public String[] kakaoLogin(kakaoTokenDto kakaoTokenDto,HttpServletResponse response) {
+    public String kakaoLogin(kakaoTokenDto kakaoTokenDto,HttpServletResponse response) {
         headers.add("Authorization", "Bearer "+kakaoTokenDto.getAccess_token());
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         try {
@@ -107,17 +107,22 @@ public class kakaoLoginservice {
             Authentication authentication=jwtService.confrimAuthenticate(dto);
             jwtService.setSecuritySession(authentication);
 
-            String jwtToken="Bearer "+jwtService.getJwtToken(dto.getId());
+            String jwtToken=jwtService.getJwtToken(dto.getId());
             jwtDto jwtDto=jwtService.getRefreshToken(dto.getId());
             String refreshToken=jwtService.getRefreshToken(jwtDto,dto.getId());
             
-            Cookie cookie=new Cookie("refreshToken",refreshToken);
+            Cookie cookie=new Cookie("Authorization",jwtToken);
             cookie.setHttpOnly(true);
             cookie.setPath("/");
+
+            Cookie cookie2=new Cookie("refreshToken",refreshToken);
+            cookie2.setHttpOnly(true);
+            cookie2.setPath("/");
         
             response.addCookie(cookie);
+            response.addCookie(cookie2);
             
-            return new String[]{jwtToken,email};
+            return email;
 
         } catch (Exception e) {
            e.printStackTrace();

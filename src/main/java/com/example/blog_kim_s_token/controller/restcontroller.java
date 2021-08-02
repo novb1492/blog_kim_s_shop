@@ -80,10 +80,8 @@ public class restcontroller {
         return kakaoLoginservice.kakaoGetCode();
     }
     @RequestMapping("/api/userInfor")
-    public userDto myPage(@CookieValue(value = "refreshToken", required = false) Cookie rCookie,HttpServletRequest request,HttpServletResponse response) {
-        System.out.println("mypage");
-        String email=SecurityContextHolder.getContext().getAuthentication().getName();
-        return userService.findEmail(email);
+    public userDto myPage(HttpServletRequest request,HttpServletResponse response) {
+        return userService.findEmail(SecurityContextHolder.getContext().getAuthentication().getName());
     }
     @RequestMapping("/auth/index2")
     public String hello2(@CookieValue(value = "refreshToken", required = false) Cookie rCookie,HttpServletResponse response) {
