@@ -1,8 +1,7 @@
 package com.example.blog_kim_s_token.service.ApiServies.kakao;
 
-import com.example.blog_kim_s_token.config.principaldetail;
 import com.example.blog_kim_s_token.config.security;
-import com.example.blog_kim_s_token.enums.confirmEnums;
+
 import com.example.blog_kim_s_token.enums.confrimTrue;
 import com.example.blog_kim_s_token.enums.role;
 import com.example.blog_kim_s_token.jwt.jwtService;
@@ -19,7 +18,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.security.authentication.AuthenticationManager;
+
 
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;

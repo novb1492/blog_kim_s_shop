@@ -22,8 +22,8 @@ public class controller {
     @RequestMapping("/auth/navercallback")
     public String naverRollback(HttpServletRequest request,HttpServletResponse response) {
         System.out.println("naverlogin요청");
-        String[] naverArray=naverLoingService.LoginNaver(naverLoingService.getNaverToken(request.getParameter("code"), request.getParameter("state")),request,response);
-        return "redirect:http://localhost:3030/index?token="+naverArray[0]+"&email="+naverArray[1];
+        String email=naverLoingService.LoginNaver(naverLoingService.getNaverToken(request.getParameter("code"), request.getParameter("state")),request,response);
+        return "redirect:http://localhost:3030/index?email="+email;
     }
     @RequestMapping("/auth/kakaocallback")
     public String kakaoRollback(HttpServletRequest request,HttpServletResponse response) {
