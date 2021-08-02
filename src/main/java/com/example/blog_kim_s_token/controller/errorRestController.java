@@ -10,6 +10,8 @@ import javax.servlet.http.HttpServletResponse;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.example.blog_kim_s_token.jwt.jwtService;
 import com.example.blog_kim_s_token.model.jwt.jwtDto;
+import com.example.blog_kim_s_token.model.user.userDao;
+import com.example.blog_kim_s_token.model.user.userDto;
 import com.example.blog_kim_s_token.service.utillService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
@@ -26,6 +28,8 @@ public class errorRestController {
     private utillService utillService;
     @Autowired
     private jwtService jwtService;
+    @Autowired
+    private userDao userDao;
     
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public JSONObject processValidationError(MethodArgumentNotValidException exception) {
@@ -42,9 +46,21 @@ public class errorRestController {
         return utillService.makeJson(false, builder.toString(),list);
     }
     @ExceptionHandler(TokenExpiredException.class)
-    public void TokenExpiredException(TokenExpiredException exception,HttpServletRequest request,HttpServletResponse response) {
+    public JSONObject TokenExpiredException(TokenExpiredException exception,HttpServletRequest request,HttpServletResponse response) {
         System.out.println("TokenExpiredException 토큰 재발급시작");
-        System.out.println(request.getHeader("refreshToken"));
-        
+        String refreshToken=request.getHeader("refreshToken");
+        System.out.println(refreshToken+" 리프레시 토큰");
+        if(refreshToken.startsWith("Bearer")){
+            refreshToken=refreshToken.replace("Bearer ", "");
+            jwtDto jwtDto=jwtService.getRefreshToken(refreshToken);
+            String newJwtToken=jwtService.getNewJwtToken(jwtDto);
+            System.out.println(newJwtToken+" 새 토큰");
+
+            JSONObject jsonObject=new JSONObject();
+            jsonObject.put("Authorization", newJwtToken);
+            jsonObject.put("refreshToken", refreshToken);
+            return jsonObject;
+        }
+        return null;
     }
 }
