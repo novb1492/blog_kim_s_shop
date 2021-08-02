@@ -11,7 +11,7 @@ import com.example.blog_kim_s_token.model.oauth.kakao.kakaoLoginDto;
 import com.example.blog_kim_s_token.model.oauth.kakao.kakaoTokenDto;
 import com.example.blog_kim_s_token.model.user.userDao;
 import com.example.blog_kim_s_token.model.user.userDto;
-
+import com.example.blog_kim_s_token.service.cookie.cookieService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,7 +27,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import java.util.LinkedHashMap;
 
-import javax.servlet.http.Cookie;
+
 import javax.servlet.http.HttpServletResponse;
 
 @Service
@@ -48,6 +48,8 @@ public class kakaoLoginservice {
     private security security;
     @Autowired
     private jwtService jwtService;
+    @Autowired
+    private cookieService cookieService;
 
 
     public String kakaoGetCode() {
@@ -110,17 +112,10 @@ public class kakaoLoginservice {
             jwtDto jwtDto=jwtService.getRefreshToken(dto.getId());
             String refreshToken=jwtService.getRefreshToken(jwtDto,dto.getId());
             
-            Cookie cookie=new Cookie("Authorization",jwtToken);
-            cookie.setHttpOnly(true);
-            cookie.setPath("/");
+            String[] cookiesNames={"Authorization","refreshToken"};
+            String[] cookiesValues={jwtToken,refreshToken};
+            cookieService.cookieFactory(response, cookiesNames, cookiesValues);
 
-            Cookie cookie2=new Cookie("refreshToken",refreshToken);
-            cookie2.setHttpOnly(true);
-            cookie2.setPath("/");
-        
-            response.addCookie(cookie);
-            response.addCookie(cookie2);
-            
             return email;
 
         } catch (Exception e) {
