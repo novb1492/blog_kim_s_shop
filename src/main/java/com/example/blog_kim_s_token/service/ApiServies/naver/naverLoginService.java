@@ -73,15 +73,8 @@ public class naverLoginService   {
            naverDto naverDto =restTemplate.postForObject("https://openapi.naver.com/v1/nid/me",entity,naverDto.class);
            System.out.println(naverDto+ "정보");
            
-           String[] split=naverDto.getResponse().get("email").toString().split("@");
-           String email="";
+           String email=(String)naverDto.getResponse().get("email");
 
-           if(!split[1].equals("naver.com")){
-               email=split[0]+"@naver.com";
-           }else{
-               email=naverDto.getResponse().get("email").toString();
-           }
-               split=naverDto.getResponse().get("mobile_e164").toString().split("2");
                userDto dto=dao.findByEmail(email);
                if(dto==null){
                 dto=userDto.builder().email(email)
