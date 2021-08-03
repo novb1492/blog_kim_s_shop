@@ -60,8 +60,8 @@ public class jwtLoginFilter extends UsernamePasswordAuthenticationFilter {
         String refreshToken=jwtService.getRefreshToken(jwtDto,userId);
         
         System.out.println(jwtToken);
-        String[] cookiesNames={"Authorization","refreshToken","userId"};
-        String[] cookiesValues={jwtToken,refreshToken,Integer.toString(userId)};
+        String[] cookiesNames={"Authorization","refreshToken",};
+        String[] cookiesValues={jwtToken,refreshToken};
         cookieService.cookieFactory(response, cookiesNames, cookiesValues);
 
         chain.doFilter(request, response);

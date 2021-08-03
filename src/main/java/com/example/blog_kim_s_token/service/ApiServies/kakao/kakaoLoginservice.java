@@ -75,7 +75,7 @@ public class kakaoLoginservice {
             body.clear();
         }
     }
-    public String kakaoLogin(kakaoTokenDto kakaoTokenDto,HttpServletResponse response) {
+    public void kakaoLogin(kakaoTokenDto kakaoTokenDto,HttpServletResponse response) {
         headers.add("Authorization", "Bearer "+kakaoTokenDto.getAccess_token());
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         try {
@@ -116,14 +116,11 @@ public class kakaoLoginservice {
             String[] cookiesValues={jwtToken,refreshToken};
             cookieService.cookieFactory(response, cookiesNames, cookiesValues);
 
-            return email;
-
         } catch (Exception e) {
            e.printStackTrace();
         }finally{
             headers.clear();
         }
-        return null;
     }
 
 }

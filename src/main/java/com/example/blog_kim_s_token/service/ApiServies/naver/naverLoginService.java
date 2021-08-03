@@ -66,7 +66,7 @@ public class naverLoginService   {
          System.out.println(jsonObject+" token"); 
          return jsonObject;
      }
-     public String LoginNaver(JSONObject jsonObject,HttpServletRequest request,HttpServletResponse response) {
+     public void LoginNaver(JSONObject jsonObject,HttpServletRequest request,HttpServletResponse response) {
         headers.add("Authorization", "Bearer "+jsonObject.get("access_token"));
         HttpEntity<JSONObject>entity=new HttpEntity<JSONObject>(headers);
         try {
@@ -108,8 +108,7 @@ public class naverLoginService   {
                String[] cookiesNames={"Authorization","refreshToken"};
                String[] cookiesValues={jwtToken,refreshToken};
                cookieService.cookieFactory(response, cookiesNames, cookiesValues);
-               
-               return email;
+            
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("LoginNaver 오류가 발생 했습니다");
