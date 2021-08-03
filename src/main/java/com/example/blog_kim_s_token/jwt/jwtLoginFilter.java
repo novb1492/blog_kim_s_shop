@@ -53,13 +53,15 @@ public class jwtLoginFilter extends UsernamePasswordAuthenticationFilter {
         System.out.println("successfulAuthentication 입장");
 
         principaldetail principaldetail=(principaldetail)authResult.getPrincipal();
-        String jwtToken=jwtService.getJwtToken(principaldetail.getUserDto().getId());
-        jwtDto jwtDto=jwtService.getRefreshToken(principaldetail.getUserDto().getId());
-        String refreshToken=jwtService.getRefreshToken(jwtDto,principaldetail.getUserDto().getId());
+        int userId=principaldetail.getUserDto().getId();
+
+        String jwtToken=jwtService.getJwtToken(userId);
+        jwtDto jwtDto=jwtService.getRefreshToken(userId);
+        String refreshToken=jwtService.getRefreshToken(jwtDto,userId);
         
         System.out.println(jwtToken);
-        String[] cookiesNames={"Authorization","refreshToken"};
-        String[] cookiesValues={jwtToken,refreshToken};
+        String[] cookiesNames={"Authorization","refreshToken","userId"};
+        String[] cookiesValues={jwtToken,refreshToken,Integer.toString(userId)};
         cookieService.cookieFactory(response, cookiesNames, cookiesValues);
 
         chain.doFilter(request, response);
