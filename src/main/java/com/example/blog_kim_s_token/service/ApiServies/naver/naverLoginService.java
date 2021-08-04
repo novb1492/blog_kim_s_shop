@@ -37,6 +37,10 @@ public class naverLoginService   {
     private final String naver="naver";
     @Value("${oauth.pwd}")
     private String oauthPwd;
+    @Value("${jwt.accessToken.name}")
+    private String AuthorizationTokenName;
+    @Value("${jwt.refreshToken.name}")
+    private String refreshTokenName;
 
     private RestTemplate restTemplate=new RestTemplate();
     private HttpHeaders headers=new HttpHeaders();
@@ -98,9 +102,12 @@ public class naverLoginService   {
                jwtDto jwtDto=jwtService.getRefreshToken(dto.getId());
                String refreshToken=jwtService.getRefreshToken(jwtDto,dto.getId());
 
-               String[] cookiesNames={"Authorization","refreshToken"};
-               String[] cookiesValues={jwtToken,refreshToken};
-               cookieService.cookieFactory(response, cookiesNames, cookiesValues);
+               String[][] cookiesNamesAndValues=new String[2][2];
+               cookiesNamesAndValues[0][0]=AuthorizationTokenName;
+               cookiesNamesAndValues[0][1]=jwtToken;
+               cookiesNamesAndValues[1][0]=refreshTokenName;
+               cookiesNamesAndValues[1][1]=refreshToken;
+               cookieService.cookieFactory(response, cookiesNamesAndValues);
             
         } catch (Exception e) {
             e.printStackTrace();
