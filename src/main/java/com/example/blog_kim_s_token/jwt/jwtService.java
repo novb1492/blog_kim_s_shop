@@ -8,13 +8,16 @@ import java.util.Date;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.example.blog_kim_s_token.config.principaldetail;
+import com.example.blog_kim_s_token.enums.userEnums;
 import com.example.blog_kim_s_token.model.jwt.jwtDao;
 import com.example.blog_kim_s_token.model.jwt.jwtDto;
 import com.example.blog_kim_s_token.model.user.userDto;
 import com.example.blog_kim_s_token.service.utillService;
+import com.nimbusds.jose.shaded.json.JSONObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -32,6 +35,12 @@ public class jwtService {
     private int refreshTokenValidity;
     @Value("${oauth.pwd}")
     private String oauthPwd;
+    @Value("${jwt.accessToken.name}")
+    private String AuthorizationTokenName;
+    @Value("${jwt.refreshToken.name}")
+    private String refreshTokenName;
+    @Value("${jwt.type}")
+    private String bearer;
     
 
     @Autowired
@@ -105,6 +114,18 @@ public class jwtService {
         } catch (Exception e) {
            e.printStackTrace();
         }
+    }
+    public JSONObject deleteRefreshToken(String tokenName) {
+        System.out.println("deleteRefreshToken 로그아웃 토큰제거");
+        jwtDto jwtDto= jwtDao.findByTokenName(tokenName.replace(bearer+" ", ""));
+        try {
+            jwtDao.delete(jwtDto);
+            return utillService.makeJson(userEnums.sucLogout.getBool(), userEnums.sucLogout.getMessege()); 
+        } catch (InvalidDataAccessApiUsageException e) {
+           e.printStackTrace();
+           System.out.println("존재 하지 않는 토큰");
+        }
+        return utillService.makeJson(userEnums.failFindRefreshToken.getBool(), userEnums.failFindRefreshToken.getMessege()); 
     }
     public String getRefreshToken(jwtDto jwtDto,int userid) {
         System.out.println("getRefreshToken입장 기존 리프레시토큰 기간확인");

@@ -92,7 +92,11 @@ public class restcontroller {
         System.out.println("auth/jwtex");
         throw new TokenExpiredException(null);
     }
-
+    @RequestMapping("/api/logout")
+    public JSONObject logout(HttpServletRequest request,HttpServletResponse response) {
+        System.out.println("logout");
+        return userService.logout(request,response);
+    }
     @RequestMapping("/auth/index2")
     public String hello2(@CookieValue(value = "refreshToken", required = false) Cookie rCookie,HttpServletResponse response) {
         System.out.println("index2");

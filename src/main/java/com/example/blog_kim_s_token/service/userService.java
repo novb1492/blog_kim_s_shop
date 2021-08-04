@@ -1,17 +1,24 @@
 package com.example.blog_kim_s_token.service;
 
 
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import com.example.blog_kim_s_token.config.security;
 import com.example.blog_kim_s_token.enums.confirmEnums;
 import com.example.blog_kim_s_token.enums.role;
 import com.example.blog_kim_s_token.enums.userEnums;
+import com.example.blog_kim_s_token.jwt.jwtService;
 import com.example.blog_kim_s_token.model.confrim.confrimDto;
 import com.example.blog_kim_s_token.model.user.singupDto;
 import com.example.blog_kim_s_token.model.user.userDao;
 import com.example.blog_kim_s_token.model.user.userDto;
+
 import com.nimbusds.jose.shaded.json.JSONObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +27,9 @@ import org.springframework.stereotype.Service;
 public class userService {
 
     private final int yes=1;
- 
+    @Value("${jwt.refreshToken.name}")
+    private String refreshTokenName;
+    
     @Autowired
     private userDao userDao;
     @Autowired
@@ -29,6 +38,9 @@ public class userService {
     private security security;
     @Autowired
     private confrimService confrimService;
+    @Autowired
+    private jwtService jwtService;
+
 
     public boolean confrimEmail(String email) {
         if(findEmail(email)==null){
@@ -87,5 +99,9 @@ public class userService {
     public void updatePwd(String email,String pwd) {
         System.out.println("updatePwd 입장 비밀번호 변경");
         userDao.updatePwd(security.pwdEncoder().encode(pwd), email);
+    }
+    public JSONObject logout(HttpServletRequest request,HttpServletResponse response) {
+        System.out.println("logout 입장");
+        return jwtService.deleteRefreshToken(request.getHeader(refreshTokenName));
     }
 }
