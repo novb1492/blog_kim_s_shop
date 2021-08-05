@@ -87,7 +87,6 @@ public class naverLoginService   {
                                     .postCode("111111")
                                     .address("address")
                                     .detailAddress("detailAddress")
-                                    .extraAddress("exa")
                                     .phoneNum((String)naverDto.getResponse().get("mobile"))
                                     .phoneCheck(confrimTrue.yes.getValue())
                                     .emailCheck(confrimTrue.yes.getValue())

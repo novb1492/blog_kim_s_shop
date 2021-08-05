@@ -27,7 +27,6 @@ public class singupDto {
     private String address;
     @NotBlank(message = "상세주소가 공백입니다")
     private String detailAddress;
-    @NotBlank(message = "참고항목이 공백입니다")
     private String extraAddress;
     @Positive(message = "전화번호가  공백입니다")
     private String phoneNum;
