@@ -20,7 +20,6 @@ import com.example.blog_kim_s_token.service.ApiServies.naver.naverLoginService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -85,7 +84,7 @@ public class restcontroller {
     }
     @RequestMapping("/api/userInfor")
     public userDto myPage(HttpServletRequest request,HttpServletResponse response) {
-        return userService.findEmail(SecurityContextHolder.getContext().getAuthentication().getName());
+        return userService.sendUserDto();
     }
     @RequestMapping("/auth/jwtex")
     public void name(HttpServletRequest request,HttpServletResponse response) {

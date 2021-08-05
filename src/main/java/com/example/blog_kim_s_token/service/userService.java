@@ -104,4 +104,9 @@ public class userService {
         System.out.println("logout 입장");
         return jwtService.deleteRefreshToken(request.getHeader(refreshTokenName));
     }
+    public userDto sendUserDto() {
+        userDto userDto=userDao.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
+        userDto.setPwd(null);
+        return userDto;
+    }
 }
