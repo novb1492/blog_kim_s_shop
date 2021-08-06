@@ -15,7 +15,9 @@ public class cookieService {
         for(int i =0;i<namesAndValues.length;i++){
             for(int ii=0;ii<namesAndValues[i].length;){
                 Cookie cookie=new Cookie(namesAndValues[i][ii],namesAndValues[i][ii+1]);
-                cookie.setHttpOnly(true);
+                if(namesAndValues[i][ii+2]!=null&&namesAndValues[i][ii+2].equals("httponly")){
+                    cookie.setHttpOnly(true);  
+                }
                 cookie.setPath("/");
                 response.addCookie(cookie);
                 break;

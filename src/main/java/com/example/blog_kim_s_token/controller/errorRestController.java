@@ -3,7 +3,7 @@ package com.example.blog_kim_s_token.controller;
 import java.util.ArrayList;
 import java.util.List;
 
-
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -44,9 +44,21 @@ public class errorRestController {
     @ExceptionHandler(TokenExpiredException.class)
     public JSONObject TokenExpiredException(TokenExpiredException exception,HttpServletRequest request,HttpServletResponse response) {
         System.out.println("TokenExpiredException 토큰 재발급시작");
-        String refreshToken=request.getHeader("refreshToken");
+        String token="";
+        try {
+            Cookie[] cookies=request.getCookies();
+            for(Cookie c: cookies){
+                if(c.getName().equals("refreshToken")){
+                    System.out.println(c.getValue());
+                    token=c.getValue();
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        String refreshToken=token;
         System.out.println(refreshToken+" 리프레시 토큰");
-        if(refreshToken.startsWith("Bearer")){
+  
             refreshToken=refreshToken.replace("Bearer ", "");
             jwtDto jwtDto=jwtService.getRefreshToken(refreshToken);
             String newJwtToken=jwtService.getNewJwtToken(jwtDto);
@@ -56,7 +68,7 @@ public class errorRestController {
             jsonObject.put("Authorization", newJwtToken);
             jsonObject.put("refreshToken", refreshToken);
             return jsonObject;
-        }
-        return null;
+        
+     
     }
 }

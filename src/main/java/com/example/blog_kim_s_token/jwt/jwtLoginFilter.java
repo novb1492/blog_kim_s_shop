@@ -63,8 +63,10 @@ public class jwtLoginFilter extends UsernamePasswordAuthenticationFilter {
         String[][] cookiesNamesAndValues=new String[2][2];
         cookiesNamesAndValues[0][0]="Authorization";
         cookiesNamesAndValues[0][1]=jwtToken;
+        cookiesNamesAndValues[0][2]="httponly";
         cookiesNamesAndValues[1][0]="refreshToken";
         cookiesNamesAndValues[1][1]=refreshToken;
+        cookiesNamesAndValues[1][2]="httponly";
         cookieService.cookieFactory(response, cookiesNamesAndValues);
 
         chain.doFilter(request, response);

@@ -11,6 +11,7 @@ import javax.validation.Valid;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.example.blog_kim_s_token.model.confrim.emailCofrimDto;
 import com.example.blog_kim_s_token.model.confrim.phoneCofrimDto;
+import com.example.blog_kim_s_token.model.user.addressDto;
 import com.example.blog_kim_s_token.model.user.singupDto;
 import com.example.blog_kim_s_token.model.user.userDto;
 import com.example.blog_kim_s_token.service.confrimService;
@@ -95,6 +96,12 @@ public class restcontroller {
     public JSONObject logout(HttpServletRequest request,HttpServletResponse response) {
         System.out.println("logout");
         return userService.logout(request,response);
+    }
+    @RequestMapping("/api/updateAddress")
+    public JSONObject updateAddress(@Valid @RequestBody addressDto addressDto,HttpServletResponse response) {
+        System.out.println("updateAddress");
+        System.out.println(addressDto.getAddress());
+        return null;
     }
     @RequestMapping("/auth/index2")
     public String hello2(@CookieValue(value = "refreshToken", required = false) Cookie rCookie,HttpServletResponse response) {

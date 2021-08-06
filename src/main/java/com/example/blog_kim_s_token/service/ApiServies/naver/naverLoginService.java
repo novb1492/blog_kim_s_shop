@@ -101,11 +101,13 @@ public class naverLoginService   {
                jwtDto jwtDto=jwtService.getRefreshToken(dto.getId());
                String refreshToken=jwtService.getRefreshToken(jwtDto,dto.getId());
 
-               String[][] cookiesNamesAndValues=new String[2][2];
+               String[][] cookiesNamesAndValues=new String[2][3];
                cookiesNamesAndValues[0][0]=AuthorizationTokenName;
                cookiesNamesAndValues[0][1]=jwtToken;
+               cookiesNamesAndValues[0][2]="httponly";
                cookiesNamesAndValues[1][0]=refreshTokenName;
                cookiesNamesAndValues[1][1]=refreshToken;
+               cookiesNamesAndValues[1][2]="httponly";
                cookieService.cookieFactory(response, cookiesNamesAndValues);
             
         } catch (Exception e) {
