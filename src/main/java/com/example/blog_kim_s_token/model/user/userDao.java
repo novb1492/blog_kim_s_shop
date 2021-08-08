@@ -14,4 +14,9 @@ public interface userDao  extends JpaRepository<userDto,Integer>{
     @Transactional(rollbackFor = Exception.class)
     @Query(value = "UPDATE user u SET u.pwd =?1 WHERE u.email=?2",nativeQuery = true)
     void updatePwd(String pwd,String email);
+
+    @Modifying
+    @Transactional(rollbackFor = Exception.class)
+    @Query(value = "UPDATE user u SET u.postcode =?1,u.address=?2,u.detail_address=?3,u.extra_address=?4 WHERE u.email=?5",nativeQuery = true)
+    void updateAddress(String postCode,String address,String detailAddress,String extAddress,String email);
 }

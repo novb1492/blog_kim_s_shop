@@ -100,8 +100,7 @@ public class restcontroller {
     @RequestMapping("/api/updateAddress")
     public JSONObject updateAddress(@Valid @RequestBody addressDto addressDto,HttpServletResponse response) {
         System.out.println("updateAddress");
-        System.out.println(addressDto.getAddress());
-        return null;
+        return  userService.updateAddress(addressDto);
     }
     @RequestMapping("/auth/index2")
     public String hello2(@CookieValue(value = "refreshToken", required = false) Cookie rCookie,HttpServletResponse response) {

@@ -11,6 +11,7 @@ import com.example.blog_kim_s_token.enums.role;
 import com.example.blog_kim_s_token.enums.userEnums;
 import com.example.blog_kim_s_token.jwt.jwtService;
 import com.example.blog_kim_s_token.model.confrim.confrimDto;
+import com.example.blog_kim_s_token.model.user.addressDto;
 import com.example.blog_kim_s_token.model.user.singupDto;
 import com.example.blog_kim_s_token.model.user.userDao;
 import com.example.blog_kim_s_token.model.user.userDto;
@@ -110,4 +111,18 @@ public class userService {
         userDto.setPwd(null);
         return userDto;
     }
+    public JSONObject updateAddress(addressDto addressDto) {
+        System.out.println("updateAddress");
+        try {
+            userDto userDto=userDao.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
+            String email=userDto.getEmail();
+            userDao.updateAddress(addressDto.getPostcode(), addressDto.getAddress(), addressDto.getDetailAddress(), addressDto.getExtraAddress(), email);
+            return utillService.makeJson(userEnums.sucUpdateAddress.getBool(), userEnums.sucUpdateAddress.getMessege());
+        } catch (Exception e) {
+            System.out.println("updateAddress 에러발생");
+           e.printStackTrace();
+        }  
+        return utillService.makeJson(userEnums.failUpdateAddress.getBool(), userEnums.failUpdateAddress.getMessege());
+    }
+
 }
