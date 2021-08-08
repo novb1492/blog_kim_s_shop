@@ -105,6 +105,7 @@ public class userService {
         return jwtService.deleteRefreshToken(request.getHeader(refreshTokenName));
     }
     public userDto sendUserDto() {
+        System.out.println("sendUserDto");
         userDto userDto=userDao.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
         userDto.setPwd(null);
         return userDto;

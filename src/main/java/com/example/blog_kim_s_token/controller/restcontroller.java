@@ -84,7 +84,7 @@ public class restcontroller {
         return kakaoLoginservice.kakaoGetCode();
     }
     @RequestMapping("/api/userInfor")
-    public userDto myPage(HttpServletRequest request,HttpServletResponse response) {
+    public userDto getUserInfor(HttpServletRequest request,HttpServletResponse response) {
         return userService.sendUserDto();
     }
     @RequestMapping("/auth/jwtex")
