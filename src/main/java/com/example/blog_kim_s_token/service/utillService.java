@@ -10,10 +10,8 @@ import java.util.Random;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
 
-import org.springframework.stereotype.Service;
 
 
-@Service
 public class utillService {
     
     public static boolean checkDate(Timestamp timestamp,int refreshTokenValidity) {

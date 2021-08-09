@@ -30,7 +30,7 @@ public class jwtService {
     @Value("${jwt.sing}")
     private String jwtSing;
     @Value("${jwt.token.name}")
-    private String jwtTokenName;
+    private  String jwtTokenName;
     @Value("${jwt.refreshToken.validity}")
     private int refreshTokenValidity;
     @Value("${oauth.pwd}")
@@ -49,11 +49,11 @@ public class jwtService {
     private jwtDao jwtDao;
 
 
-    public String getJwtToken(int id) {
+    public  String getJwtToken(int id) {
         System.out.println("getJwtToken 토큰 제작시작");
         return JWT.create().withSubject(jwtTokenName).withExpiresAt(new Date(System.currentTimeMillis()+(1000*30))).withClaim("id",id).sign(Algorithm.HMAC512(jwtSing));
     }
-    public String getJwtToken() {
+    public  String getJwtToken() {
         System.out.println("getJwtToken 리프레시 토큰 제작시작");
         return JWT.create().withSubject(jwtTokenName).withExpiresAt(new Date(System.currentTimeMillis()+(86400*refreshTokenValidity))).sign(Algorithm.HMAC512(jwtSing));
     }

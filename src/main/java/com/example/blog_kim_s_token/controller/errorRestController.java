@@ -23,8 +23,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class errorRestController {
     @Autowired
-    private utillService utillService;
-    @Autowired
     private jwtService jwtService;
     
     @ExceptionHandler(MethodArgumentNotValidException.class)

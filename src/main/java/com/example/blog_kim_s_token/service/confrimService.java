@@ -33,8 +33,6 @@ public class confrimService {
     @Autowired
     private confrimDao confimDao;
     @Autowired
-    private coolSmsService coolSmsService;
-    @Autowired
     private userService userService;
     @Autowired
     private sendEmailService sendEmailService;

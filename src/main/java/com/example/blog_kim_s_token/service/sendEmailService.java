@@ -12,11 +12,12 @@ import org.springframework.stereotype.Service;
 public class sendEmailService {
 
     @Autowired
-    private JavaMailSender javaMailSender;
+    private  JavaMailSender javaMailSender;
 
-    public void sendEmail(String toAddress,String subject,String body) {
+    public  void sendEmail(String toAddress,String subject,String body) {
 
         System.out.println(toAddress+"보낼주소");
+        
 
         MimeMessage message = javaMailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message);
