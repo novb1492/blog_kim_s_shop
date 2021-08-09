@@ -18,6 +18,7 @@ public class jwtAuthorizationFilter  extends BasicAuthenticationFilter {
 
     private userDao dao;
     private jwtService jwtService;
+    
 
     public jwtAuthorizationFilter(AuthenticationManager authenticationManager,userDao dao,jwtService jwtService) {
         super(authenticationManager);
@@ -28,12 +29,16 @@ public class jwtAuthorizationFilter  extends BasicAuthenticationFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)throws IOException, ServletException {
         System.out.println("doFilterInternal 입장"+request.getHeader("Authorization"));
+        System.out.println(request.getRequestURL()+"url");
+        System.out.println( request.getHeader("REFERER")+"도메인");
+        if(!request.getHeader("REFERER").equals("http://localhost:3030/")){
+            return;
+        }
         if(request.getHeader("Authorization")==null||!request.getHeader("Authorization").startsWith("Bearer")){
             System.out.println("헤더 없음");
             chain.doFilter(request, response);
         }else{
             String jwtToken=request.getHeader("Authorization");
-            System.out.println( request.getHeader("REFERER")+"도메인");
             if(jwtToken.startsWith("Bearer")){
                 jwtToken=jwtToken.replace("Bearer ", "");
                 System.out.println(jwtToken+"토큰받음");
