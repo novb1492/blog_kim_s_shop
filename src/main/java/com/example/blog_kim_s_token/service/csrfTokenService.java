@@ -26,6 +26,7 @@ public class csrfTokenService {
             return;
         }
         System.out.println("기존 csrf있음");
+        csrfDao.updateCsrfToken(csrfToken, userID);
     }
     public void deleteCsrfToken(String email) {
         csrfDto dto=csrfDao.findByEmail(email);

@@ -8,8 +8,11 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import com.auth0.jwt.exceptions.TokenExpiredException;
+import com.example.blog_kim_s_token.model.csrf.csrfDao;
+import com.example.blog_kim_s_token.model.csrf.csrfDto;
 import com.example.blog_kim_s_token.model.user.userDao;
 import com.example.blog_kim_s_token.model.user.userDto;
+import com.example.blog_kim_s_token.service.csrfTokenService;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
@@ -18,11 +21,13 @@ public class jwtAuthorizationFilter  extends BasicAuthenticationFilter {
 
     private userDao dao;
     private jwtService jwtService;
+    private csrfDao csrfDao;
 
-    public jwtAuthorizationFilter(AuthenticationManager authenticationManager,userDao dao,jwtService jwtService) {
+    public jwtAuthorizationFilter(AuthenticationManager authenticationManager,userDao dao,jwtService jwtService,csrfDao csrfDao) {
         super(authenticationManager);
         this.dao=dao;
         this.jwtService=jwtService;
+        this.csrfDao=csrfDao;
     }
 
     @Override
@@ -34,6 +39,7 @@ public class jwtAuthorizationFilter  extends BasicAuthenticationFilter {
             System.out.println("도에민이 다릅니다");
             return;
         }
+
         if(request.getHeader("Authorization")==null||!request.getHeader("Authorization").startsWith("Bearer")){
             System.out.println("헤더 없음");
             chain.doFilter(request, response);
@@ -45,10 +51,19 @@ public class jwtAuthorizationFilter  extends BasicAuthenticationFilter {
                 try {
                     int userid=jwtService.onpenJwtToken(jwtToken);
                     System.out.println(userid+"토큰해제");
- 
+                    
+                    csrfDto csrfDto=csrfDao.findByUserId(userid);
+                    String csrfToken=request.getHeader("csrfToken");
+                    System.out.println(csrfToken+"csrfToken");
+                    /*if(csrfDto==null||!csrfToken.equals(csrfDto.getCsrfToken())){
+                        System.out.println("csrf 토큰이 없거나 조작됨");
+                        return;
+                    }*/
+
                     userDto userDto=dao.findById(userid).orElseThrow(()->new RuntimeException("존재하지 않는 회원입니다"));
                     jwtService.setSecuritySession(jwtService.makeAuthentication(userDto));
-            
+                    
+                   
                     chain.doFilter(request, response);   
                 } catch (TokenExpiredException e) {
                     e.printStackTrace();
