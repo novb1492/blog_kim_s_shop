@@ -51,8 +51,7 @@ public class naverLoginService   {
     private security security;
     @Autowired
     private jwtService jwtService;
-    @Autowired
-    private cookieService cookieService;
+
 
 
     public String naverLogin() {

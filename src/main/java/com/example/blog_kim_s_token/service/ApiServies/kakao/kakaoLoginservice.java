@@ -52,8 +52,7 @@ public class kakaoLoginservice {
     private security security;
     @Autowired
     private jwtService jwtService;
-    @Autowired
-    private cookieService cookieService;
+
 
 
     public String kakaoGetCode() {

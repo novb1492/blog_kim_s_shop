@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class utillService {
     
-    public boolean checkDate(Timestamp timestamp,int refreshTokenValidity) {
+    public static boolean checkDate(Timestamp timestamp,int refreshTokenValidity) {
         System.out.println(timestamp+"토큰 기간");
         System.out.println("날짜 비교 시작");
         LocalDateTime timestamp2=timestamp.toLocalDateTime();
@@ -28,7 +28,7 @@ public class utillService {
         }
         return false;
     }
-    public boolean checkTime(Timestamp timestamp,int totalTokenTime) {
+    public static boolean checkTime(Timestamp timestamp,int totalTokenTime) {
         System.out.println(timestamp+"인증시간");
         System.out.println("날짜 비교 시작");
         LocalDateTime timestamp2=timestamp.toLocalDateTime();
@@ -40,7 +40,7 @@ public class utillService {
         }
         return false;
     }
-    public boolean checkDate(Timestamp timestamp) {
+    public static boolean checkDate(Timestamp timestamp) {
         System.out.println(timestamp+"인증시간");
         System.out.println("날짜 비교 시작");
         LocalDateTime timestamp2=timestamp.toLocalDateTime();
@@ -52,24 +52,24 @@ public class utillService {
         }
         return false;
     }
-    public Timestamp getNowTimestamp() {
+    public static Timestamp getNowTimestamp() {
         System.out.println("getNowTimestamp 현재 시간 가져오기");
         return new Timestamp(System.currentTimeMillis());
     }
-    public JSONObject makeJson(boolean bool,String messege) {
+    public static JSONObject makeJson(boolean bool,String messege) {
         JSONObject jsonObject=new JSONObject();
         jsonObject.put("bool",bool);
         jsonObject.put("messege", messege);
         return jsonObject;
     }
-    public JSONObject makeJson(boolean bool,String messege,List<String>list) {
+    public static JSONObject makeJson(boolean bool,String messege,List<String>list) {
         JSONObject jsonObject=new JSONObject();
         jsonObject.put("bool",bool);
         jsonObject.put("messege", messege);
         jsonObject.put("errorPart",list);
         return jsonObject;
     }
-    public String GetRandomNum(int end) {
+    public static String GetRandomNum(int end) {
         String num="";
         Random random=new Random();
         for(int i=0;i<end;i++){

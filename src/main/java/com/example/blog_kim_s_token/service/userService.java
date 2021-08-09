@@ -34,8 +34,6 @@ public class userService {
     @Autowired
     private userDao userDao;
     @Autowired
-    private utillService utillService;
-    @Autowired
     private security security;
     @Autowired
     private confrimService confrimService;

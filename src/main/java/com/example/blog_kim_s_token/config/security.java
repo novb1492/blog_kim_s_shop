@@ -5,7 +5,7 @@ import com.example.blog_kim_s_token.jwt.jwtAuthorizationFilter;
 import com.example.blog_kim_s_token.jwt.jwtLoginFilter;
 import com.example.blog_kim_s_token.jwt.jwtService;
 import com.example.blog_kim_s_token.model.user.userDao;
-import com.example.blog_kim_s_token.service.cookie.cookieService;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -33,8 +33,7 @@ public class security extends WebSecurityConfigurerAdapter {
     private jwtService jwtService;
     @Autowired
     private corsConfig corsConfig;
-    @Autowired
-    private cookieService cookieService;
+  
  
     @Bean
     @Override
@@ -55,7 +54,7 @@ public class security extends WebSecurityConfigurerAdapter {
         .formLogin().disable()
         .httpBasic().disable()
         .addFilter(new jwtAuthorizationFilter(authenticationManager(),dao,jwtService))
-        .addFilter(new jwtLoginFilter(jwtService,cookieService))
+        .addFilter(new jwtLoginFilter(jwtService))
         .authorizeRequests()
         .antMatchers("/","/auth/**","/login")////이 링크들은
         .permitAll()///허용한다

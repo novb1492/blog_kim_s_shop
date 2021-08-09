@@ -35,8 +35,6 @@ public class confrimService {
     @Autowired
     private coolSmsService coolSmsService;
     @Autowired
-    private utillService utillService;
-    @Autowired
     private userService userService;
     @Autowired
     private sendEmailService sendEmailService;

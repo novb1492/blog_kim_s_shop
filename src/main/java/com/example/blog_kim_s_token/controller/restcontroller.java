@@ -102,6 +102,12 @@ public class restcontroller {
         System.out.println("updateAddress");
         return  userService.updateAddress(addressDto);
     }
+    @RequestMapping("/api/changePhoneNum")
+    public JSONObject changePhoneNum(@RequestBody JSONObject jsonObject,HttpServletResponse response) {
+        System.out.println("changePhoneNum");
+        System.out.println(jsonObject.get("phoneNum"));
+        return null;
+    }
     @RequestMapping("/auth/index2")
     public String hello2(@CookieValue(value = "refreshToken", required = false) Cookie rCookie,HttpServletResponse response) {
         System.out.println("index2");

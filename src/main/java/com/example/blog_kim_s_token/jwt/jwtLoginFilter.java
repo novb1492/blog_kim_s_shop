@@ -21,11 +21,8 @@ public class jwtLoginFilter extends UsernamePasswordAuthenticationFilter {
     
     private jwtService jwtService;
     
-    private cookieService cookieService;
-
-    public jwtLoginFilter(jwtService jwtService,cookieService cookieService ){
+    public jwtLoginFilter(jwtService jwtService){
         this.jwtService=jwtService;
-        this.cookieService=cookieService;
     }
 
     @Override

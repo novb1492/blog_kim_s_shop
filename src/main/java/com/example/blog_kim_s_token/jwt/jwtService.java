@@ -47,8 +47,7 @@ public class jwtService {
     private AuthenticationManager authenticationManager;
     @Autowired
     private jwtDao jwtDao;
-    @Autowired
-    private utillService utillService;
+
 
     public String getJwtToken(int id) {
         System.out.println("getJwtToken 토큰 제작시작");

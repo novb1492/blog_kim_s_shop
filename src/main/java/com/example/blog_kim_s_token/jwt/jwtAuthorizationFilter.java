@@ -33,6 +33,7 @@ public class jwtAuthorizationFilter  extends BasicAuthenticationFilter {
             chain.doFilter(request, response);
         }else{
             String jwtToken=request.getHeader("Authorization");
+            System.out.println( request.getHeader("REFERER")+"도메인");
             if(jwtToken.startsWith("Bearer")){
                 jwtToken=jwtToken.replace("Bearer ", "");
                 System.out.println(jwtToken+"토큰받음");
