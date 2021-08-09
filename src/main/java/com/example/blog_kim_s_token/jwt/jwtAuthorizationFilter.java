@@ -18,7 +18,6 @@ public class jwtAuthorizationFilter  extends BasicAuthenticationFilter {
 
     private userDao dao;
     private jwtService jwtService;
-    
 
     public jwtAuthorizationFilter(AuthenticationManager authenticationManager,userDao dao,jwtService jwtService) {
         super(authenticationManager);
@@ -32,6 +31,7 @@ public class jwtAuthorizationFilter  extends BasicAuthenticationFilter {
         System.out.println(request.getRequestURL()+"url");
         System.out.println( request.getHeader("REFERER")+"도메인");
         if(!request.getHeader("REFERER").equals("http://localhost:3030/")){
+            System.out.println("도에민이 다릅니다");
             return;
         }
         if(request.getHeader("Authorization")==null||!request.getHeader("Authorization").startsWith("Bearer")){

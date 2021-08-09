@@ -18,7 +18,9 @@ public enum confirmEnums {
     EqulsTempNum("인증 되었습니다",true),
     notFindEmail("없는 이메일 입니다",false),
     notReuestConfrim("인증번호 요청부터 해주세요",false),
-    sendEmail("이메일을 전송했습니다",true);
+    sendEmail("이메일을 전송했습니다",true),
+    notFindCsrf("이미 로그아웃 했거나 csrf 미발급 사용자입니다",false),
+    notEqualsCsrf("일치 하지 않는 로그아웃 시도",false);
 
     private final String messege;
     private final boolean bool;

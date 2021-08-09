@@ -39,6 +39,8 @@ public class userService {
     private confrimService confrimService;
     @Autowired
     private jwtService jwtService;
+    @Autowired
+    private csrfTokenService csrfTokenService;
 
 
     public boolean confrimEmail(String email) {
@@ -101,6 +103,7 @@ public class userService {
     }
     public JSONObject logout(HttpServletRequest request,HttpServletResponse response) {
         System.out.println("logout 입장");
+         csrfTokenService.deleteCsrfToken(SecurityContextHolder.getContext().getAuthentication().getName());
         return jwtService.deleteRefreshToken(request.getHeader(refreshTokenName));
     }
     public userDto sendUserDto() {
