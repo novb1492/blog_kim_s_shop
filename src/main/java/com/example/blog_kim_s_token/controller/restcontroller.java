@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.example.blog_kim_s_token.model.confrim.emailCofrimDto;
 import com.example.blog_kim_s_token.model.confrim.phoneCofrimDto;
@@ -88,7 +89,7 @@ public class restcontroller {
         return userService.sendUserDto();
     }
     @RequestMapping("/auth/jwtex")
-    public void name(HttpServletRequest request,HttpServletResponse response) {
+    public void TokenExpired() {
         System.out.println("auth/jwtex");
         throw new TokenExpiredException(null);
     }
@@ -107,6 +108,10 @@ public class restcontroller {
         System.out.println("changePhoneNum");
         System.out.println(jsonObject.get("phoneNum"));
         return null;
+    }
+    @RequestMapping("/auth/onlyBearer")
+    public void onlyBearer() {
+        throw new JWTDecodeException(null);
     }
     @RequestMapping("/auth/index2")
     public String hello2(@CookieValue(value = "refreshToken", required = false) Cookie rCookie,HttpServletResponse response) {

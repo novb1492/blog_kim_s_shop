@@ -7,12 +7,14 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.example.blog_kim_s_token.model.csrf.csrfDao;
 import com.example.blog_kim_s_token.model.csrf.csrfDto;
 import com.example.blog_kim_s_token.model.user.userDao;
 import com.example.blog_kim_s_token.model.user.userDto;
-import com.example.blog_kim_s_token.service.csrfTokenService;
+
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
@@ -68,11 +70,24 @@ public class jwtAuthorizationFilter  extends BasicAuthenticationFilter {
                 } catch (TokenExpiredException e) {
                     e.printStackTrace();
                     System.out.println("기간만료");
-                    RequestDispatcher dp=request.getRequestDispatcher("/auth/jwtex");
-		            dp.forward(request, response);
+                    goToError("/auth/jwtex", request, response);
+                }catch(JWTDecodeException e){
+                    e.printStackTrace();
+                    System.out.println("베리어 다음 토큰이 없음");
+                    goToError("/auth/onlyBearer", request, response);
                 }
             } 
         }
+    }
+    private void goToError(String errorUrl,HttpServletRequest request,HttpServletResponse response) {
+        System.out.println("goToError");
+        RequestDispatcher dp=request.getRequestDispatcher(errorUrl);
+        try {
+            dp.forward(request, response);
+        } catch (ServletException | IOException e) {
+            System.out.println("에러링크 존재 하지 않음");
+            e.printStackTrace();
+        } 
     }
     
 }

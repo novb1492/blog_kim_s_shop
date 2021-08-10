@@ -7,6 +7,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.example.blog_kim_s_token.jwt.jwtService;
 import com.example.blog_kim_s_token.model.jwt.jwtDto;
@@ -54,7 +55,10 @@ public class errorRestController {
             jsonObject.put("Authorization", newJwtToken);
             jsonObject.put("refreshToken", refreshToken);
             return jsonObject;
-        
-     
+    }
+    @ExceptionHandler(JWTDecodeException.class)
+    public JSONObject JWTDecodeException(JWTDecodeException exception,HttpServletRequest request,HttpServletResponse response) {
+        System.out.println("JWTDecodeException 입장");
+        return utillService.makeJson(false, "재 로그인 부탁드립니다");
     }
 }
