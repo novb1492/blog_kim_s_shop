@@ -37,8 +37,23 @@ public class jwtAuthorizationFilter  extends BasicAuthenticationFilter {
         System.out.println("doFilterInternal 입장"+request.getHeader("Authorization"));
         System.out.println(request.getRequestURL()+"url");
         System.out.println( request.getHeader("REFERER")+"도메인");
-        if(!request.getHeader("REFERER").equals("http://localhost:3030/")){
-            System.out.println("도에민이 다릅니다");
+
+        String uri=request.getRequestURI();
+        if(request.getHeader("REFERER")==null){
+            System.out.println("도메인이 없습니다"+uri);
+            if(uri.equals("/auth/navercallback")){
+                System.out.println("네이버 로그인 시도입니다");
+            }
+            else if(uri.equals("/auth/kakaocallback")){
+                System.out.println("카카오 로그인 시도입니다");
+            }
+            else{
+                System.out.println("도메인이 없습니다");
+                return;
+            }
+        }
+        else if(!request.getHeader("REFERER").equals("http://localhost:3030/")){
+            System.out.println("도에민이 다릅니다"+request.getRequestURI()+request.getRequestURL());
             return;
         }
 
