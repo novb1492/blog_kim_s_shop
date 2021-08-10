@@ -29,6 +29,7 @@ public class csrfTokenService {
         csrfDao.updateCsrfToken(csrfToken, userID);
     }
     public void deleteCsrfToken(String email) {
+        System.out.println("deleteCsrfToken");
         csrfDto dto=csrfDao.findByEmail(email);
         if(dto==null){
             System.out.println("이미 로그아웃 했거나 csrf 미발급 사용자");

@@ -54,11 +54,11 @@ public class jwtAuthorizationFilter  extends BasicAuthenticationFilter {
                     
                     csrfDto csrfDto=csrfDao.findByUserId(userid);
                     String csrfToken=request.getHeader("csrfToken");
-                    System.out.println(csrfToken+"csrfToken");
-                    /*if(csrfDto==null||!csrfToken.equals(csrfDto.getCsrfToken())){
+                    System.out.println(csrfToken+"csrfToken"+csrfDto.getCsrfToken());
+                    if(csrfDto==null||!csrfToken.equals(csrfDto.getCsrfToken())){
                         System.out.println("csrf 토큰이 없거나 조작됨");
                         return;
-                    }*/
+                    }
 
                     userDto userDto=dao.findById(userid).orElseThrow(()->new RuntimeException("존재하지 않는 회원입니다"));
                     jwtService.setSecuritySession(jwtService.makeAuthentication(userDto));
