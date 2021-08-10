@@ -35,7 +35,7 @@ public class csrfTokenService {
             System.out.println("이미 로그아웃 했거나 csrf 미발급 사용자");
             return;
         }
-        if(dto.getEmail()!=email){
+        if(!dto.getEmail().equals(email)){
             System.out.println("일치 하지 않는 로그아웃 시도");
             return;
         }
