@@ -52,14 +52,22 @@ public class confrimService {
     }
     public void insertConfrim(confrimInterface confrimInterface){
         confrimDto dto=confrimInterface.getDto();
-        dto.setRequestTime(1);
+        if(confrimInterface.unit().equals("phone")){
+            dto.setRequestTime(1); 
+        }else{
+            dto.setEmailRequestTime(1);
+        }
         confrimDao.save(dto);
     }
     public void updateconfrim(confrimInterface confrimInterface,String tempNum) {
         System.out.println("updateconfrim");
         int requestTime=confrimInterface.getRequestTime();
         requestTime+=1;
-        confrimDao.updatePhoneTempNum(tempNum,requestTime,utillService.getNowTimestamp(),confrimInterface.valueOfUbit());
+        if(confrimInterface.unit().equals("phone")){
+            confrimDao.updatePhoneTempNum(tempNum,requestTime,utillService.getNowTimestamp(),confrimInterface.valueOfUbit());
+        }else{
+            confrimDao.updateEmailTempNum(tempNum, requestTime, utillService.getNowTimestamp(), confrimInterface.valueOfUbit());
+        }  
     }
     public void updateconfrimEmail(confrimDto confrimDto,String tempNum) {
         System.out.println("updateconfrimEmail"+tempNum+confrimDto.getEmail());
@@ -148,12 +156,12 @@ public class confrimService {
         if((boolean) result.get("bool")){
             sendEmailService.sendEmail(email,"안녕하세요 kim's Shop입니다","인증번호는 "+tempNum+" 입니다.");
         }
-        return utillService.makeJson(confirmEnums.sendEmail.getBool(),confirmEnums.sendEmail.getMessege());
+        return result;
 
     }
     public void updateconfrimEmail(String email){
-            System.out.println("updateconfrimEmail 입장 이메일인증 완료");
-            confrimDao.updateEmailCheckTrue(t, email);
+        System.out.println("updateconfrimEmail 입장 이메일인증 완료");
+        confrimDao.updateEmailCheckTrue(t, email);
     }
     public JSONObject sendTempPwd(emailCofrimDto emailCofrimDto) {
         System.out.println("sendTempPwd");

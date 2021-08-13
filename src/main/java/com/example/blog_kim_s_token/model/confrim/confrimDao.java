@@ -33,7 +33,7 @@ public interface confrimDao extends JpaRepository<confrimDto,Integer> {
     
     @Modifying
     @Transactional
-    @Query(value = "UPDATE confrim c SET emailtempnum=?1,requesttime=?2,created=?3 WHERE c.email=?4",nativeQuery = true)
+    @Query(value = "UPDATE confrim c SET emailtempnum=?1,email_requesttime=?2,created=?3 WHERE c.email=?4",nativeQuery = true)
     void updateEmailTempNum(String tempNum,int requestTime,Timestamp timestamp,String email);
 
     

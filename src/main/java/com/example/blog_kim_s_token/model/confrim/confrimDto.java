@@ -49,9 +49,11 @@ public class confrimDto {
     @ColumnDefault("0")
     private int phoneCheck;
 
-    @Column(name="requesttime",nullable = false,length = 2)
-    @ColumnDefault("1")
+    @Column(name="requesttime",nullable = false)
     private int requestTime;
+
+    @Column(name="emailRequesttime",nullable = false)
+    private int emailRequestTime;
 
     @Column(name="created")
     @CreationTimestamp  
