@@ -102,23 +102,18 @@ public class confrimService {
         }
         return utillService.makeJson(confirmEnums.nullPhoneNum.getBool(), confirmEnums.nullPhoneNum.getMessege());
     }
+
     public JSONObject cofrimTempNum(phoneCofrimDto phoneCofrimDto) {
-        System.out.println("cofrimTempNum 제출 "+phoneCofrimDto.getTempNum()+phoneCofrimDto.getPhoneNum());
+        System.out.println("cofrimTempNum");
         confrimDto confrimDto=confimDao.findByPhoneNum(phoneCofrimDto.getPhoneNum());
-        if(confrimDto!=null){
-            if(confrimDto.getPhoneNum().equals(phoneCofrimDto.getPhoneNum())){
-                if(utillService.checkTime(confrimDto.getCreated(),overTime)==false){
-                    if(confrimDto.getPhoneTempNum().equals(phoneCofrimDto.getTempNum().trim())){
-                        confimDao.updatePhoneCheckTrue(t, phoneCofrimDto.getPhoneNum());
-                        return utillService.makeJson(confirmEnums.EqulsTempNum.getBool(), confirmEnums.EqulsTempNum.getMessege());
-                    }
-                    return utillService.makeJson(confirmEnums.notEqulsTempNum.getBool(), confirmEnums.notEqulsTempNum.getMessege());
-                }
-               return utillService.makeJson(confirmEnums.overTime.getBool(), confirmEnums.overTime.getMessege());
-            }
-           return utillService.makeJson(confirmEnums.notEqulsPhoneNum.getBool(), confirmEnums.notEqulsPhoneNum.getMessege());
+        confrimInterface confrimInterface=new phoneConfrim(confrimDto);
+        JSONObject result=compareTempNum(confrimInterface,phoneCofrimDto.getTempNum());
+        if((boolean) result.get("bool")==false){
+            return result;
         }
-        return utillService.makeJson(confirmEnums.nullPhoneNumInDb.getBool(),confirmEnums.nullPhoneNumInDb.getMessege());
+        confimDao.updatePhoneCheckTrue(t, phoneCofrimDto.getPhoneNum());
+        return utillService.makeJson(confirmEnums.EqulsTempNum.getBool(), confirmEnums.EqulsTempNum.getMessege());
+                   
     }
     public JSONObject sendEmail(String email) {
         userDto userDto=userService.findEmail(email);
@@ -170,28 +165,5 @@ public class confrimService {
         }
         return utillService.makeJson(confirmEnums.EqulsTempNum.getBool(),confirmEnums.EqulsTempNum.getMessege());  
        
-    }
-    /*public JSONObject confrimTempNum(emailCofrimDto emailCofrimDto) {
-        System.out.println("confrimTempNum Email 입장");
-            confrimDto confrimDto=confimDao.findByEmail(emailCofrimDto.getEmail());
-            if(confrimDto!=null){
-                if(utillService.checkTime(confrimDto.getCreated(),overTime)==false){
-                    if(emailCofrimDto.getTempNum().trim().equals(confrimDto.getEmailTempNum())){
-                        String tempPwd=utillService.GetRandomNum(tempPwdLength);
-                        userService.updatePwd(confrimDto.getEmail(),tempPwd);
-                        deleteCofrim(confrimDto);
-                        sendEmailService.sendEmail(confrimDto.getEmail(),"안녕하세요 kim's Shop입니다","임시비밀번호는 "+tempPwd+" 입니다.");
-                        return utillService.makeJson(confirmEnums.EqulsTempNum.getBool(),"임시비밀번호를 발송해 드렸습니다");
-                    }
-                    return utillService.makeJson(confirmEnums.notEqulsTempNum.getBool(), confirmEnums.notEqulsTempNum.getMessege());
-                }
-                return utillService.makeJson(confirmEnums.overTime.getBool(), confirmEnums.overTime.getMessege());
-            }
-            return utillService.makeJson(confirmEnums.notReuestConfrim.getBool(), confirmEnums.notReuestConfrim.getMessege());
-    }*/
-
-         
-       
-    
-    
+    } 
 }
