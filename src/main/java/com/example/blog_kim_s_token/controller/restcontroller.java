@@ -15,10 +15,10 @@ import com.example.blog_kim_s_token.model.confrim.phoneCofrimDto;
 import com.example.blog_kim_s_token.model.user.addressDto;
 import com.example.blog_kim_s_token.model.user.singupDto;
 import com.example.blog_kim_s_token.model.user.userDto;
-import com.example.blog_kim_s_token.service.confrimService;
 import com.example.blog_kim_s_token.service.userService;
 import com.example.blog_kim_s_token.service.ApiServies.kakao.kakaoLoginservice;
 import com.example.blog_kim_s_token.service.ApiServies.naver.naverLoginService;
+import com.example.blog_kim_s_token.service.confrim.confrimService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,9 +72,9 @@ public class restcontroller {
     public JSONObject sendEmail(HttpServletRequest request,HttpServletResponse response) {
         return confrimService.sendEmail(request.getParameter("email"));
     }
-    @RequestMapping("/auth/cofrimEmailNum")
-    public JSONObject cofrimEmailNum(@Valid @RequestBody emailCofrimDto emailCofrimDto,HttpServletResponse response) {
-        return confrimService.confrimTempNum(emailCofrimDto);
+    @RequestMapping("/auth/sendTempPwd")
+    public JSONObject sendTempPwd(@Valid @RequestBody emailCofrimDto emailCofrimDto,HttpServletResponse response) {
+        return confrimService.sendTempPwd(emailCofrimDto);
     }
     @RequestMapping("/auth/naver")
     public String naverLogin() {

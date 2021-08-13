@@ -6,6 +6,8 @@ import com.example.blog_kim_s_token.jwt.jwtLoginFilter;
 import com.example.blog_kim_s_token.jwt.jwtService;
 import com.example.blog_kim_s_token.model.csrf.csrfDao;
 import com.example.blog_kim_s_token.model.user.userDao;
+import com.example.blog_kim_s_token.service.csrfTokenService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,6 +36,8 @@ public class security extends WebSecurityConfigurerAdapter {
     private corsConfig corsConfig;
     @Autowired
     private csrfDao csrfDao;
+    @Autowired
+    private csrfTokenService csrfTokenService;
   
  
     @Bean
@@ -55,7 +59,7 @@ public class security extends WebSecurityConfigurerAdapter {
         .formLogin().disable()
         .httpBasic().disable()
         .addFilter(new jwtAuthorizationFilter(authenticationManager(),dao,jwtService,csrfDao))
-        .addFilter(new jwtLoginFilter(jwtService))
+        .addFilter(new jwtLoginFilter(jwtService,csrfTokenService))
         .authorizeRequests()
         .antMatchers("/","/auth/**","/login")////이 링크들은
         .permitAll()///허용한다

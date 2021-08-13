@@ -17,7 +17,6 @@ public class sendEmailService {
     public  void sendEmail(String toAddress,String subject,String body) {
 
         System.out.println(toAddress+"보낼주소");
-        
 
         MimeMessage message = javaMailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message);

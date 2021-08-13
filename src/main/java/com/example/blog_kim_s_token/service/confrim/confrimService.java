@@ -1,4 +1,4 @@
-package com.example.blog_kim_s_token.service;
+package com.example.blog_kim_s_token.service.confrim;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -8,6 +8,10 @@ import com.example.blog_kim_s_token.model.confrim.confrimDto;
 import com.example.blog_kim_s_token.model.confrim.emailCofrimDto;
 import com.example.blog_kim_s_token.model.confrim.phoneCofrimDto;
 import com.example.blog_kim_s_token.model.user.userDto;
+import com.example.blog_kim_s_token.service.coolSmsService;
+import com.example.blog_kim_s_token.service.sendEmailService;
+import com.example.blog_kim_s_token.service.userService;
+import com.example.blog_kim_s_token.service.utillService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
 
@@ -138,7 +142,36 @@ public class confrimService {
             System.out.println("updateconfrimEmail 입장 이메일인증 완료");
             confimDao.updateEmailCheckTrue(t, email);
     }
-    public JSONObject confrimTempNum(emailCofrimDto emailCofrimDto) {
+    public JSONObject sendTempPwd(emailCofrimDto emailCofrimDto) {
+        System.out.println("sendTempPwd");
+        confrimDto confrimDto=confimDao.findByEmail(emailCofrimDto.getEmail());
+        confrimInterface confrimInterface=new emailConfrim(confrimDto);
+        JSONObject result=compareTempNum(confrimInterface,emailCofrimDto.getTempNum());
+        if((boolean) result.get("bool")==false){
+            return result;
+        }
+        String tempPwd=utillService.GetRandomNum(tempPwdLength);
+                        System.out.println(tempPwd+"임시비밀번호");
+                        userService.updatePwd(confrimDto.getEmail(),tempPwd);
+                        deleteCofrim(confrimDto);
+                        sendEmailService.sendEmail(confrimDto.getEmail(),"안녕하세요 kim's Shop입니다","임시비밀번호는 "+tempPwd+" 입니다.");
+        return utillService.makeJson(true, "임시 비밀번호를 메일로 보내드렸습니다");
+    }
+    public JSONObject compareTempNum(confrimInterface confrimInterface,String requestTempNum) {
+        System.out.println("confrimTempNum 입장");
+        if(confrimInterface.isNULL()){
+            return utillService.makeJson(confirmEnums.notReuestConfrim.getBool(), confirmEnums.notReuestConfrim.getMessege());
+        }
+        if(utillService.checkTime(confrimInterface.getCreated(),overTime)){
+            return utillService.makeJson(confirmEnums.overTime.getBool(), confirmEnums.overTime.getMessege()); 
+        }
+        if(!requestTempNum.trim().equals(confrimInterface.TempNumAtDb())){
+            return utillService.makeJson(confirmEnums.notEqulsTempNum.getBool(), confirmEnums.notEqulsTempNum.getMessege());
+        }
+        return utillService.makeJson(confirmEnums.EqulsTempNum.getBool(),confirmEnums.EqulsTempNum.getMessege());  
+       
+    }
+    /*public JSONObject confrimTempNum(emailCofrimDto emailCofrimDto) {
         System.out.println("confrimTempNum Email 입장");
             confrimDto confrimDto=confimDao.findByEmail(emailCofrimDto.getEmail());
             if(confrimDto!=null){
@@ -155,6 +188,10 @@ public class confrimService {
                 return utillService.makeJson(confirmEnums.overTime.getBool(), confirmEnums.overTime.getMessege());
             }
             return utillService.makeJson(confirmEnums.notReuestConfrim.getBool(), confirmEnums.notReuestConfrim.getMessege());
-    }
+    }*/
+
+         
+       
+    
     
 }

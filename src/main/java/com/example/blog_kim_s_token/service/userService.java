@@ -15,7 +15,7 @@ import com.example.blog_kim_s_token.model.user.addressDto;
 import com.example.blog_kim_s_token.model.user.singupDto;
 import com.example.blog_kim_s_token.model.user.userDao;
 import com.example.blog_kim_s_token.model.user.userDto;
-
+import com.example.blog_kim_s_token.service.confrim.confrimService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -98,7 +98,7 @@ public class userService {
         return utillService.makeJson(true, userDto.getEmail());
     }
     public void updatePwd(String email,String pwd) {
-        System.out.println("updatePwd 입장 비밀번호 변경");
+        System.out.println("updatePwd 입장");
         userDao.updatePwd(security.pwdEncoder().encode(pwd), email);
     }
     public JSONObject logout(HttpServletRequest request,HttpServletResponse response) {

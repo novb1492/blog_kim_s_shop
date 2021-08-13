@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.example.blog_kim_s_token.config.principaldetail;
 import com.example.blog_kim_s_token.model.jwt.jwtDto;
 import com.example.blog_kim_s_token.model.user.userDto;
+import com.example.blog_kim_s_token.service.csrfTokenService;
 import com.example.blog_kim_s_token.service.cookie.cookieService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.security.core.Authentication;
@@ -20,9 +21,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class jwtLoginFilter extends UsernamePasswordAuthenticationFilter {
     
     private jwtService jwtService;
+    private csrfTokenService csrfService;
     
-    public jwtLoginFilter(jwtService jwtService){
+    public jwtLoginFilter(jwtService jwtService,csrfTokenService csrfService){
         this.jwtService=jwtService;
+        this.csrfService=csrfService;
     }
 
     @Override
@@ -55,15 +58,21 @@ public class jwtLoginFilter extends UsernamePasswordAuthenticationFilter {
         String jwtToken=jwtService.getJwtToken(userId);
         jwtDto jwtDto=jwtService.getRefreshToken(userId);
         String refreshToken=jwtService.getRefreshToken(jwtDto,userId);
+        String csrfToken=csrfTokenService.getCsrfToken();
+        csrfService.insertCsrfToken(userId,csrfToken,principaldetail.getUserDto().getEmail());
+
         
         System.out.println(jwtToken);
-        String[][] cookiesNamesAndValues=new String[2][3];
+        String[][] cookiesNamesAndValues=new String[3][3];
         cookiesNamesAndValues[0][0]="Authorization";
         cookiesNamesAndValues[0][1]=jwtToken;
         cookiesNamesAndValues[0][2]="httponly";
         cookiesNamesAndValues[1][0]="refreshToken";
         cookiesNamesAndValues[1][1]=refreshToken;
         cookiesNamesAndValues[1][2]="httponly";
+        cookiesNamesAndValues[2][0]="csrfToken";
+        cookiesNamesAndValues[2][1]=csrfToken;
+        cookiesNamesAndValues[2][2]="httponly";
         cookieService.cookieFactory(response, cookiesNamesAndValues);
 
         chain.doFilter(request, response);
