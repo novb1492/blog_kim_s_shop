@@ -2,6 +2,8 @@ package com.example.blog_kim_s_token.service.confrim;
 
 import java.sql.Timestamp;
 
+import com.example.blog_kim_s_token.model.confrim.confrimDto;
+
 
 
 public interface confrimInterface {
@@ -11,4 +13,5 @@ public interface confrimInterface {
     public Timestamp getCreated();
     public int getRequestTime();
     public boolean isNULL();
+    public confrimDto getDto();
 }

@@ -36,6 +36,10 @@ public class emailConfrim implements  confrimInterface {
        }
         return false;
     }
+    @Override
+    public confrimDto getDto() {
+        return this.confrimDto;
+    }
   
  
 
