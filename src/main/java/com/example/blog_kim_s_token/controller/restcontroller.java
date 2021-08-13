@@ -50,7 +50,7 @@ public class restcontroller {
     }
     @RequestMapping("/auth/sendSms")
     public JSONObject sendSms(HttpServletRequest request,HttpServletResponse response) {
-        return confrimService.sendMessege(request);
+        return confrimService.sendPhone(request);
     }
     @RequestMapping("/auth/cofrimSmsNum")
     public JSONObject cofrimSmsNum(@Valid @RequestBody phoneCofrimDto phoneCofrimDto,HttpServletResponse response) {
