@@ -50,12 +50,14 @@ public class confrimService {
     public confrimDto findConfrimEmai(String email){
         return confrimDao.findByEmail(email);
     }
-    public void insertConfrim(confrimInterface confrimInterface){
+    public void insertConfrim(confrimInterface confrimInterface,String tempNum){
         confrimDto dto=confrimInterface.getDto();
         if(confrimInterface.unit().equals("phone")){
             dto.setRequestTime(1); 
+            dto.setPhoneTempNum(tempNum);
         }else{
             dto.setEmailRequestTime(1);
+            dto.setEmailTempNum(tempNum);
         }
         confrimDao.save(dto);
     }
@@ -106,18 +108,19 @@ public class confrimService {
     public JSONObject sendSms(confrimInterface confrimInterface,String tempNum) {
             if(confrimInterface.getRequestTime()==0){
                 System.out.println("처음 인증요청"); 
-                insertConfrim(confrimInterface);
+                insertConfrim(confrimInterface,tempNum);
             }
             else{
                 System.out.println("요청 기록존재");
-                if(confrimInterface.getRequestTime()<maxOfday){
-                    System.out.println(maxOfday+"회 이하");
-                    updateconfrim(confrimInterface, tempNum);
-                }else{
-                    if(utillService.checkDate(confrimInterface.getCreated(),coolTime)){
-                        System.out.println(maxOfday+"회 초과후 쿨타임지남");
-                        deleteCofrim(confrimInterface.getDto());
-                        insertConfrim(confrimInterface);
+                if(utillService.checkDate(confrimInterface.getCreated(),coolTime)){
+                    System.out.println(maxOfday+"회 초과후 쿨타임지남 or 그냥 하루지남");
+                    deleteCofrim(confrimInterface.getDto());
+                    insertConfrim(confrimInterface,tempNum);
+                }
+                else{
+                    if(confrimInterface.getRequestTime()<maxOfday){
+                        System.out.println(maxOfday+"회 이하");
+                        updateconfrim(confrimInterface, tempNum);
                     }else{
                         System.out.println(maxOfday+"초과후 하루 안지남");
                         return utillService.makeJson(confirmEnums.tooManyTime.getBool(),"하루 "+maxOfday+"회 제한입니다");
