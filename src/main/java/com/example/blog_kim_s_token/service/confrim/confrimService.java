@@ -137,7 +137,6 @@ public class confrimService {
         if((boolean) result.get("bool")==false){
             return result;
         }
-        confrimDao.delete(confrimDto);
         confrimDao.updatePhoneCheckTrue(t, phoneCofrimDto.getPhoneNum());
         return utillService.makeJson(confirmEnums.EqulsTempNum.getBool(), confirmEnums.EqulsTempNum.getMessege());
                    
