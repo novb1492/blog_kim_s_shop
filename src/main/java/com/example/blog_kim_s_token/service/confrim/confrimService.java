@@ -44,6 +44,7 @@ public class confrimService {
     private userService userService;
     @Autowired
     private sendEmailService sendEmailService;
+  
 
 
 
@@ -148,7 +149,9 @@ public class confrimService {
     }
     public JSONObject cofrimTempNum(phoneCofrimDto phoneCofrimDto) {
         System.out.println("cofrimTempNum");
-        confrimDto confrimDto=confrimDao.findByPhoneNum(phoneCofrimDto.getPhoneNum());
+        confrimDto confrimDto=confrimDao.findByPhoneNum("phoneCofrimDto.getPhoneNum()");
+        new confrimDtos<confrimDto>(confrimDto, "인증요청을 한 내역이없습니다");
+        
         confrimInterface confrimInterface=new phoneConfrim(confrimDto);
         JSONObject result=compareTempNum(confrimInterface,phoneCofrimDto.getTempNum());
         if((boolean) result.get("bool")==false){
@@ -212,6 +215,5 @@ public class confrimService {
             return utillService.makeJson(confirmEnums.notEqulsTempNum.getBool(), confirmEnums.notEqulsTempNum.getMessege());
         }
         return utillService.makeJson(confirmEnums.EqulsTempNum.getBool(),confirmEnums.EqulsTempNum.getMessege());  
-       
     } 
 }
