@@ -4,6 +4,7 @@ package com.example.blog_kim_s_token.service;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.transaction.Transactional;
 
 import com.example.blog_kim_s_token.config.security;
 import com.example.blog_kim_s_token.enums.confirmEnums;
@@ -15,7 +16,9 @@ import com.example.blog_kim_s_token.model.user.addressDto;
 import com.example.blog_kim_s_token.model.user.singupDto;
 import com.example.blog_kim_s_token.model.user.userDao;
 import com.example.blog_kim_s_token.model.user.userDto;
+import com.example.blog_kim_s_token.service.confrim.confrimInterface;
 import com.example.blog_kim_s_token.service.confrim.confrimService;
+import com.example.blog_kim_s_token.service.confrim.phoneConfrim;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -125,5 +128,27 @@ public class userService {
         }  
         return utillService.makeJson(userEnums.failUpdateAddress.getBool(), userEnums.failUpdateAddress.getMessege());
     }
+    @Transactional
+    public JSONObject updatephoneNum(JSONObject jsonObject) {
+        System.out.println("updatephoneNum");
+        try {
+            String phoneNum=jsonObject.getAsString("phoneNum");
+            confrimDto confrimDto=confrimService.findConfrim(phoneNum);
+            confrimInterface confrimInterface=new phoneConfrim(confrimDto);
+            JSONObject result=confrimService.compareTempNum(confrimInterface, (String)jsonObject.get("tempNum"));
+            if((boolean) result.get("bool")){
+                confrimService.deleteCofrim(confrimDto);
+                userDto dto=findEmail(SecurityContextHolder.getContext().getAuthentication().getName());
+                dto.setPhoneNum(phoneNum);
+                return utillService.makeJson(userEnums.sucUpdatePhone.getBool(), userEnums.sucUpdatePhone.getMessege());
+            }
+            return result;
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("updatephoneNum error");
+            throw new RuntimeException("updatephoneNum 도중 에러가 발생했습니다");
+        }
+    }
+    
 
 }

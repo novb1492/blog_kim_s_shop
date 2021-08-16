@@ -8,7 +8,8 @@ public enum userEnums {
     sucLogout("로그아웃 성공",true),
     failFindRefreshToken("이미 로그아웃 되었거나 존재하지 않습니다",false),
     sucUpdateAddress("주소변경 완료",true),
-    failUpdateAddress("주소변경 실패",false);
+    failUpdateAddress("주소변경 실패",false),
+    sucUpdatePhone("전화번경 성공",true);
 
     private final String messege;
     private final boolean bool;

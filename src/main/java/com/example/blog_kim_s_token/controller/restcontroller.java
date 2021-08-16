@@ -106,8 +106,7 @@ public class restcontroller {
     @RequestMapping("/api/changePhoneNum")
     public JSONObject changePhoneNum(@RequestBody JSONObject jsonObject,HttpServletResponse response) {
         System.out.println("changePhoneNum");
-        System.out.println(jsonObject.get("phoneNum"));
-        return null;
+        return userService.updatephoneNum(jsonObject);
     }
     @RequestMapping("/auth/onlyBearer")
     public void onlyBearer() {

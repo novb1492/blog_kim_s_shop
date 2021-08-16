@@ -8,7 +8,6 @@ import com.example.blog_kim_s_token.model.confrim.confrimDao;
 import com.example.blog_kim_s_token.model.confrim.confrimDto;
 import com.example.blog_kim_s_token.model.confrim.emailCofrimDto;
 import com.example.blog_kim_s_token.model.confrim.phoneCofrimDto;
-import com.example.blog_kim_s_token.model.user.userDao;
 import com.example.blog_kim_s_token.model.user.userDto;
 import com.example.blog_kim_s_token.service.coolSmsService;
 import com.example.blog_kim_s_token.service.sendEmailService;
@@ -45,8 +44,7 @@ public class confrimService {
     private userService userService;
     @Autowired
     private sendEmailService sendEmailService;
-    @Autowired
-    private userDao userDao;
+
 
 
     public confrimDto findConfrim(String phoneNum) {
@@ -78,6 +76,7 @@ public class confrimService {
             dto.setRequestTime(requestTime);
         } catch (Exception e) {
             e.printStackTrace();
+            System.out.println("updateconfrim error");
            throw new RuntimeException();
         }
        
@@ -119,7 +118,7 @@ public class confrimService {
            //sendSms(phoneNum, tempNum);
         };  
         } catch (Exception e) {
-            throw new RuntimeException("실패");
+            throw new RuntimeException("인증번호 발송실패");
         }
         return result;
     }
@@ -201,12 +200,15 @@ public class confrimService {
     public JSONObject compareTempNum(confrimInterface confrimInterface,String requestTempNum) {
         System.out.println("confrimTempNum 입장");
         if(confrimInterface.isNULL()){
+            System.out.println("인증번호 요청이없음");
             return utillService.makeJson(confirmEnums.notReuestConfrim.getBool(), confirmEnums.notReuestConfrim.getMessege());
         }
         if(utillService.checkTime(confrimInterface.getCreated(),overTime)){
+            System.out.println("인증 제한시간이 지남");
             return utillService.makeJson(confirmEnums.overTime.getBool(), confirmEnums.overTime.getMessege()); 
         }
         if(!requestTempNum.trim().equals(confrimInterface.TempNumAtDb())){
+            System.out.println("인증번호 불일치");
             return utillService.makeJson(confirmEnums.notEqulsTempNum.getBool(), confirmEnums.notEqulsTempNum.getMessege());
         }
         return utillService.makeJson(confirmEnums.EqulsTempNum.getBool(),confirmEnums.EqulsTempNum.getMessege());  

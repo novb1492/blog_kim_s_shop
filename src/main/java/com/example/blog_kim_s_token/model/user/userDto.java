@@ -50,7 +50,7 @@ public class userDto {
     @Column(name="detailAddress",nullable = false,length = 20)
     private String detailAddress;
     
-    @Column(name="extraAddress",length = 10)
+    @Column(name="extraAddress",length = 50)
     private String extraAddress;
     
     @Column(name="phoneNum",nullable = false,length = 15)
