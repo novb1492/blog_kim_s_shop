@@ -23,8 +23,8 @@ import com.nimbusds.jose.shaded.json.JSONObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 
@@ -40,86 +40,86 @@ public class restcontroller {
     @Autowired
     private kakaoLoginservice kakaoLoginservice;
 
-    @RequestMapping("/auth/confrimEmail")
+    @PostMapping("/auth/confrimEmail")
     public boolean confrimEmail(HttpServletRequest request,HttpServletResponse response) {
         return userService.confrimEmail((String)request.getParameter("email"));
     }
-    @RequestMapping("/auth/confrimPhoneNum")
+    @PostMapping("/auth/confrimPhoneNum")
     public boolean confrimPhoneNum(HttpServletRequest request,HttpServletResponse response) {
         return userService.confrimPhone((String)request.getParameter("phoneNum"));
     }
-    @RequestMapping("/auth/sendSms")
+    @PostMapping("/auth/sendSms")
     public JSONObject sendSms(HttpServletRequest request,HttpServletResponse response) {
         return confrimService.sendPhone(request);
     }
-    @RequestMapping("/auth/cofrimSmsNum")
+    @PostMapping("/auth/cofrimSmsNum")
     public JSONObject cofrimSmsNum(@Valid @RequestBody phoneCofrimDto phoneCofrimDto,HttpServletResponse response) {
         return confrimService.cofrimTempNum(phoneCofrimDto);
     }
-    @RequestMapping("/auth/insertUser")
+    @PostMapping("/auth/insertUser")
     public JSONObject insertUser(@Valid @RequestBody singupDto singupDto) {
         return userService.insertUser(singupDto);
     }
-    @RequestMapping("/login")
+    @PostMapping("/login")
     public JSONObject login(HttpServletRequest request,HttpServletResponse response) {
         return userService.doLogin();
     }
-    @RequestMapping("/auth/findEmail")
+    @PostMapping("/auth/findEmail")
     public JSONObject findEmail(HttpServletRequest request,HttpServletResponse response) {
         return userService.findLostEmail(request.getParameter("phoneNum"));
     }
-    @RequestMapping("/auth/sendEmail")
+    @PostMapping("/auth/sendEmail")
     public JSONObject sendEmail(HttpServletRequest request,HttpServletResponse response) {
         return confrimService.sendEmail(request.getParameter("email"));
     }
-    @RequestMapping("/auth/sendTempPwd")
+    @PostMapping("/auth/sendTempPwd")
     public JSONObject sendTempPwd(@Valid @RequestBody emailCofrimDto emailCofrimDto,HttpServletResponse response) {
         return confrimService.sendTempPwd(emailCofrimDto);
     }
-    @RequestMapping("/auth/naver")
+    @PostMapping("/auth/naver")
     public String naverLogin() {
         return  naverLoingService.naverLogin();
     }
-    @RequestMapping("/auth/kakao")
+    @PostMapping("/auth/kakao")
     public String kakaoLogin(HttpServletRequest request,HttpServletResponse response) {
         return kakaoLoginservice.kakaoGetCode();
     }
-    @RequestMapping("/api/userInfor")
+    @PostMapping("/api/userInfor")
     public userDto getUserInfor(HttpServletRequest request,HttpServletResponse response) {
         return userService.sendUserDto();
     }
-    @RequestMapping("/auth/jwtex")
+    @PostMapping("/auth/jwtex")
     public void TokenExpired() {
         System.out.println("auth/jwtex");
         throw new TokenExpiredException(null);
     }
-    @RequestMapping("/api/logout")
+    @PostMapping("/api/logout")
     public JSONObject logout(HttpServletRequest request,HttpServletResponse response) {
         System.out.println("logout");
         return userService.logout(request,response);
     }
-    @RequestMapping("/api/updateAddress")
+    @PostMapping("/api/updateAddress")
     public JSONObject updateAddress(@Valid @RequestBody addressDto addressDto,HttpServletResponse response) {
         System.out.println("updateAddress");
         return  userService.updateAddress(addressDto);
     }
-    @RequestMapping("/api/changePhoneNum")
+    @PostMapping("/api/changePhoneNum")
     public JSONObject changePhoneNum(@RequestBody JSONObject jsonObject,HttpServletResponse response) {
         System.out.println("changePhoneNum");
         return userService.updatephoneNum(jsonObject);
     }
-    @RequestMapping("/auth/onlyBearer")
+    @PostMapping("/auth/onlyBearer")
     public void onlyBearer() {
         throw new JWTDecodeException(null);
     }
-    @RequestMapping("/auth/index2")
+    @PostMapping("/auth/index2")
     public String hello2(@CookieValue(value = "refreshToken", required = false) Cookie rCookie,HttpServletResponse response) {
         System.out.println("index2");
         System.out.println(rCookie.getValue());
         return "index2";
     }
 
-    @RequestMapping("/api/v1/user/test")
+    @PostMapping("/api/v1/user/test")
     public JSONObject  user(HttpServletRequest request,HttpServletResponse response) {
         System.out.println("user 입장");
         JSONObject jsonObject=new JSONObject();
@@ -127,12 +127,12 @@ public class restcontroller {
         jsonObject.put("hello", "world");
         return jsonObject;
     }
-    @RequestMapping("/api/v1/manage/test")
+    @PostMapping("/api/v1/manage/test")
     public String  manage(HttpServletRequest request,HttpServletResponse response) {
         System.out.println("manage 입장");
         return "manage";
     }
-    @RequestMapping("/api/v1/admin/test")
+    @PostMapping("/api/v1/admin/test")
     public String  admin(HttpServletRequest request,HttpServletResponse response) {
         System.out.println("admin 입장");
         return "admin";

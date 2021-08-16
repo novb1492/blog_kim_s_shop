@@ -32,7 +32,7 @@ public class csrfTokenService {
         System.out.println("deleteCsrfToken");
         csrfDto dto=csrfDao.findByEmail(email);
         if(dto==null){
-            System.out.println("이미 로그아웃 했거나 csrf 미발급 사용자");
+            System.out.println("이미 로그아웃 사용자입니다 ");
             return;
         }
         if(!dto.getEmail().equals(email)){
