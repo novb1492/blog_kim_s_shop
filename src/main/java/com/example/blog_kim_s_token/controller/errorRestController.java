@@ -61,4 +61,8 @@ public class errorRestController {
         System.out.println("JWTDecodeException 입장");
         return utillService.makeJson(false, "재 로그인 부탁드립니다");
     }
+    @ExceptionHandler(RuntimeException.class)
+    public JSONObject runtimeException(RuntimeException exception) {
+        return utillService.makeJson(false, exception.getMessage());
+    }
 }

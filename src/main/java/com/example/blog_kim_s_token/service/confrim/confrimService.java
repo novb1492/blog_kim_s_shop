@@ -2,11 +2,13 @@ package com.example.blog_kim_s_token.service.confrim;
 
 import javax.servlet.http.HttpServletRequest;
 
+
 import com.example.blog_kim_s_token.enums.confirmEnums;
 import com.example.blog_kim_s_token.model.confrim.confrimDao;
 import com.example.blog_kim_s_token.model.confrim.confrimDto;
 import com.example.blog_kim_s_token.model.confrim.emailCofrimDto;
 import com.example.blog_kim_s_token.model.confrim.phoneCofrimDto;
+import com.example.blog_kim_s_token.model.user.userDao;
 import com.example.blog_kim_s_token.model.user.userDto;
 import com.example.blog_kim_s_token.service.coolSmsService;
 import com.example.blog_kim_s_token.service.sendEmailService;
@@ -18,6 +20,8 @@ import com.nimbusds.jose.shaded.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 
 
 
@@ -30,7 +34,6 @@ public class confrimService {
     @Value("${confrim.overTime}")
     private int overTime;
 
-    private final int f=0;
     private final int t=1;
     private final int tempNumLength=6;
     private final int tempPwdLength=8;
@@ -42,6 +45,8 @@ public class confrimService {
     private userService userService;
     @Autowired
     private sendEmailService sendEmailService;
+    @Autowired
+    private userDao userDao;
 
 
     public confrimDto findConfrim(String phoneNum) {
@@ -61,15 +66,22 @@ public class confrimService {
         }
         confrimDao.save(dto);
     }
+
     public void updateconfrim(confrimInterface confrimInterface,String tempNum) {
-        System.out.println("updateconfrim");
-        int requestTime=confrimInterface.getRequestTime();
-        requestTime+=1;
-        if(confrimInterface.unit().equals("phone")){
-            confrimDao.updatePhoneTempNum(tempNum,requestTime,utillService.getNowTimestamp(),confrimInterface.valueOfUbit());
-        }else{
-            confrimDao.updateEmailTempNum(tempNum, requestTime, utillService.getNowTimestamp(), confrimInterface.valueOfUbit());
-        }  
+        try {
+            System.out.println("updateconfrim");
+            int requestTime=confrimInterface.getRequestTime();
+            requestTime+=1;
+            System.out.println("updateconfrim");
+            confrimDto dto=confrimInterface.getDto();
+            System.out.println(dto.getRequestTime()+"회수");
+            dto.setRequestTime(requestTime);
+        } catch (Exception e) {
+            e.printStackTrace();
+           throw new RuntimeException();
+        }
+       
+        
     }
     public void updateconfrimEmail(confrimDto confrimDto,String tempNum) {
         System.out.println("updateconfrimEmail"+tempNum+confrimDto.getEmail());
@@ -85,7 +97,10 @@ public class confrimService {
     public void sendSms(String phoneNum,String tempNum){
         coolSmsService.sendMessege(phoneNum,"인증번호는 "+tempNum+"입니다");
     }
+    @Transactional(rollbackFor = Exception.class)
     public JSONObject sendPhone(HttpServletRequest request) {
+        JSONObject result=null;
+        try {
         System.out.println("sendMessege 입장"+request.getParameter("phoneNum"));
         String phoneNum=request.getParameter("phoneNum");
         if(phoneNum.isEmpty()||phoneNum==null){
@@ -99,11 +114,14 @@ public class confrimService {
         }
         confrimInterface confrimInterface=new phoneConfrim(dto);
         String tempNum=utillService.GetRandomNum(tempNumLength);
-        JSONObject result=sendSms(confrimInterface,tempNum);
+         result=sendSms(confrimInterface,tempNum);
         if((boolean)result.get("bool")){
            //sendSms(phoneNum, tempNum);
         };  
-       return result;
+        } catch (Exception e) {
+            throw new RuntimeException("실패");
+        }
+        return result;
     }
     public JSONObject sendSms(confrimInterface confrimInterface,String tempNum) {
             if(confrimInterface.getRequestTime()==0){
