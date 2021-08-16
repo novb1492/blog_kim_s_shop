@@ -149,9 +149,9 @@ public class confrimService {
     }
     public JSONObject cofrimTempNum(phoneCofrimDto phoneCofrimDto) {
         System.out.println("cofrimTempNum");
-        confrimDto confrimDto=confrimDao.findByPhoneNum("phoneCofrimDto.getPhoneNum()");
+        confrimDto confrimDto=confrimDao.findByPhoneNum(phoneCofrimDto.getPhoneNum());
         new confrimDtos<confrimDto>(confrimDto, "인증요청을 한 내역이없습니다");
-        
+
         confrimInterface confrimInterface=new phoneConfrim(confrimDto);
         JSONObject result=compareTempNum(confrimInterface,phoneCofrimDto.getTempNum());
         if((boolean) result.get("bool")==false){
