@@ -13,6 +13,8 @@ import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.example.blog_kim_s_token.model.confrim.emailCofrimDto;
 import com.example.blog_kim_s_token.model.confrim.phoneCofrimDto;
 import com.example.blog_kim_s_token.model.user.addressDto;
+import com.example.blog_kim_s_token.model.user.phoneDto;
+import com.example.blog_kim_s_token.model.user.pwdDto;
 import com.example.blog_kim_s_token.model.user.singupDto;
 import com.example.blog_kim_s_token.model.user.userDto;
 import com.example.blog_kim_s_token.service.userService;
@@ -103,10 +105,15 @@ public class restcontroller {
         System.out.println("updateAddress");
         return  userService.updateAddress(addressDto);
     }
-    @PostMapping("/api/changePhoneNum")
-    public JSONObject changePhoneNum(@RequestBody JSONObject jsonObject,HttpServletResponse response) {
-        System.out.println("changePhoneNum");
-        return userService.updatephoneNum(jsonObject);
+    @PostMapping("/api/updatePhoneNum")
+    public JSONObject changePhoneNum(@Valid @RequestBody phoneDto phoneDto,HttpServletResponse response) {
+        System.out.println("updatePhoneNum");
+        return userService.updatephoneNum(phoneDto);
+    }
+    @PostMapping("/api/updatePwd")
+    public JSONObject changePhoneNum(@Valid @RequestBody pwdDto pwdDto,HttpServletResponse response) {
+        System.out.println("updatePwd");
+        return userService.updatePwd(pwdDto);
     }
     @PostMapping("/auth/onlyBearer")
     public void onlyBearer() {

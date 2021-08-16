@@ -9,7 +9,10 @@ public enum userEnums {
     failFindRefreshToken("이미 로그아웃 되었거나 존재하지 않습니다",false),
     sucUpdateAddress("주소변경 완료",true),
     failUpdateAddress("주소변경 실패",false),
-    sucUpdatePhone("전화번경 성공",true);
+    sucUpdatePhone("전화번경 성공",true),
+    notEqualsPwd("현재 비밀번호 불일치",false),
+    notEqualsNpwd("새 비밀번호 불일치",false),
+    sucUpdatePwd("비밀번호가 변경 되었습니다",true);
 
     private final String messege;
     private final boolean bool;

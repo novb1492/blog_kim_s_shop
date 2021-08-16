@@ -13,6 +13,8 @@ import com.example.blog_kim_s_token.enums.userEnums;
 import com.example.blog_kim_s_token.jwt.jwtService;
 import com.example.blog_kim_s_token.model.confrim.confrimDto;
 import com.example.blog_kim_s_token.model.user.addressDto;
+import com.example.blog_kim_s_token.model.user.phoneDto;
+import com.example.blog_kim_s_token.model.user.pwdDto;
 import com.example.blog_kim_s_token.model.user.singupDto;
 import com.example.blog_kim_s_token.model.user.userDao;
 import com.example.blog_kim_s_token.model.user.userDto;
@@ -24,6 +26,7 @@ import com.nimbusds.jose.shaded.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 
@@ -124,18 +127,18 @@ public class userService {
             return utillService.makeJson(userEnums.sucUpdateAddress.getBool(), userEnums.sucUpdateAddress.getMessege());
         } catch (Exception e) {
             System.out.println("updateAddress 에러발생");
-           e.printStackTrace();
+            e.printStackTrace();
+            throw new RuntimeException("updateAddress 에러발생");
         }  
-        return utillService.makeJson(userEnums.failUpdateAddress.getBool(), userEnums.failUpdateAddress.getMessege());
     }
     @Transactional
-    public JSONObject updatephoneNum(JSONObject jsonObject) {
+    public JSONObject updatephoneNum(phoneDto phoneDto) {
         System.out.println("updatephoneNum");
         try {
-            String phoneNum=jsonObject.getAsString("phoneNum");
+            String phoneNum=phoneDto.getPhoneNum();
             confrimDto confrimDto=confrimService.findConfrim(phoneNum);
             confrimInterface confrimInterface=new phoneConfrim(confrimDto);
-            JSONObject result=confrimService.compareTempNum(confrimInterface, (String)jsonObject.get("tempNum"));
+            JSONObject result=confrimService.compareTempNum(confrimInterface,phoneDto.getTempNum());
             if((boolean) result.get("bool")){
                 confrimService.deleteCofrim(confrimDto);
                 userDto dto=findEmail(SecurityContextHolder.getContext().getAuthentication().getName());
@@ -147,6 +150,29 @@ public class userService {
             e.printStackTrace();
             System.out.println("updatephoneNum error");
             throw new RuntimeException("updatephoneNum 도중 에러가 발생했습니다");
+        }
+    }
+    @Transactional
+    public JSONObject updatePwd(pwdDto pwdDto) {
+        System.out.println("updatePwd");
+        try {
+            userDto userDto=userDao.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
+            BCryptPasswordEncoder passwordEncoder=security.pwdEncoder();
+            if(!passwordEncoder.matches(pwdDto.getNowPwd(), userDto.getPwd())){
+                System.out.println("현재 비밀번호 불일치");
+                return utillService.makeJson(userEnums.notEqualsPwd.getBool(), userEnums.notEqualsPwd.getMessege());
+            }
+            if(!pwdDto.getNewPwd().equals(pwdDto.getNewPwd2())){
+                System.out.println("새 비밀번호 불일치");
+                return utillService.makeJson(userEnums.notEqualsNpwd.getBool(), userEnums.notEqualsNpwd.getMessege());
+            }
+            System.out.println("비밀번호 변경");
+            userDto.setPwd(passwordEncoder.encode(pwdDto.getNewPwd()));
+            return utillService.makeJson(userEnums.sucUpdatePwd.getBool(),userEnums.sucUpdatePwd.getMessege());
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("updatePwd error");
+            throw new RuntimeException("updatePwd 에러발생");
         }
     }
     
