@@ -21,6 +21,7 @@ import com.example.blog_kim_s_token.service.userService;
 import com.example.blog_kim_s_token.service.ApiServies.kakao.kakaoLoginservice;
 import com.example.blog_kim_s_token.service.ApiServies.naver.naverLoginService;
 import com.example.blog_kim_s_token.service.confrim.confrimService;
+import com.example.blog_kim_s_token.service.reservation.resevationService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +42,8 @@ public class restcontroller {
     private naverLoginService naverLoingService;
     @Autowired
     private kakaoLoginservice kakaoLoginservice;
+    @Autowired
+    private resevationService resevationService;
 
     @PostMapping("/auth/confrimEmail")
     public boolean confrimEmail(HttpServletRequest request,HttpServletResponse response) {
@@ -118,6 +121,11 @@ public class restcontroller {
     @PostMapping("/auth/onlyBearer")
     public void onlyBearer() {
         throw new JWTDecodeException(null);
+    }
+    @PostMapping("/api/getDateBySeat")
+    public JSONObject getDateBySeatUrl(HttpServletRequest request,HttpServletResponse response) {
+        System.out.println("getDateBySeat");
+        return resevationService.getDateBySeat(8);
     }
     @PostMapping("/auth/index2")
     public String hello2(@CookieValue(value = "refreshToken", required = false) Cookie rCookie,HttpServletResponse response) {
