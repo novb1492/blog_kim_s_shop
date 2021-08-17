@@ -26,22 +26,23 @@ public class resevationService {
             start=dayOfWeek.getValue();
             int endDayIdOfMonth=lastDay+start;
             JSONObject dates=new JSONObject();
-            int []a=new int[lastDayIdNumber];
+            int [][]dateAndValue=new int[lastDayIdNumber][2];
             for(int i=1;i<start;i++) {
-                a[i]=0;
-               
+                dateAndValue[i][0]=0;
+                dateAndValue[i][1]=0;
             }
             for(int i=start;i<endDayIdOfMonth;i++) {
-                a[i]=temp;
-                
+                dateAndValue[i][0]=temp;
+                dateAndValue[i][1]=temp;
                 temp+=1;
             }
             if(endDayIdOfMonth<lastDayIdNumber) {
                 for(int i=endDayIdOfMonth;i<=lastDayIdNumber;i++) {
-                    a[i]=0;
+                    dateAndValue[i][0]=0;
+                    dateAndValue[i][1]=0;
                 }
             }
-            dates.put("dates", a);
+            dates.put("dates", dateAndValue);
             
             System.out.println(dates);
             return dates;
