@@ -11,22 +11,23 @@ import org.springframework.stereotype.Service;
 @Service
 public class resevationService {
 
-    private final int lastDayIdNumber=38;
-
     public JSONObject getDateBySeat(int month) {
         try {
-            System.out.println("getDateBySeat");
+            System.out.println("getDateBySeat"+month);
             LocalDate today=LocalDate.of(LocalDate.now().getYear(),month,1);
             YearMonth yearMonth=YearMonth.from(today);
             int lastDay=yearMonth.lengthOfMonth();
+            System.out.println(lastDay+" lastDay");
             int start=0;
             LocalDate date = LocalDate.of(today.getYear(),today.getMonthValue(),1);
             DayOfWeek dayOfWeek = date.getDayOfWeek();
             int temp=1;
             start=dayOfWeek.getValue();
+            System.out.println(start+" start");
             int endDayIdOfMonth=lastDay+start;
+            System.out.println(endDayIdOfMonth+" endDayIdOfMonth");
             JSONObject dates=new JSONObject();
-            int [][]dateAndValue=new int[lastDayIdNumber][2];
+            int [][]dateAndValue=new int[endDayIdOfMonth][2];
             for(int i=1;i<start;i++) {
                 dateAndValue[i][0]=0;
                 dateAndValue[i][1]=0;
@@ -35,12 +36,6 @@ public class resevationService {
                 dateAndValue[i][0]=temp;
                 dateAndValue[i][1]=temp;
                 temp+=1;
-            }
-            if(endDayIdOfMonth<lastDayIdNumber) {
-                for(int i=endDayIdOfMonth;i<=lastDayIdNumber;i++) {
-                    dateAndValue[i][0]=0;
-                    dateAndValue[i][1]=0;
-                }
             }
             dates.put("dates", dateAndValue);
             

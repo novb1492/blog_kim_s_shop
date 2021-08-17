@@ -123,9 +123,17 @@ public class restcontroller {
         throw new JWTDecodeException(null);
     }
     @PostMapping("/api/getDateBySeat")
-    public JSONObject getDateBySeatUrl(HttpServletRequest request,HttpServletResponse response) {
+    public JSONObject getDateBySeatUrl(@RequestBody JSONObject jsonObject,HttpServletResponse response) {
         System.out.println("getDateBySeat");
-        return resevationService.getDateBySeat(8);
+        int month=0;
+        try {
+           month=Integer.parseInt((String)jsonObject.get("month")); 
+        } catch (Exception e) {
+            System.out.println(jsonObject.get("month"));
+            month=(int) jsonObject.get("month");
+        }
+
+        return resevationService.getDateBySeat(month);
     }
     @PostMapping("/auth/index2")
     public String hello2(@CookieValue(value = "refreshToken", required = false) Cookie rCookie,HttpServletResponse response) {
