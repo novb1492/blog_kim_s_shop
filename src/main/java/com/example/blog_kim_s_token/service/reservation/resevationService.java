@@ -6,14 +6,15 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.List;
 
-import com.example.blog_kim_s_token.config.principaldetail;
-import com.example.blog_kim_s_token.config.security;
+
+import com.example.blog_kim_s_token.enums.reservationEnums;
 import com.example.blog_kim_s_token.model.reservation.*;
 import com.example.blog_kim_s_token.model.reservation.getDateDto;
 import com.example.blog_kim_s_token.model.reservation.getTimeDto;
 import com.example.blog_kim_s_token.model.reservation.reservationInsertDto;
 import com.example.blog_kim_s_token.model.user.userDto;
 import com.example.blog_kim_s_token.service.userService;
+import com.example.blog_kim_s_token.service.utillService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,7 @@ public class resevationService {
     public JSONObject getDateBySeat(getDateDto getDateDto) {
         System.out.println("getDateBySeat");
         try {
-            int month=Integer.parseInt(getDateDto.getMonth());
+            int month=getDateDto.getMonth();
             LocalDate today=LocalDate.of(LocalDate.now().getYear(),month,1);
             YearMonth yearMonth=YearMonth.from(today);
             int lastDay=yearMonth.lengthOfMonth();
@@ -89,7 +90,7 @@ public class resevationService {
         }
     }
     @Transactional(rollbackFor = Exception.class)
-    public void insertReservation(reservationInsertDto reservationInsertDto) {
+    public JSONObject insertReservation(reservationInsertDto reservationInsertDto) {
         System.out.println("insertReservation");
         try {   
             String email= SecurityContextHolder.getContext().getAuthentication().getName();
@@ -109,7 +110,7 @@ public class resevationService {
                                         reservationDao.save(dto);
             }
 
-            //return timesJson;
+            return utillService.makeJson(reservationEnums.sucInsert.getBool(), reservationEnums.sucInsert.getMessege());
         } catch (Exception e) {
            e.printStackTrace();
            throw new RuntimeException("getTimeByDate error");

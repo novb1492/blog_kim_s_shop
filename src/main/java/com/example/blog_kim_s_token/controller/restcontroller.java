@@ -125,19 +125,19 @@ public class restcontroller {
         throw new JWTDecodeException(null);
     }
     @PostMapping("/api/getDateBySeat")
-    public JSONObject getDateBySeat(@RequestBody getDateDto getDateDto,HttpServletResponse response) {
+    public JSONObject getDateBySeat(@Valid @RequestBody getDateDto getDateDto,HttpServletResponse response) {
         System.out.println("getDateBySeat");
         return resevationService.getDateBySeat(getDateDto);
     }
     @PostMapping("/api/getTimeByDate")
-    public JSONObject getTimeByDate(@RequestBody getTimeDto getTimeDto,HttpServletResponse response) {
+    public JSONObject getTimeByDate(@Valid @RequestBody getTimeDto getTimeDto,HttpServletResponse response) {
         System.out.println("getTimeByDate");
         return resevationService.getTimeByDate(getTimeDto);
     }
     @PostMapping("/api/insertReservation")
-    public void insertReservation(@RequestBody reservationInsertDto reservationInsertDto,HttpServletResponse response) {
+    public JSONObject insertReservation(@Valid @RequestBody reservationInsertDto reservationInsertDto,HttpServletResponse response) {
         System.out.println("insertReservation");
-        resevationService.insertReservation(reservationInsertDto);
+       return resevationService.insertReservation(reservationInsertDto);
     }
     @PostMapping("/auth/index2")
     public String hello2(@CookieValue(value = "refreshToken", required = false) Cookie rCookie,HttpServletResponse response) {
