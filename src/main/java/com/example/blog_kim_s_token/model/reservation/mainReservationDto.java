@@ -41,6 +41,12 @@ public class mainReservationDto {
     @Column(name="time")
     private int time;
 
+    @Column(name="impId")
+    private String impId;
+
+    @Column(name="price")
+    private String price;
+
     @Column(name="rDate")
     private Timestamp rDate;
 

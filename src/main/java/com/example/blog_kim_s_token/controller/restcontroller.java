@@ -12,6 +12,7 @@ import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.example.blog_kim_s_token.model.confrim.emailCofrimDto;
 import com.example.blog_kim_s_token.model.confrim.phoneCofrimDto;
+import com.example.blog_kim_s_token.model.price.seatPriceDto;
 import com.example.blog_kim_s_token.model.reservation.getDateDto;
 import com.example.blog_kim_s_token.model.reservation.getTimeDto;
 import com.example.blog_kim_s_token.model.reservation.reservationInsertDto;
@@ -20,6 +21,7 @@ import com.example.blog_kim_s_token.model.user.phoneDto;
 import com.example.blog_kim_s_token.model.user.pwdDto;
 import com.example.blog_kim_s_token.model.user.singupDto;
 import com.example.blog_kim_s_token.model.user.userDto;
+import com.example.blog_kim_s_token.service.priceService;
 import com.example.blog_kim_s_token.service.userService;
 import com.example.blog_kim_s_token.service.ApiServies.kakao.kakaoLoginservice;
 import com.example.blog_kim_s_token.service.ApiServies.naver.naverLoginService;
@@ -46,6 +48,8 @@ public class restcontroller {
     private kakaoLoginservice kakaoLoginservice;
     @Autowired
     private resevationService resevationService;
+    @Autowired
+    private priceService priceService;
 
     @PostMapping("/auth/confrimEmail")
     public boolean confrimEmail(HttpServletRequest request,HttpServletResponse response) {
@@ -138,6 +142,11 @@ public class restcontroller {
     public JSONObject insertReservation(@Valid @RequestBody reservationInsertDto reservationInsertDto,HttpServletResponse response) {
         System.out.println("insertReservation");
        return resevationService.insertReservation(reservationInsertDto);
+    }
+    @PostMapping("/api/getPrice")
+    public JSONObject getPrice(@RequestBody seatPriceDto seatPriceDto,HttpServletResponse response) {
+        System.out.println("getPrice");
+       return priceService.getTotalSeatPrice(seatPriceDto);
     }
     @PostMapping("/auth/index2")
     public String hello2(@CookieValue(value = "refreshToken", required = false) Cookie rCookie,HttpServletResponse response) {

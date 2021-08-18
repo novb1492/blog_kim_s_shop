@@ -60,6 +60,12 @@ public class utillService {
         jsonObject.put("messege", messege);
         return jsonObject;
     }
+    public static JSONObject makeJson(boolean bool,int messege) {
+        JSONObject jsonObject=new JSONObject();
+        jsonObject.put("bool",bool);
+        jsonObject.put("messege", messege);
+        return jsonObject;
+    }
     public static JSONObject makeJson(boolean bool,String messege,List<String>list) {
         JSONObject jsonObject=new JSONObject();
         jsonObject.put("bool",bool);

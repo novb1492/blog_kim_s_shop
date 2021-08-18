@@ -13,6 +13,7 @@ import com.example.blog_kim_s_token.model.reservation.getDateDto;
 import com.example.blog_kim_s_token.model.reservation.getTimeDto;
 import com.example.blog_kim_s_token.model.reservation.reservationInsertDto;
 import com.example.blog_kim_s_token.model.user.userDto;
+import com.example.blog_kim_s_token.service.iamportService;
 import com.example.blog_kim_s_token.service.userService;
 import com.example.blog_kim_s_token.service.utillService;
 import com.nimbusds.jose.shaded.json.JSONObject;
@@ -32,6 +33,8 @@ public class resevationService {
     private userService userService;
     @Autowired
     private reservationDao reservationDao;
+    @Autowired
+    private iamportService iamportService;
 
     public JSONObject getDateBySeat(getDateDto getDateDto) {
         System.out.println("getDateBySeat");
@@ -92,10 +95,14 @@ public class resevationService {
     @Transactional(rollbackFor = Exception.class)
     public JSONObject insertReservation(reservationInsertDto reservationInsertDto) {
         System.out.println("insertReservation");
+        String impId=reservationInsertDto.getImpId();
+        String seat=reservationInsertDto.getSeat();
+        List<Integer>times=reservationInsertDto.getTimes();
         try {   
+            int totalPrice=makeTotalPrice(seat, times);
+            iamportService.confrimPayment(impId,times,seat,totalPrice);
             String email= SecurityContextHolder.getContext().getAuthentication().getName();
             userDto userDto=userService.findEmail(email);
-            List<Integer>times=reservationInsertDto.getTimes();
             System.out.println(Timestamp.valueOf("2021-"+reservationInsertDto.getMonth()+"-"+reservationInsertDto.getDate()+" 00:00:00")+" 사용예정일");
             for(int i=0;i<times.size();i++){
                 mainReservationDto dto=mainReservationDto.builder()
@@ -103,7 +110,8 @@ public class resevationService {
                                         .name(userDto.getName())
                                         .userid(userDto.getId())
                                         .time(times.get(i))
-                                        .seat(reservationInsertDto.getSeat())
+                                        .seat(seat)
+                                        .impId(impId)
                                         .rDate(Timestamp.valueOf("2021-"+reservationInsertDto.getMonth()+"-"+reservationInsertDto.getDate()+" 00:00:00"))
                                         .dateAndTime(Timestamp.valueOf("2021-"+reservationInsertDto.getMonth()+"-"+reservationInsertDto.getDate()+" "+times.get(i)+":00:00"))
                                         .build();
@@ -115,5 +123,8 @@ public class resevationService {
            e.printStackTrace();
            throw new RuntimeException("getTimeByDate error");
         }
+    }
+    private int makeTotalPrice(String seat,List<Integer>times) {
+        return 500*times.size();
     }
 }
