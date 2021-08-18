@@ -5,6 +5,6 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @Data
-public class insertDto {
+public class getDateDto {
     private String month;
 }

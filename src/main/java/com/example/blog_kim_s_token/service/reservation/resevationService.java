@@ -4,6 +4,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.YearMonth;
 
+import com.example.blog_kim_s_token.model.reservation.getDateDto;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
 import org.springframework.stereotype.Service;
@@ -11,9 +12,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class resevationService {
 
-    public JSONObject getDateBySeat(int month) {
+    public JSONObject getDateBySeat(getDateDto getDateDto) {
+        System.out.println("getDateBySeat");
         try {
-            System.out.println("getDateBySeat"+month);
+            int month=Integer.parseInt(getDateDto.getMonth());
             LocalDate today=LocalDate.of(LocalDate.now().getYear(),month,1);
             YearMonth yearMonth=YearMonth.from(today);
             int lastDay=yearMonth.lengthOfMonth();

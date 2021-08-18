@@ -12,6 +12,7 @@ import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.example.blog_kim_s_token.model.confrim.emailCofrimDto;
 import com.example.blog_kim_s_token.model.confrim.phoneCofrimDto;
+import com.example.blog_kim_s_token.model.reservation.getDateDto;
 import com.example.blog_kim_s_token.model.user.addressDto;
 import com.example.blog_kim_s_token.model.user.phoneDto;
 import com.example.blog_kim_s_token.model.user.pwdDto;
@@ -123,17 +124,14 @@ public class restcontroller {
         throw new JWTDecodeException(null);
     }
     @PostMapping("/api/getDateBySeat")
-    public JSONObject getDateBySeatUrl(@RequestBody JSONObject jsonObject,HttpServletResponse response) {
+    public JSONObject getDateBySeat(@RequestBody getDateDto getDateDto,HttpServletResponse response) {
         System.out.println("getDateBySeat");
-        int month=0;
-        try {
-           month=Integer.parseInt((String)jsonObject.get("month")); 
-        } catch (Exception e) {
-            System.out.println(jsonObject.get("month"));
-            month=(int) jsonObject.get("month");
-        }
-
-        return resevationService.getDateBySeat(month);
+        return resevationService.getDateBySeat(getDateDto);
+    }
+    @PostMapping("/api/getTimeByDate")
+    public void getTimeByDate(@RequestBody JSONObject jsonObject,HttpServletResponse response) {
+        System.out.println("getTimeByDate");
+       
     }
     @PostMapping("/auth/index2")
     public String hello2(@CookieValue(value = "refreshToken", required = false) Cookie rCookie,HttpServletResponse response) {
