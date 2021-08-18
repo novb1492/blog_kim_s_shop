@@ -1,16 +1,36 @@
 package com.example.blog_kim_s_token.service.reservation;
 
+import java.sql.Timestamp;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.util.List;
 
+import com.example.blog_kim_s_token.config.principaldetail;
+import com.example.blog_kim_s_token.config.security;
+import com.example.blog_kim_s_token.model.reservation.*;
 import com.example.blog_kim_s_token.model.reservation.getDateDto;
+import com.example.blog_kim_s_token.model.reservation.getTimeDto;
+import com.example.blog_kim_s_token.model.reservation.reservationInsertDto;
+import com.example.blog_kim_s_token.model.user.userDto;
+import com.example.blog_kim_s_token.service.userService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class resevationService {
+
+    private final int openTime=9;
+    private final int closeTime=18;
+
+    @Autowired
+    private userService userService;
+    @Autowired
+    private reservationDao reservationDao;
 
     public JSONObject getDateBySeat(getDateDto getDateDto) {
         System.out.println("getDateBySeat");
@@ -49,5 +69,50 @@ public class resevationService {
         }
         
     
+    }
+    public JSONObject getTimeByDate(getTimeDto getTimeDto) {
+        System.out.println("getTimeByDate");
+        try {
+            JSONObject timesJson=new JSONObject();
+            int totalHour=closeTime-openTime;
+            System.out.println(totalHour+" totalHour");
+            int[][] timesArray=new int[totalHour+1][2];
+            for(int i=0;i<=totalHour;i++){
+                timesArray[i][0]=i+openTime;
+                timesArray[i][1]=i;
+            }
+            timesJson.put("times", timesArray);
+            return timesJson;
+        } catch (Exception e) {
+           e.printStackTrace();
+           throw new RuntimeException("getTimeByDate error");
+        }
+    }
+    @Transactional(rollbackFor = Exception.class)
+    public void insertReservation(reservationInsertDto reservationInsertDto) {
+        System.out.println("insertReservation");
+        try {   
+            String email= SecurityContextHolder.getContext().getAuthentication().getName();
+            userDto userDto=userService.findEmail(email);
+            List<Integer>times=reservationInsertDto.getTimes();
+            System.out.println(Timestamp.valueOf("2021-"+reservationInsertDto.getMonth()+"-"+reservationInsertDto.getDate()+" 00:00:00")+" 사용예정일");
+            for(int i=0;i<times.size();i++){
+                mainReservationDto dto=mainReservationDto.builder()
+                                        .email(email)
+                                        .name(userDto.getName())
+                                        .userid(userDto.getId())
+                                        .time(times.get(i))
+                                        .seat(reservationInsertDto.getSeat())
+                                        .rDate(Timestamp.valueOf("2021-"+reservationInsertDto.getMonth()+"-"+reservationInsertDto.getDate()+" 00:00:00"))
+                                        .dateAndTime(Timestamp.valueOf("2021-"+reservationInsertDto.getMonth()+"-"+reservationInsertDto.getDate()+" "+times.get(i)+":00:00"))
+                                        .build();
+                                        reservationDao.save(dto);
+            }
+
+            //return timesJson;
+        } catch (Exception e) {
+           e.printStackTrace();
+           throw new RuntimeException("getTimeByDate error");
+        }
     }
 }

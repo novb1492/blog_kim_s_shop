@@ -20,7 +20,7 @@ import lombok.Data;
 @Data
 @Table(name="reservation")
 @Entity
-public class reservationDto {
+public class mainReservationDto {
     @Id
     @Column(name="id",nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,6 +34,9 @@ public class reservationDto {
 
     @Column(name = "email",nullable = false)
     private String email;
+
+    @Column(name = "name",nullable = false)
+    private String name;
 
     @Column(name="time")
     private int time;

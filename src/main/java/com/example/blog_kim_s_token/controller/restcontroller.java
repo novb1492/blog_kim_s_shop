@@ -13,6 +13,8 @@ import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.example.blog_kim_s_token.model.confrim.emailCofrimDto;
 import com.example.blog_kim_s_token.model.confrim.phoneCofrimDto;
 import com.example.blog_kim_s_token.model.reservation.getDateDto;
+import com.example.blog_kim_s_token.model.reservation.getTimeDto;
+import com.example.blog_kim_s_token.model.reservation.reservationInsertDto;
 import com.example.blog_kim_s_token.model.user.addressDto;
 import com.example.blog_kim_s_token.model.user.phoneDto;
 import com.example.blog_kim_s_token.model.user.pwdDto;
@@ -24,7 +26,6 @@ import com.example.blog_kim_s_token.service.ApiServies.naver.naverLoginService;
 import com.example.blog_kim_s_token.service.confrim.confrimService;
 import com.example.blog_kim_s_token.service.reservation.resevationService;
 import com.nimbusds.jose.shaded.json.JSONObject;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -129,9 +130,14 @@ public class restcontroller {
         return resevationService.getDateBySeat(getDateDto);
     }
     @PostMapping("/api/getTimeByDate")
-    public void getTimeByDate(@RequestBody JSONObject jsonObject,HttpServletResponse response) {
+    public JSONObject getTimeByDate(@RequestBody getTimeDto getTimeDto,HttpServletResponse response) {
         System.out.println("getTimeByDate");
-       
+        return resevationService.getTimeByDate(getTimeDto);
+    }
+    @PostMapping("/api/insertReservation")
+    public void insertReservation(@RequestBody reservationInsertDto reservationInsertDto,HttpServletResponse response) {
+        System.out.println("insertReservation");
+        resevationService.insertReservation(reservationInsertDto);
     }
     @PostMapping("/auth/index2")
     public String hello2(@CookieValue(value = "refreshToken", required = false) Cookie rCookie,HttpServletResponse response) {
