@@ -26,6 +26,20 @@ public class utillService {
         }
         return false;
     }
+    public static boolean compareDate(Timestamp timestamp,LocalDateTime localDateTime) {
+        System.out.println("checkDate");
+        System.out.println("날짜 비교 시작");
+        LocalDateTime timestamp2=timestamp.toLocalDateTime(); 
+        if(timestamp2.getDayOfMonth()==localDateTime.getDayOfMonth()){
+            System.out.println("당일입니다");
+            return false;
+        }
+        if(timestamp2.isBefore(localDateTime)){
+            System.out.println("날짜가 지났습니다");
+           return true;
+        }
+        return false;
+    }
     public static boolean checkTime(Timestamp timestamp,int totalTokenTime) {
         System.out.println(timestamp+"인증시간");
         System.out.println("날짜 비교 시작");

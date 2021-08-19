@@ -3,6 +3,7 @@ package com.example.blog_kim_s_token.service.reservation;
 import java.sql.Timestamp;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.List;
 
@@ -29,6 +30,10 @@ public class resevationService {
 
     private final int openTime=9;
     private final int closeTime=18;
+    private final int maxPeopleOfDay=60;
+    private final int maxPeopleOfTime=6;
+    private final int cantFlag=100;
+    private final int canFlag=200;
 
     @Autowired
     private userService userService;
@@ -56,14 +61,22 @@ public class resevationService {
             int endDayIdOfMonth=lastDay+start;
             System.out.println(endDayIdOfMonth+" endDayIdOfMonth");
             JSONObject dates=new JSONObject();
-            int [][]dateAndValue=new int[endDayIdOfMonth][2];
+            int [][]dateAndValue=new int[endDayIdOfMonth][3];
             for(int i=1;i<start;i++) {
                 dateAndValue[i][0]=0;
                 dateAndValue[i][1]=0;
+                dateAndValue[i][2]=cantFlag;
             }
             for(int i=start;i<endDayIdOfMonth;i++) {
+                Timestamp  timestamp=Timestamp.valueOf(LocalDate.now().getYear()+"-"+month+"-"+temp+" 00:00:00");
+                int countAlready=getCountAlreadyInDate(timestamp);
                 dateAndValue[i][0]=temp;
-                dateAndValue[i][1]=getCountAlreadyInDate(Timestamp.valueOf(LocalDate.now().getYear()+"-"+month+"-"+temp+" 00:00:00"));
+                dateAndValue[i][1]=countAlready;
+                if(countAlready>=maxPeopleOfDay||utillService.compareDate(timestamp, LocalDateTime.now())){
+                    dateAndValue[i][2]=cantFlag; 
+                }else{
+                    dateAndValue[i][2]=canFlag; 
+                }
                 temp+=1;
             }
             dates.put("dates", dateAndValue);
@@ -86,11 +99,17 @@ public class resevationService {
             JSONObject timesJson=new JSONObject();
             int totalHour=closeTime-openTime;
             System.out.println(totalHour+" totalHour");
-            int[][] timesArray=new int[totalHour+1][2];
+            int[][] timesArray=new int[totalHour+1][3];
             for(int i=0;i<=totalHour;i++){
+                Timestamp timestamp=Timestamp.valueOf(LocalDate.now().getYear()+"-"+getTimeDto.getMonth()+"-"+getTimeDto.getDate()+" "+(i+openTime)+":00:00");
+                int count=getCountAlreadyInTime(timestamp);
                 timesArray[i][0]=i+openTime;
-                //System.out.println(getCountAlreadyInTime(Timestamp.valueOf(LocalDate.now().getYear()+"-"+getTimeDto.getMonth()+"-"+getTimeDto.getDate()+" "+i+openTime+":00:00")))
-                timesArray[i][1]=getCountAlreadyInTime(Timestamp.valueOf(LocalDate.now().getYear()+"-"+getTimeDto.getMonth()+"-"+getTimeDto.getDate()+" "+(i+openTime)+":00:00"));
+                timesArray[i][1]=count;
+                if(LocalDateTime.now().getDayOfMonth()==getTimeDto.getDate()){
+                    if((i+openTime)<=LocalDateTime.now().getHour()||count>=maxPeopleOfTime){
+                        timesArray[i][2]=100;
+                    }
+                }
             }
             timesJson.put("times", timesArray);
             return timesJson;
