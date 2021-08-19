@@ -14,6 +14,7 @@ import com.example.blog_kim_s_token.model.reservation.getTimeDto;
 import com.example.blog_kim_s_token.model.reservation.reservationInsertDto;
 import com.example.blog_kim_s_token.model.user.userDto;
 import com.example.blog_kim_s_token.service.iamportService;
+import com.example.blog_kim_s_token.service.priceService;
 import com.example.blog_kim_s_token.service.userService;
 import com.example.blog_kim_s_token.service.utillService;
 import com.nimbusds.jose.shaded.json.JSONObject;
@@ -35,6 +36,8 @@ public class resevationService {
     private reservationDao reservationDao;
     @Autowired
     private iamportService iamportService;
+    @Autowired
+    private priceService priceService;
 
     public JSONObject getDateBySeat(getDateDto getDateDto) {
         System.out.println("getDateBySeat");
@@ -98,9 +101,12 @@ public class resevationService {
         String impId=reservationInsertDto.getImpId();
         String seat=reservationInsertDto.getSeat();
         List<Integer>times=reservationInsertDto.getTimes();
-        try {   
-            int totalPrice=makeTotalPrice(seat, times);
-            iamportService.confrimPayment(impId,times,seat,totalPrice);
+        try {  
+            int totalPrice=priceService.getTotalSeatPrice(seat,times.size());
+            if(iamportService.confrimPayment(impId, times, seat, totalPrice)==false){
+                System.out.println("insertReservation 검증실패");
+                return utillService.makeJson(false,"결제 검증에 실패했습니다");
+            }
             String email= SecurityContextHolder.getContext().getAuthentication().getName();
             userDto userDto=userService.findEmail(email);
             System.out.println(Timestamp.valueOf("2021-"+reservationInsertDto.getMonth()+"-"+reservationInsertDto.getDate()+" 00:00:00")+" 사용예정일");
