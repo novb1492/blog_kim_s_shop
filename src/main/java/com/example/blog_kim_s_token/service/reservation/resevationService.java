@@ -126,16 +126,20 @@ public class resevationService {
     @Transactional(rollbackFor = Exception.class)
     public JSONObject insertReservation(reservationInsertDto reservationInsertDto) {
         System.out.println("insertReservation");
+        String email= SecurityContextHolder.getContext().getAuthentication().getName();
         String impId=reservationInsertDto.getImpId();
         String seat=reservationInsertDto.getSeat();
         List<Integer>times=reservationInsertDto.getTimes();
+        JSONObject result=confrimInsert(reservationInsertDto,email);
+        if((boolean)result.get("bool")==false){
+            return result;
+        }
         try {  
             int totalPrice=priceService.getTotalSeatPrice(seat,times.size());
             if(iamportService.confrimPayment(impId, times, seat, totalPrice)==false){
                 System.out.println("insertReservation 검증실패");
                 return utillService.makeJson(false,"결제 검증에 실패했습니다");
             }
-            String email= SecurityContextHolder.getContext().getAuthentication().getName();
             userDto userDto=userService.findEmail(email);
             System.out.println(Timestamp.valueOf("2021-"+reservationInsertDto.getMonth()+"-"+reservationInsertDto.getDate()+" 00:00:00")+" 사용예정일");
             for(int i=0;i<times.size();i++){
@@ -156,6 +160,30 @@ public class resevationService {
         } catch (Exception e) {
            e.printStackTrace();
            throw new RuntimeException("getTimeByDate error");
+        }
+    }
+    private JSONObject confrimInsert(reservationInsertDto reservationInsertDto,String email){
+        System.out.println("confrimInsert");
+         List<mainReservationDto>array=SelectByEmail(email);
+            if(array!=null){
+                for(mainReservationDto m:array){
+                    for(int i=0;i<=reservationInsertDto.getTimes().size();i++){
+                        if(m.getDateAndTime().equals(Timestamp.valueOf(LocalDate.now().getYear()+"-"+reservationInsertDto.getMonth()+"-"+reservationInsertDto.getDate()+" "+reservationInsertDto.getTimes().get(i)+":00:00"))){
+                            System.out.println("이미 예약한 시간 발견");
+                            return utillService.makeJson(reservationEnums.findAlready.getBool(),reservationEnums.findAlready.getMessege()+LocalDate.now().getYear()+"-"+reservationInsertDto.getMonth()+"-"+reservationInsertDto.getDate()+" "+reservationInsertDto.getTimes().get(i)+":00:00"); 
+                        }
+                    }
+                }
+            }
+        return null;
+    }
+    public List<mainReservationDto> SelectByEmail(String email) {
+        try {
+            return reservationDao.findByEmail(email);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("SelectByEmail error");
+            throw new RuntimeException("SelectByEmail error");
         }
     }
 }

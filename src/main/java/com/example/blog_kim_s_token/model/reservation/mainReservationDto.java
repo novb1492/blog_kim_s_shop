@@ -14,8 +14,10 @@ import org.hibernate.annotations.CreationTimestamp;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
 @Data
 @Table(name="reservation")
@@ -43,9 +45,6 @@ public class mainReservationDto {
 
     @Column(name="impId")
     private String impId;
-
-    @Column(name="price")
-    private String price;
 
     @Column(name="rDate")
     private Timestamp rDate;
