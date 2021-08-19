@@ -69,13 +69,11 @@ public class resevationService {
             }
             for(int i=start;i<endDayIdOfMonth;i++) {
                 Timestamp  timestamp=Timestamp.valueOf(LocalDate.now().getYear()+"-"+month+"-"+temp+" 00:00:00");
-                int countAlready=getCountAlreadyInDate(timestamp);
+                int countAlready=getCountAlreadyInDate(timestamp,getDateDto.getSeat());
                 dateAndValue[i][0]=temp;
                 dateAndValue[i][1]=countAlready;
                 if(countAlready>=maxPeopleOfDay||utillService.compareDate(timestamp, LocalDateTime.now())){
                     dateAndValue[i][2]=cantFlag; 
-                }else{
-                    dateAndValue[i][2]=canFlag; 
                 }
                 temp+=1;
             }
@@ -88,10 +86,10 @@ public class resevationService {
            throw new RuntimeException("getDateBySeat error");
         }
     }
-    private int getCountAlreadyInDate(Timestamp timestamp) {
+    private int getCountAlreadyInDate(Timestamp timestamp,String seat) {
         System.out.println("getCountAlreadyIn");
         System.out.println(timestamp);
-        return reservationDao.findByRdate(timestamp);
+        return reservationDao.findByRdate(timestamp,seat);
     }
     public JSONObject getTimeByDate(getTimeDto getTimeDto) {
         System.out.println("getTimeByDate");
@@ -102,13 +100,19 @@ public class resevationService {
             int[][] timesArray=new int[totalHour+1][3];
             for(int i=0;i<=totalHour;i++){
                 Timestamp timestamp=Timestamp.valueOf(LocalDate.now().getYear()+"-"+getTimeDto.getMonth()+"-"+getTimeDto.getDate()+" "+(i+openTime)+":00:00");
-                int count=getCountAlreadyInTime(timestamp);
+                int count=getCountAlreadyInTime(timestamp,getTimeDto.getSeat());
                 timesArray[i][0]=i+openTime;
                 timesArray[i][1]=count;
+                System.out.println(count);
                 if(LocalDateTime.now().getDayOfMonth()==getTimeDto.getDate()){
-                    if((i+openTime)<=LocalDateTime.now().getHour()||count>=maxPeopleOfTime){
+                    if((i+openTime)<=LocalDateTime.now().getHour()){
+                        System.out.println("지난시간");
                         timesArray[i][2]=100;
                     }
+                }
+                else if(count==maxPeopleOfTime){
+                    System.out.println("자리가 다찬시간");
+                    timesArray[i][2]=100;
                 }
             }
             timesJson.put("times", timesArray);
@@ -118,10 +122,10 @@ public class resevationService {
            throw new RuntimeException("getTimeByDate error");
         }
     }
-    public int getCountAlreadyInTime(Timestamp timestamp) {
+    public int getCountAlreadyInTime(Timestamp timestamp,String seat) {
         System.out.println("getCountAlreadyInTime");
         System.out.println(timestamp);
-        return reservationDao.findByTime(timestamp);
+        return reservationDao.findByTime(timestamp,seat);
     }
     @Transactional(rollbackFor = Exception.class)
     public JSONObject insertReservation(reservationInsertDto reservationInsertDto) {
@@ -175,7 +179,7 @@ public class resevationService {
                     }
                 }
             }
-        return null;
+        return utillService.makeJson(true, "");
     }
     public List<mainReservationDto> SelectByEmail(String email) {
         try {

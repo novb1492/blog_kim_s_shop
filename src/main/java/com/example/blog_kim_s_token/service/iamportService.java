@@ -61,6 +61,9 @@ public class iamportService {
             e.printStackTrace();
             System.out.println("getBuyInfor error");
             throw new RuntimeException("getBuyInfor 결제 정보 불러오기 실패");
+        }finally{
+            headers.clear();
+            body.clear();
         }
     }
     private boolean confrimBuy(JSONObject buyInfor,String impId,List<Integer>times,String seat,int totalPrice) {
@@ -73,6 +76,15 @@ public class iamportService {
         }
         System.out.println("결제 검증실패");
         return false;
+    }
+    public void cancleBuy(String impId) {
+        try {
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("cancleBuy error");
+            throw new RuntimeException("환불에 실패했습니다");
+        }
     }
 
     
