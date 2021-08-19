@@ -52,9 +52,6 @@ public class confrimDto {
     @Column(name="requesttime",nullable = false)
     private int requestTime;
 
-    @Column(name="emailRequesttime",nullable = false)
-    private int emailRequestTime;
-
     @Column(name="created")
     @CreationTimestamp  
     private Timestamp created;

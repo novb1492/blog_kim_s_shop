@@ -56,11 +56,10 @@ public class confrimService {
     }
     public void insertConfrim(confrimInterface confrimInterface,String tempNum){
         confrimDto dto=confrimInterface.getDto();
+        dto.setRequestTime(1); 
         if(confrimInterface.unit().equals("phone")){
-            dto.setRequestTime(1); 
             dto.setPhoneTempNum(tempNum);
         }else{
-            dto.setEmailRequestTime(1);
             dto.setEmailTempNum(tempNum);
         }
         confrimDao.save(dto);
@@ -71,7 +70,6 @@ public class confrimService {
             System.out.println("updateconfrim");
             int requestTime=confrimInterface.getRequestTime();
             requestTime+=1;
-            System.out.println("updateconfrim");
             confrimDto dto=confrimInterface.getDto();
             System.out.println(dto.getRequestTime()+"회수");
             dto.setRequestTime(requestTime);
@@ -161,6 +159,7 @@ public class confrimService {
         return utillService.makeJson(confirmEnums.EqulsTempNum.getBool(), confirmEnums.EqulsTempNum.getMessege());
                    
     }
+    @Transactional(rollbackFor = Exception.class)
     public JSONObject sendEmail(String email) {
         System.out.println("sendEmail");
         userDto userDto=userService.findEmail(email);

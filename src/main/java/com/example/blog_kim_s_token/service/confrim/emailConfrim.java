@@ -27,7 +27,7 @@ public class emailConfrim implements  confrimInterface {
     }
     @Override
     public int getRequestTime() {
-        return confrimDto.getEmailRequestTime();
+        return confrimDto.getRequestTime();
     }
     @Override
     public boolean isNULL() {
