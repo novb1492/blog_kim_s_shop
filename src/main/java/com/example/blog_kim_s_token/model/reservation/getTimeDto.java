@@ -14,6 +14,11 @@ public class getTimeDto {
     @Min(value = 1,message = "일이 1보다 작습니다")
     @Max(value = 31,message = "일이 31보다 큽니다")
     private int date;
+
+    @Min(value = 1,message = "월이 1보다 작습니다")
+    @Max(value = 12,message = "월이 12보다 큽니다")
+    private int month;
+
     @NotBlank(message = "자리가 빈칸입니다")
     private String seat;
 }

@@ -63,7 +63,7 @@ public class resevationService {
             }
             for(int i=start;i<endDayIdOfMonth;i++) {
                 dateAndValue[i][0]=temp;
-                dateAndValue[i][1]=temp;
+                dateAndValue[i][1]=getCountAlreadyInDate(Timestamp.valueOf(LocalDate.now().getYear()+"-"+month+"-"+temp+" 00:00:00"));
                 temp+=1;
             }
             dates.put("dates", dateAndValue);
@@ -74,8 +74,11 @@ public class resevationService {
            e.printStackTrace();
            throw new RuntimeException("getDateBySeat error");
         }
-        
-    
+    }
+    private int getCountAlreadyInDate(Timestamp timestamp) {
+        System.out.println("getCountAlreadyIn");
+        System.out.println(timestamp);
+        return reservationDao.findByRdate(timestamp);
     }
     public JSONObject getTimeByDate(getTimeDto getTimeDto) {
         System.out.println("getTimeByDate");
@@ -86,7 +89,8 @@ public class resevationService {
             int[][] timesArray=new int[totalHour+1][2];
             for(int i=0;i<=totalHour;i++){
                 timesArray[i][0]=i+openTime;
-                timesArray[i][1]=i;
+                //System.out.println(getCountAlreadyInTime(Timestamp.valueOf(LocalDate.now().getYear()+"-"+getTimeDto.getMonth()+"-"+getTimeDto.getDate()+" "+i+openTime+":00:00")))
+                timesArray[i][1]=getCountAlreadyInTime(Timestamp.valueOf(LocalDate.now().getYear()+"-"+getTimeDto.getMonth()+"-"+getTimeDto.getDate()+" "+(i+openTime)+":00:00"));
             }
             timesJson.put("times", timesArray);
             return timesJson;
@@ -94,6 +98,11 @@ public class resevationService {
            e.printStackTrace();
            throw new RuntimeException("getTimeByDate error");
         }
+    }
+    public int getCountAlreadyInTime(Timestamp timestamp) {
+        System.out.println("getCountAlreadyInTime");
+        System.out.println(timestamp);
+        return reservationDao.findByTime(timestamp);
     }
     @Transactional(rollbackFor = Exception.class)
     public JSONObject insertReservation(reservationInsertDto reservationInsertDto) {
@@ -129,8 +138,5 @@ public class resevationService {
            e.printStackTrace();
            throw new RuntimeException("getTimeByDate error");
         }
-    }
-    private int makeTotalPrice(String seat,List<Integer>times) {
-        return 500*times.size();
     }
 }
