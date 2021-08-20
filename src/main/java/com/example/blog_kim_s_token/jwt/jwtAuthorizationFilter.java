@@ -39,7 +39,7 @@ public class jwtAuthorizationFilter  extends BasicAuthenticationFilter {
         System.out.println(request.getHeader("REFERER")+"도메인");
 
         String uri=request.getRequestURI();
-        if(request.getHeader("REFERER")==null){
+        /*if(request.getHeader("REFERER")==null){
             System.out.println("도메인이 없습니다"+uri);
             if(uri.equals("/auth/navercallback")){
                 System.out.println("네이버 로그인 시도입니다");
@@ -55,7 +55,7 @@ public class jwtAuthorizationFilter  extends BasicAuthenticationFilter {
         else if(!request.getHeader("REFERER").equals("http://localhost:3030/")){
             System.out.println("도에민이 다릅니다"+request.getRequestURI()+request.getRequestURL());
             return;
-        }
+        }*/
 
         if(request.getHeader("Authorization")==null||!request.getHeader("Authorization").startsWith("Bearer")){
             System.out.println("헤더 없음");
