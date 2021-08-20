@@ -165,10 +165,11 @@ public class resevationService {
            e.printStackTrace();
            throw new RuntimeException("getTimeByDate error");
         }
+        
     }
     private JSONObject confrimInsert(reservationInsertDto reservationInsertDto,String email){
         System.out.println("confrimInsert");
-         List<mainReservationDto>array=SelectByEmail(email);
+         List<mainReservationDto>array=SelectByEmail(email,reservationInsertDto.getSeat());
             if(array!=null){
                 for(mainReservationDto m:array){
                     for(int i=0;i<reservationInsertDto.getTimes().size();i++){
@@ -181,9 +182,9 @@ public class resevationService {
             }
         return utillService.makeJson(true, "");
     }
-    public List<mainReservationDto> SelectByEmail(String email) {
+    public List<mainReservationDto> SelectByEmail(String email,String seat) {
         try {
-            return reservationDao.findByEmail(email);
+            return reservationDao.findByEmail(email,seat);
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("SelectByEmail error");

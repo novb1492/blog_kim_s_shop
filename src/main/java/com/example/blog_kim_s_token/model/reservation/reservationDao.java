@@ -14,7 +14,7 @@ public interface reservationDao extends JpaRepository<mainReservationDto,Integer
     @Query(value = "select  count(*) from reservation where date_and_time=? AND seat=?",nativeQuery = true)
     int findByTime(Timestamp timestamp,String seat);
 
-    //@Query(value = "select  * from reservation where email=?",nativeQuery = true)
-    List<mainReservationDto>findByEmail(String email);
+    @Query(value = "select  * from reservation where email=? AND seat=?",nativeQuery = true)
+    List<mainReservationDto>findByEmail(String email,String seat);
 }
    
