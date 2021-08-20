@@ -64,6 +64,7 @@ public class errorRestController {
     @ExceptionHandler(RuntimeException.class)
     public JSONObject runtimeException(RuntimeException exception) {
         System.out.println("runtimeException");
+        exception.printStackTrace();
         return utillService.makeJson(false, exception.getMessage());
     }
     @ExceptionHandler(IllegalArgumentException.class)

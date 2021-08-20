@@ -33,7 +33,7 @@ public class resevationService {
     private final int maxPeopleOfDay=60;
     private final int maxPeopleOfTime=6;
     private final int cantFlag=100;
-    private final int canFlag=200;
+ 
 
     @Autowired
     private userService userService;
@@ -48,7 +48,7 @@ public class resevationService {
         System.out.println("getDateBySeat");
         try {
             int month=getDateDto.getMonth();
-            LocalDate today=LocalDate.of(LocalDate.now().getYear(),month,1);
+            LocalDate today=LocalDate.of(getDateDto.getYear(),month,1);
             YearMonth yearMonth=YearMonth.from(today);
             int lastDay=yearMonth.lengthOfMonth();
             System.out.println(lastDay+" lastDay");
@@ -68,7 +68,7 @@ public class resevationService {
                 dateAndValue[i][2]=cantFlag;
             }
             for(int i=start;i<endDayIdOfMonth;i++) {
-                Timestamp  timestamp=Timestamp.valueOf(LocalDate.now().getYear()+"-"+month+"-"+temp+" 00:00:00");
+                Timestamp  timestamp=Timestamp.valueOf(getDateDto.getYear()+"-"+month+"-"+temp+" 00:00:00");
                 int countAlready=getCountAlreadyInDate(timestamp,getDateDto.getSeat());
                 dateAndValue[i][0]=temp;
                 dateAndValue[i][1]=countAlready;
@@ -99,7 +99,7 @@ public class resevationService {
             System.out.println(totalHour+" totalHour");
             int[][] timesArray=new int[totalHour+1][3];
             for(int i=0;i<=totalHour;i++){
-                Timestamp timestamp=Timestamp.valueOf(LocalDate.now().getYear()+"-"+getTimeDto.getMonth()+"-"+getTimeDto.getDate()+" "+(i+openTime)+":00:00");
+                Timestamp timestamp=Timestamp.valueOf(getTimeDto.getYear()+"-"+getTimeDto.getMonth()+"-"+getTimeDto.getDate()+" "+(i+openTime)+":00:00");
                 int count=getCountAlreadyInTime(timestamp,getTimeDto.getSeat());
                 timesArray[i][0]=i+openTime;
                 timesArray[i][1]=count;
@@ -171,7 +171,7 @@ public class resevationService {
          List<mainReservationDto>array=SelectByEmail(email);
             if(array!=null){
                 for(mainReservationDto m:array){
-                    for(int i=0;i<=reservationInsertDto.getTimes().size();i++){
+                    for(int i=0;i<reservationInsertDto.getTimes().size();i++){
                         if(m.getDateAndTime().equals(Timestamp.valueOf(LocalDate.now().getYear()+"-"+reservationInsertDto.getMonth()+"-"+reservationInsertDto.getDate()+" "+reservationInsertDto.getTimes().get(i)+":00:00"))){
                             System.out.println("이미 예약한 시간 발견");
                             return utillService.makeJson(reservationEnums.findAlready.getBool(),reservationEnums.findAlready.getMessege()+LocalDate.now().getYear()+"-"+reservationInsertDto.getMonth()+"-"+reservationInsertDto.getDate()+" "+reservationInsertDto.getTimes().get(i)+":00:00"); 
