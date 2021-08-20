@@ -145,7 +145,7 @@ public class resevationService {
                 return utillService.makeJson(false,"결제 검증에 실패했습니다");
             }
             userDto userDto=userService.findEmail(email);
-            System.out.println(Timestamp.valueOf("2021-"+reservationInsertDto.getMonth()+"-"+reservationInsertDto.getDate()+" 00:00:00")+" 사용예정일");
+            System.out.println(Timestamp.valueOf(reservationInsertDto.getYear()+"-"+reservationInsertDto.getMonth()+"-"+reservationInsertDto.getDate()+" 00:00:00")+" 사용예정일");
             for(int i=0;i<times.size();i++){
                 mainReservationDto dto=mainReservationDto.builder()
                                         .email(email)
@@ -154,8 +154,8 @@ public class resevationService {
                                         .time(times.get(i))
                                         .seat(seat)
                                         .impId(impId)
-                                        .rDate(Timestamp.valueOf("2021-"+reservationInsertDto.getMonth()+"-"+reservationInsertDto.getDate()+" 00:00:00"))
-                                        .dateAndTime(Timestamp.valueOf("2021-"+reservationInsertDto.getMonth()+"-"+reservationInsertDto.getDate()+" "+times.get(i)+":00:00"))
+                                        .rDate(Timestamp.valueOf(reservationInsertDto.getYear()+"-"+reservationInsertDto.getMonth()+"-"+reservationInsertDto.getDate()+" 00:00:00"))
+                                        .dateAndTime(Timestamp.valueOf(reservationInsertDto.getYear()+"-"+reservationInsertDto.getMonth()+"-"+reservationInsertDto.getDate()+" "+times.get(i)+":00:00"))
                                         .build();
                                         reservationDao.save(dto);
             }
