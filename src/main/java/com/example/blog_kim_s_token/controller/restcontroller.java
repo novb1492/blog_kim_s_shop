@@ -141,7 +141,7 @@ public class restcontroller {
     @PostMapping("/api/insertReservation")
     public JSONObject insertReservation(@Valid @RequestBody reservationInsertDto reservationInsertDto,HttpServletResponse response) {
         System.out.println("insertReservation");
-       return resevationService.insertReservation(reservationInsertDto);
+       return resevationService.confrimPayment(reservationInsertDto);
     }
     @PostMapping("/api/getPrice")
     public JSONObject getPrice(@RequestBody seatPriceDto seatPriceDto,HttpServletResponse response) {

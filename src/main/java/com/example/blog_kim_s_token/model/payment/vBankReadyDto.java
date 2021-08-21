@@ -46,6 +46,10 @@ public class vBankReadyDto {
     @Column(name = "count",nullable = false)
     private int count;
 
+    
+    @Column(name = "productId",nullable = false)
+    private int productId;
+
     @Column(name = "created")
     @CreationTimestamp
     private Timestamp created;   

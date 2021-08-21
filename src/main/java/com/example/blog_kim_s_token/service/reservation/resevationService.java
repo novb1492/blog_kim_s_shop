@@ -127,24 +127,30 @@ public class resevationService {
         System.out.println(timestamp);
         return reservationDao.findByTime(timestamp,seat);
     }
+    public JSONObject confrimPayment(reservationInsertDto reservationInsertDto) {
+        System.out.println("confrimPayment");
+        String impId=reservationInsertDto.getPaymentId();
+        String seat=reservationInsertDto.getSeat();
+        List<Integer>times=reservationInsertDto.getTimes();
+        int totalPrice=priceService.getTotalSeatPrice(seat,times.size());
+            paymentEnums paymentEnums=iamportService.confrimPayment(impId, times, seat, totalPrice);
+            if(paymentEnums.getBool()==false){
+                System.out.println("confrimPayment 검증실패");
+                return utillService.makeJson(false,"결제 검증에 실패했습니다");
+            }
+        reservationInsertDto.setStatus(paymentEnums.getStatus());
+        return insertReservation(reservationInsertDto);
+    }
     @Transactional(rollbackFor = Exception.class)
     public JSONObject insertReservation(reservationInsertDto reservationInsertDto) {
         System.out.println("insertReservation");
         String email= SecurityContextHolder.getContext().getAuthentication().getName();
-        String impId=reservationInsertDto.getPaymentId();
-        String seat=reservationInsertDto.getSeat();
-        List<Integer>times=reservationInsertDto.getTimes();
         JSONObject result=confrimInsert(reservationInsertDto,email);
         if((boolean)result.get("bool")==false){
             return result;
         }
+        List<Integer>times=reservationInsertDto.getTimes();
         try {  
-            int totalPrice=priceService.getTotalSeatPrice(seat,times.size());
-            paymentEnums paymentEnums=iamportService.confrimPayment(impId, times, seat, totalPrice);
-            if(paymentEnums.getBool()==false){
-                System.out.println("insertReservation 검증실패");
-                return utillService.makeJson(false,"결제 검증에 실패했습니다");
-            }
             userDto userDto=userService.findEmail(email);
             System.out.println(Timestamp.valueOf(reservationInsertDto.getYear()+"-"+reservationInsertDto.getMonth()+"-"+reservationInsertDto.getDate()+" 00:00:00")+" 사용예정일");
             for(int i=0;i<times.size();i++){
@@ -153,11 +159,11 @@ public class resevationService {
                                         .name(userDto.getName())
                                         .userid(userDto.getId())
                                         .time(times.get(i))
-                                        .seat(seat)
-                                        .paymentId(impId)
+                                        .seat(reservationInsertDto.getSeat())
+                                        .paymentId(reservationInsertDto.getPaymentId())
                                         .rDate(Timestamp.valueOf(reservationInsertDto.getYear()+"-"+reservationInsertDto.getMonth()+"-"+reservationInsertDto.getDate()+" 00:00:00"))
                                         .dateAndTime(Timestamp.valueOf(reservationInsertDto.getYear()+"-"+reservationInsertDto.getMonth()+"-"+reservationInsertDto.getDate()+" "+times.get(i)+":00:00"))
-                                        .status(paymentEnums.getStatus())
+                                        .status(reservationInsertDto.getStatus())
                                         .build();
                                         reservationDao.save(dto);
             }
