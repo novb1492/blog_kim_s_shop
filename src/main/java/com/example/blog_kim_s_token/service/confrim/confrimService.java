@@ -55,6 +55,7 @@ public class confrimService {
         return confrimDao.findByEmail(email);
     }
     public void insertConfrim(confrimInterface confrimInterface,String tempNum){
+        System.out.println("insertConfrim");
         confrimDto dto=confrimInterface.getDto();
         dto.setRequestTime(1); 
         if(confrimInterface.unit().equals("phone")){
@@ -97,7 +98,6 @@ public class confrimService {
     }
     @Transactional(rollbackFor = Exception.class)
     public JSONObject sendPhone(HttpServletRequest request) {
-        JSONObject result=null;
         try {
         System.out.println("sendMessege 입장"+request.getParameter("phoneNum"));
         String phoneNum=request.getParameter("phoneNum");
@@ -112,16 +112,18 @@ public class confrimService {
         }
         confrimInterface confrimInterface=new phoneConfrim(dto);
         String tempNum=utillService.GetRandomNum(tempNumLength);
-         result=sendSms(confrimInterface,tempNum);
-        if((boolean)result.get("bool")){
+        confirmEnums confirmEnums=sendSms(confrimInterface,tempNum);
+        if(confirmEnums.getBool()){
            //sendSms(phoneNum, tempNum);
         };  
+        return utillService.makeJson(confirmEnums.getBool(), confirmEnums.getMessege());
         } catch (Exception e) {
-            throw new RuntimeException("인증번호 발송실패");
+            e.printStackTrace();
+            System.out.println("sendPhone error");
+            throw new RuntimeException("sendPhone 인증번호 발송실패");
         }
-        return result;
     }
-    public JSONObject sendSms(confrimInterface confrimInterface,String tempNum) {
+    public confirmEnums sendSms(confrimInterface confrimInterface,String tempNum) {
             if(confrimInterface.getRequestTime()==0){
                 System.out.println("처음 인증요청"); 
                 insertConfrim(confrimInterface,tempNum);
@@ -130,7 +132,6 @@ public class confrimService {
                 System.out.println("요청 기록존재");
                 if(utillService.checkDate(confrimInterface.getCreated(),coolTime)){
                     System.out.println(maxOfday+"회 초과후 쿨타임지남 or 그냥 하루지남");
-                    deleteCofrim(confrimInterface.getDto());
                     insertConfrim(confrimInterface,tempNum);
                 }
                 else{
@@ -139,11 +140,12 @@ public class confrimService {
                         updateconfrim(confrimInterface, tempNum);
                     }else{
                         System.out.println(maxOfday+"초과후 하루 안지남");
-                        return utillService.makeJson(confirmEnums.tooManyTime.getBool(),"하루 "+maxOfday+"회 제한입니다");
+                        confirmEnums.tooManyTime.setMessege("하루 "+maxOfday+"회 제한입니다");
+                        return confirmEnums.tooManyTime;
                     }
                 }
             }
-        return utillService.makeJson(confirmEnums.sendSmsNum.getBool(), confirmEnums.sendSmsNum.getMessege());
+        return confirmEnums.sendSmsNum;
     }
     public JSONObject cofrimTempNum(phoneCofrimDto phoneCofrimDto) {
         System.out.println("cofrimTempNum");
@@ -173,11 +175,11 @@ public class confrimService {
             dto=confrimDto.builder().email(email).build();
         }
         confrimInterface confrimInterface=new emailConfrim(dto);
-        JSONObject result=sendSms(confrimInterface, tempNum);
-        if((boolean) result.get("bool")){
+        confirmEnums result=sendSms(confrimInterface, tempNum);
+        if(result.getBool()){
             sendEmailService.sendEmail(email,"안녕하세요 kim's Shop입니다","인증번호는 "+tempNum+" 입니다.");
         }
-        return result;
+        return utillService.makeJson(result.getBool(), result.getMessege());
 
     }
     public void updateconfrimEmail(String email){

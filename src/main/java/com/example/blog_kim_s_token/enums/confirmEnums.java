@@ -22,13 +22,16 @@ public enum confirmEnums {
     notFindCsrf("이미 로그아웃 했거나 csrf 미발급 사용자입니다",false),
     notEqualsCsrf("일치 하지 않는 로그아웃 시도",false);
 
-    private final String messege;
-    private final boolean bool;
+    private  String messege;
+    private  boolean bool;
    
 
     confirmEnums(String messege,boolean bool){
         this.messege=messege;
         this.bool=bool;
+    }
+    public void setMessege(String messege) {
+        this.messege=messege;
     }
     public String getMessege() {
         return messege;

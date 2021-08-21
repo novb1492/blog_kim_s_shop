@@ -127,6 +127,13 @@ public class resevationService {
         System.out.println(timestamp);
         return reservationDao.findByTime(timestamp,seat);
     }
+    public JSONObject confrimContents(reservationInsertDto reservationInsertDto) {
+        reservationEnums result=confrimInsert(reservationInsertDto,SecurityContextHolder.getContext().getAuthentication().getName());
+        if(result.getBool()==false){
+            return utillService.makeJson(result.getBool(),result.getMessege());
+        }
+        return confrimPayment(reservationInsertDto);
+    }
     public JSONObject confrimPayment(reservationInsertDto reservationInsertDto) {
         System.out.println("confrimPayment");
         String impId=reservationInsertDto.getPaymentId();
@@ -145,10 +152,6 @@ public class resevationService {
     public JSONObject insertReservation(reservationInsertDto reservationInsertDto) {
         System.out.println("insertReservation");
         String email= SecurityContextHolder.getContext().getAuthentication().getName();
-        JSONObject result=confrimInsert(reservationInsertDto,email);
-        if((boolean)result.get("bool")==false){
-            return result;
-        }
         List<Integer>times=reservationInsertDto.getTimes();
         try {  
             userDto userDto=userService.findEmail(email);
@@ -175,20 +178,21 @@ public class resevationService {
         }
         
     }
-    private JSONObject confrimInsert(reservationInsertDto reservationInsertDto,String email){
+    private reservationEnums confrimInsert(reservationInsertDto reservationInsertDto,String email){
         System.out.println("confrimInsert");
          List<mainReservationDto>array=SelectByEmail(email,reservationInsertDto.getSeat());
             if(array!=null){
                 for(mainReservationDto m:array){
                     for(int i=0;i<reservationInsertDto.getTimes().size();i++){
-                        if(m.getDateAndTime().equals(Timestamp.valueOf(LocalDate.now().getYear()+"-"+reservationInsertDto.getMonth()+"-"+reservationInsertDto.getDate()+" "+reservationInsertDto.getTimes().get(i)+":00:00"))){
+                        if(m.getDateAndTime().equals(Timestamp.valueOf(reservationInsertDto.getYear()+"-"+reservationInsertDto.getMonth()+"-"+reservationInsertDto.getDate()+" "+reservationInsertDto.getTimes().get(i)+":00:00"))){
                             System.out.println("이미 예약한 시간 발견");
-                            return utillService.makeJson(reservationEnums.findAlready.getBool(),reservationEnums.findAlready.getMessege()+LocalDate.now().getYear()+"-"+reservationInsertDto.getMonth()+"-"+reservationInsertDto.getDate()+" "+reservationInsertDto.getTimes().get(i)+":00:00"); 
+                            reservationEnums.findAlready.setMessete("이미 같은 시간에 예약이 있습니다 "+reservationInsertDto.getYear()+"-"+reservationInsertDto.getMonth()+"-"+reservationInsertDto.getDate()+" "+reservationInsertDto.getTimes().get(i)+":00:00");
+                            return reservationEnums.findAlready; 
                         }
                     }
                 }
             }
-        return utillService.makeJson(true, "");
+        return reservationEnums.sucInsert;
     }
     public List<mainReservationDto> SelectByEmail(String email,String seat) {
         try {
