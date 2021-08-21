@@ -48,13 +48,12 @@ public class resevationService {
         System.out.println("getDateBySeat");
         try {
             int month=getDateDto.getMonth();
-            LocalDate today=LocalDate.of(getDateDto.getYear(),month,1);
-            YearMonth yearMonth=YearMonth.from(today);
+            LocalDate selectDate=LocalDate.of(getDateDto.getYear(),month,1);
+            YearMonth yearMonth=YearMonth.from(selectDate);
             int lastDay=yearMonth.lengthOfMonth();
             System.out.println(lastDay+" lastDay");
             int start=0;
-            LocalDate date = LocalDate.of(today.getYear(),today.getMonthValue(),1);
-            DayOfWeek dayOfWeek = date.getDayOfWeek();
+            DayOfWeek dayOfWeek = selectDate.getDayOfWeek();
             int temp=1;
             start=dayOfWeek.getValue();
             System.out.println(start+" start");
@@ -107,12 +106,12 @@ public class resevationService {
                 if(LocalDateTime.now().getDayOfMonth()==getTimeDto.getDate()){
                     if((i+openTime)<=LocalDateTime.now().getHour()){
                         System.out.println("지난시간");
-                        timesArray[i][2]=100;
+                        timesArray[i][2]=cantFlag;
                     }
                 }
                 else if(count==maxPeopleOfTime){
                     System.out.println("자리가 다찬시간");
-                    timesArray[i][2]=100;
+                    timesArray[i][2]=cantFlag;
                 }
             }
             timesJson.put("times", timesArray);
