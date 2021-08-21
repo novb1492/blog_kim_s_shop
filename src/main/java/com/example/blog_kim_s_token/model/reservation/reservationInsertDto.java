@@ -27,7 +27,7 @@ public class reservationInsertDto {
     private int year;
 
     @NotBlank(message = "결제번호가 없습니다")
-    private String impId;
+    private String paymentId;
 
     private List<Integer>times;
 }

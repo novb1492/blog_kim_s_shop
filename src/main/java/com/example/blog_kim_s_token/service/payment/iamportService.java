@@ -4,6 +4,7 @@ package com.example.blog_kim_s_token.service.payment;
 
 import java.util.List;
 
+import com.example.blog_kim_s_token.enums.paymentEnums;
 import com.example.blog_kim_s_token.model.iamport.buyInforDto;
 import com.example.blog_kim_s_token.model.iamport.impTokenDto;
 import com.nimbusds.jose.shaded.json.JSONObject;
@@ -24,7 +25,7 @@ public class iamportService {
     private HttpHeaders headers=new HttpHeaders();
     private JSONObject body=new JSONObject();
 
-    public boolean confrimPayment(String impId,List<Integer>times,String seat,int totalPrice) {
+    public paymentEnums confrimPayment(String impId,List<Integer>times,String seat,int totalPrice) {
         System.out.println("confrimPayment");
         String token=getToken();
         JSONObject buyInfor=getBuyInfor(token, impId);
@@ -66,16 +67,18 @@ public class iamportService {
             body.clear();
         }
     }
-    private boolean confrimBuy(JSONObject buyInfor,String impId,List<Integer>times,String seat,int totalPrice) {
+    private paymentEnums confrimBuy(JSONObject buyInfor,String impId,List<Integer>times,String seat,int totalPrice) {
         System.out.println("confrimBuy");
         int amount=(int) buyInfor.get("amount");
-        System.out.println(amount+"결제총량"+totalPrice+" 결제되어야 하는 금액");
-        if(totalPrice==amount){
+        String status=(String) buyInfor.get("status");
+        System.out.println(amount+"결제총량"+totalPrice+" 결제되어야 하는 금액"+status+" 결제상태");
+        if(totalPrice==amount&&status.equals("paid")){
             System.out.println("결제 검증완료");
-            return true;
+            paymentEnums.sucCheck.setStatus("paid");
+            return paymentEnums.valueOf("sucCheck");
         }
         System.out.println("결제 검증실패");
-        return false;
+        return paymentEnums.valueOf("failCheck");
     }
     public void cancleBuy(String impId) {
         try {

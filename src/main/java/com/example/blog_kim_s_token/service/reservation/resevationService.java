@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.List;
 
-
+import com.example.blog_kim_s_token.enums.paymentEnums;
 import com.example.blog_kim_s_token.enums.reservationEnums;
 import com.example.blog_kim_s_token.model.reservation.*;
 import com.example.blog_kim_s_token.model.reservation.getDateDto;
@@ -131,7 +131,7 @@ public class resevationService {
     public JSONObject insertReservation(reservationInsertDto reservationInsertDto) {
         System.out.println("insertReservation");
         String email= SecurityContextHolder.getContext().getAuthentication().getName();
-        String impId=reservationInsertDto.getImpId();
+        String impId=reservationInsertDto.getPaymentId();
         String seat=reservationInsertDto.getSeat();
         List<Integer>times=reservationInsertDto.getTimes();
         JSONObject result=confrimInsert(reservationInsertDto,email);
@@ -140,7 +140,8 @@ public class resevationService {
         }
         try {  
             int totalPrice=priceService.getTotalSeatPrice(seat,times.size());
-            if(iamportService.confrimPayment(impId, times, seat, totalPrice)==false){
+            paymentEnums paymentEnums=iamportService.confrimPayment(impId, times, seat, totalPrice);
+            if(paymentEnums.getBool()==false){
                 System.out.println("insertReservation 검증실패");
                 return utillService.makeJson(false,"결제 검증에 실패했습니다");
             }
@@ -153,9 +154,10 @@ public class resevationService {
                                         .userid(userDto.getId())
                                         .time(times.get(i))
                                         .seat(seat)
-                                        .impId(impId)
+                                        .paymentId(impId)
                                         .rDate(Timestamp.valueOf(reservationInsertDto.getYear()+"-"+reservationInsertDto.getMonth()+"-"+reservationInsertDto.getDate()+" 00:00:00"))
                                         .dateAndTime(Timestamp.valueOf(reservationInsertDto.getYear()+"-"+reservationInsertDto.getMonth()+"-"+reservationInsertDto.getDate()+" "+times.get(i)+":00:00"))
+                                        .status(paymentEnums.getStatus())
                                         .build();
                                         reservationDao.save(dto);
             }
@@ -163,7 +165,7 @@ public class resevationService {
             return utillService.makeJson(reservationEnums.sucInsert.getBool(), reservationEnums.sucInsert.getMessege());
         } catch (Exception e) {
            e.printStackTrace();
-           throw new RuntimeException("getTimeByDate error");
+           throw new RuntimeException("insertReservation error");
         }
         
     }
