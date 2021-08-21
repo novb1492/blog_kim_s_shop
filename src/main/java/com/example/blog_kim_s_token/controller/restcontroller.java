@@ -148,7 +148,7 @@ public class restcontroller {
         System.out.println("getPrice");
        return priceService.getTotalSeatPrice(seatPriceDto);
     }
-    @PostMapping("auth/bootPay")
+    @PostMapping("/auth/payment")
     public void bootPay(@RequestBody JSONObject jsonObject,HttpServletResponse response) {
         System.out.println("bootPay");
         System.out.println(jsonObject.get("imp_uid"));
