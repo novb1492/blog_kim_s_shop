@@ -14,4 +14,6 @@ public interface confrimInterface {
     public int getRequestTime();
     public boolean isNULL();
     public confrimDto getDto();
+    public void setPassOneDay(boolean bool);
+    public boolean getPassOneDay();
 }

@@ -1,5 +1,8 @@
 package com.example.blog_kim_s_token.service.confrim;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+
 import javax.servlet.http.HttpServletRequest;
 
 
@@ -62,6 +65,9 @@ public class confrimService {
             dto.setPhoneTempNum(tempNum);
         }else{
             dto.setEmailTempNum(tempNum);
+        }
+        if(confrimInterface.getPassOneDay()){
+            dto.setCreated(Timestamp.valueOf(LocalDateTime.now()));
         }
         confrimDao.save(dto);
     }
@@ -132,6 +138,7 @@ public class confrimService {
                 System.out.println("요청 기록존재");
                 if(utillService.checkDate(confrimInterface.getCreated(),coolTime)){
                     System.out.println(maxOfday+"회 초과후 쿨타임지남 or 그냥 하루지남");
+                    confrimInterface.setPassOneDay(true);
                     insertConfrim(confrimInterface,tempNum);
                 }
                 else{
@@ -153,9 +160,9 @@ public class confrimService {
         new confrimDtos<confrimDto>(confrimDto, "인증요청을 한 내역이없습니다");
 
         confrimInterface confrimInterface=new phoneConfrim(confrimDto);
-        JSONObject result=compareTempNum(confrimInterface,phoneCofrimDto.getTempNum());
-        if((boolean) result.get("bool")==false){
-            return result;
+        confirmEnums result=compareTempNum(confrimInterface,phoneCofrimDto.getTempNum());
+        if( result.getBool()==false){
+            return utillService.makeJson(result.getBool(), result.getMessege());
         }
         confrimDao.updatePhoneCheckTrue(t, phoneCofrimDto.getPhoneNum());
         return utillService.makeJson(confirmEnums.EqulsTempNum.getBool(), confirmEnums.EqulsTempNum.getMessege());
@@ -190,9 +197,9 @@ public class confrimService {
         System.out.println("sendTempPwd");
         confrimDto confrimDto=confrimDao.findByEmail(emailCofrimDto.getEmail());
         confrimInterface confrimInterface=new emailConfrim(confrimDto);
-        JSONObject result=compareTempNum(confrimInterface,emailCofrimDto.getTempNum());
-        if((boolean) result.get("bool")==false){
-            return result;
+        confirmEnums result=compareTempNum(confrimInterface,emailCofrimDto.getTempNum());
+        if(result.getBool()==false){
+            return utillService.makeJson(result.getBool(), result.getMessege());
         }
         String tempPwd=utillService.GetRandomNum(tempPwdLength);
                         System.out.println(tempPwd+"임시비밀번호");
@@ -201,20 +208,20 @@ public class confrimService {
                         sendEmailService.sendEmail(confrimDto.getEmail(),"안녕하세요 kim's Shop입니다","임시비밀번호는 "+tempPwd+" 입니다.");
         return utillService.makeJson(true, "임시 비밀번호를 메일로 보내드렸습니다");
     }
-    public JSONObject compareTempNum(confrimInterface confrimInterface,String requestTempNum) {
+    public confirmEnums compareTempNum(confrimInterface confrimInterface,String requestTempNum) {
         System.out.println("confrimTempNum 입장");
         if(confrimInterface.isNULL()){
             System.out.println("인증번호 요청이없음");
-            return utillService.makeJson(confirmEnums.notReuestConfrim.getBool(), confirmEnums.notReuestConfrim.getMessege());
+            return confirmEnums.notReuestConfrim;
         }
         if(utillService.checkTime(confrimInterface.getCreated(),overTime)){
             System.out.println("인증 제한시간이 지남");
-            return utillService.makeJson(confirmEnums.overTime.getBool(), confirmEnums.overTime.getMessege()); 
+            return confirmEnums.overTime; 
         }
         if(!requestTempNum.trim().equals(confrimInterface.TempNumAtDb())){
             System.out.println("인증번호 불일치");
-            return utillService.makeJson(confirmEnums.notEqulsTempNum.getBool(), confirmEnums.notEqulsTempNum.getMessege());
+            return confirmEnums.notEqulsTempNum;
         }
-        return utillService.makeJson(confirmEnums.EqulsTempNum.getBool(),confirmEnums.EqulsTempNum.getMessege());  
+        return confirmEnums.EqulsTempNum;  
     } 
 }

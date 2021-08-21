@@ -6,6 +6,7 @@ import com.example.blog_kim_s_token.model.confrim.confrimDto;
 
 public class emailConfrim implements  confrimInterface {
     private confrimDto confrimDto;
+    private boolean passOneDay=false;
     public emailConfrim(confrimDto confrimDto){
         this.confrimDto=confrimDto;
     }
@@ -40,7 +41,15 @@ public class emailConfrim implements  confrimInterface {
     public confrimDto getDto() {
         return this.confrimDto;
     }
-  
+    @Override
+    public void setPassOneDay(boolean bool) {
+       this.passOneDay=bool;
+        
+    }
+    @Override
+    public boolean getPassOneDay() {
+        return  this.passOneDay;
+    }
  
 
     

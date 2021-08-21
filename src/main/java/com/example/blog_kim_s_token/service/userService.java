@@ -138,14 +138,14 @@ public class userService {
             String phoneNum=phoneDto.getPhoneNum();
             confrimDto confrimDto=confrimService.findConfrim(phoneNum);
             confrimInterface confrimInterface=new phoneConfrim(confrimDto);
-            JSONObject result=confrimService.compareTempNum(confrimInterface,phoneDto.getTempNum());
-            if((boolean) result.get("bool")){
+            confirmEnums result=confrimService.compareTempNum(confrimInterface,phoneDto.getTempNum());
+            if(result.getBool()){
                 confrimService.deleteCofrim(confrimDto);
                 userDto dto=findEmail(SecurityContextHolder.getContext().getAuthentication().getName());
                 dto.setPhoneNum(phoneNum);
                 return utillService.makeJson(userEnums.sucUpdatePhone.getBool(), userEnums.sucUpdatePhone.getMessege());
             }
-            return result;
+            return utillService.makeJson(result.getBool(), result.getMessege());
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("updatephoneNum error");
