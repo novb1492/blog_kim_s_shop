@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.List;
 
+import com.example.blog_kim_s_token.customException.failBuyException;
 import com.example.blog_kim_s_token.enums.paymentEnums;
 import com.example.blog_kim_s_token.enums.reservationEnums;
 import com.example.blog_kim_s_token.model.reservation.*;
@@ -128,8 +129,11 @@ public class resevationService {
         System.out.println(timestamp);
         return reservationDao.findByTime(timestamp,seat);
     }
+    @Transactional(rollbackFor = Exception.class)
     public JSONObject confrimContents(reservationInsertDto reservationInsertDto) {
-        reservationEnums result=confrimInsert(reservationInsertDto,SecurityContextHolder.getContext().getAuthentication().getName());
+        reservationInsertDto.setEmail(SecurityContextHolder.getContext().getAuthentication().getName());
+        reservationEnums result=confrimInsert(reservationInsertDto);
+
         if(result.getBool()==false){
             return utillService.makeJson(result.getBool(),result.getMessege());
         }
@@ -137,17 +141,16 @@ public class resevationService {
     }
     public JSONObject confrimPayment(reservationInsertDto reservationInsertDto) {
         System.out.println("confrimPayment");
-        String email= SecurityContextHolder.getContext().getAuthentication().getName();
-        userDto userDto=userService.findEmail(email);
+        userDto userDto=userService.findEmail(reservationInsertDto.getEmail());
         String seat=reservationInsertDto.getSeat();
         List<Integer>times=reservationInsertDto.getTimes();
         int totalPrice=priceService.getTotalSeatPrice(seat,times.size());
 
-        reservationInsertDto.setEmail(email);
+        reservationInsertDto.setUserId(userDto.getId());
         reservationInsertDto.setName(userDto.getName());
         
         iamInter inter=iamInter.builder()
-                                .BuyerEmail(email)
+                                .BuyerEmail(reservationInsertDto.getEmail())
                                 .BuyerName(userDto.getName())
                                 .kind("reservation")
                                 .payCompany("iamport")
@@ -155,27 +158,24 @@ public class resevationService {
                                 .totalPrice(totalPrice)
                                 .build();
         payMentInterFace payMentInterFace=inter;
-            paymentEnums paymentEnums=iamportService.confrimPayment(payMentInterFace);
-            if(paymentEnums.getBool()==false){
-                System.out.println("confrimPayment 검증실패");
-                return utillService.makeJson(false,"결제 검증에 실패했습니다");
-            }
+        paymentEnums paymentEnums=iamportService.confrimPayment(payMentInterFace);
+        if(paymentEnums.getBool()==false){
+            System.out.println("confrimPayment 검증실패");
+            return utillService.makeJson(false,"결제 검증에 실패했습니다");
+        }
         reservationInsertDto.setStatus(paymentEnums.getStatus());
         return insertReservation(reservationInsertDto);
     }
-    @Transactional(rollbackFor = Exception.class)
     public JSONObject insertReservation(reservationInsertDto reservationInsertDto) {
         System.out.println("insertReservation");
-        String email= SecurityContextHolder.getContext().getAuthentication().getName();
         List<Integer>times=reservationInsertDto.getTimes();
         try {  
-            userDto userDto=userService.findEmail(email);
             System.out.println(Timestamp.valueOf(reservationInsertDto.getYear()+"-"+reservationInsertDto.getMonth()+"-"+reservationInsertDto.getDate()+" 00:00:00")+" 사용예정일");
             for(int i=0;i<times.size();i++){
                 mainReservationDto dto=mainReservationDto.builder()
-                                        .email(email)
-                                        .name(userDto.getName())
-                                        .userid(userDto.getId())
+                                        .email(reservationInsertDto.getEmail())
+                                        .name(reservationInsertDto.getName())
+                                        .userid(reservationInsertDto.getUserId())
                                         .time(times.get(i))
                                         .seat(reservationInsertDto.getSeat())
                                         .paymentId(reservationInsertDto.getPaymentId())
@@ -185,17 +185,17 @@ public class resevationService {
                                         .build();
                                         reservationDao.save(dto);
             }
-
             return utillService.makeJson(reservationEnums.sucInsert.getBool(), reservationEnums.sucInsert.getMessege());
         } catch (Exception e) {
            e.printStackTrace();
-           throw new RuntimeException("insertReservation error");
+           System.out.println("insertReservation error");
+           throw new failBuyException(reservationInsertDto.getPaymentId());
         }
         
     }
-    private reservationEnums confrimInsert(reservationInsertDto reservationInsertDto,String email){
+    private reservationEnums confrimInsert(reservationInsertDto reservationInsertDto){
         System.out.println("confrimInsert");
-         List<mainReservationDto>array=SelectByEmail(email,reservationInsertDto.getSeat());
+         List<mainReservationDto>array=SelectByEmail(reservationInsertDto.getEmail(),reservationInsertDto.getSeat());
             if(array!=null){
                 for(mainReservationDto m:array){
                     for(int i=0;i<reservationInsertDto.getTimes().size();i++){

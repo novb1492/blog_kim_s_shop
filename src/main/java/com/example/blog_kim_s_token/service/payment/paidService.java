@@ -5,13 +5,16 @@ import com.example.blog_kim_s_token.model.payment.paidDto;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class paidService {
     @Autowired
     private paidDao paidDao;
 
+    
     public void insertPayment(payMentInterFace payMentInterFace) {
+        System.out.println("insertPayment");
         try {
             paidDto dto=paidDto.builder()
             .email(payMentInterFace.getBuyerEmail())

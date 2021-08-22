@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
+import com.example.blog_kim_s_token.customException.failBuyException;
 import com.example.blog_kim_s_token.jwt.jwtService;
 import com.example.blog_kim_s_token.model.jwt.jwtDto;
 import com.example.blog_kim_s_token.service.utillService;
@@ -71,5 +72,10 @@ public class errorRestController {
     public JSONObject IllegalArgumentException(IllegalArgumentException exception) {
         System.out.println("IllegalArgumentException");
         return utillService.makeJson(false, exception.getMessage());
+    }
+    @ExceptionHandler(failBuyException.class)
+    public void failBuyException(failBuyException exception) {
+        System.out.println("failBuyException");
+        System.out.println(exception.getMessage());
     }
 }
