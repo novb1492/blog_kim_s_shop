@@ -4,6 +4,7 @@ package com.example.blog_kim_s_token.service.payment;
 
 
 
+import com.example.blog_kim_s_token.customException.failBuyException;
 import com.example.blog_kim_s_token.enums.paymentEnums;
 import com.example.blog_kim_s_token.model.iamport.buyInforDto;
 import com.example.blog_kim_s_token.model.iamport.impTokenDto;
@@ -85,17 +86,34 @@ public class iamportService {
             return paymentEnums.sucCheck;
         }
         System.out.println("결제 검증실패");
-        return paymentEnums.valueOf("failCheck");
+        throw new failBuyException("결제 검증실패",payMentInterFace.getPaymentId());
     }    
     
-    public void cancleBuy(String impId) {
+    public boolean cancleBuy(String impId,int zeorOrPrice) {
         try {
+            String token=getToken();
+
+            headers.add("Authorization",token);
+            body.put("imp_uid", impId);
             
+            if(zeorOrPrice!=0){
+                body.put("amount", zeorOrPrice);
+            }
+
+            HttpEntity<JSONObject>entity=new HttpEntity<JSONObject>(body, headers);
+            restTemplate.postForObject("https://api.iamport.kr/payments/cancel",entity,JSONObject.class);
+
+            return true;
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("cancleBuy error");
-            throw new RuntimeException("환불에 실패했습니다");
+            System.out.println("cancleBuy가 실패 했습니다 직접 환불 바랍니다");
+            throw new RuntimeException("환불에 실패 했습니다 다시시도 바랍니다");
+        }finally{
+            headers.clear();
+            body.clear();
+
         }
+
     }
 
     

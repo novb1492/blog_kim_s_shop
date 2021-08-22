@@ -189,9 +189,8 @@ public class resevationService {
         } catch (Exception e) {
            e.printStackTrace();
            System.out.println("insertReservation error");
-           throw new failBuyException(reservationInsertDto.getPaymentId());
+           throw new failBuyException("예약 저장 실패",reservationInsertDto.getPaymentId());
         }
-        
     }
     private reservationEnums confrimInsert(reservationInsertDto reservationInsertDto){
         System.out.println("confrimInsert");

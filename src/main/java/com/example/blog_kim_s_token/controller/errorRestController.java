@@ -13,6 +13,7 @@ import com.example.blog_kim_s_token.customException.failBuyException;
 import com.example.blog_kim_s_token.jwt.jwtService;
 import com.example.blog_kim_s_token.model.jwt.jwtDto;
 import com.example.blog_kim_s_token.service.utillService;
+import com.example.blog_kim_s_token.service.payment.iamportService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class errorRestController {
     @Autowired
     private jwtService jwtService;
+    @Autowired
+    private iamportService iamportService;
+    
     
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public JSONObject processValidationError(MethodArgumentNotValidException exception) {
@@ -74,8 +78,9 @@ public class errorRestController {
         return utillService.makeJson(false, exception.getMessage());
     }
     @ExceptionHandler(failBuyException.class)
-    public void failBuyException(failBuyException exception) {
+    public JSONObject failBuyException(failBuyException exception) {
         System.out.println("failBuyException");
-        System.out.println(exception.getMessage());
+        iamportService.cancleBuy(exception.getPayMentId(),0);
+        return utillService.makeJson(true, exception.getMessage());
     }
 }

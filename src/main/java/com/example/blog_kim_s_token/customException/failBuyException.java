@@ -4,7 +4,12 @@ import org.springframework.dao.DataAccessException;
 
 public class failBuyException extends DataAccessException {
 
-    public failBuyException(String msg) {
+    private String payMentId;
+    public failBuyException(String msg,String payMentId) {
         super(msg);
+        this.payMentId=payMentId;
+    }
+    public String getPayMentId() {
+        return this.payMentId;
     }
 }

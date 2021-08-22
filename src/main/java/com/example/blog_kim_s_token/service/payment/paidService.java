@@ -1,18 +1,17 @@
 package com.example.blog_kim_s_token.service.payment;
 
+import com.example.blog_kim_s_token.customException.failBuyException;
 import com.example.blog_kim_s_token.model.payment.paidDao;
 import com.example.blog_kim_s_token.model.payment.paidDto;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class paidService {
     @Autowired
     private paidDao paidDao;
 
-    
     public void insertPayment(payMentInterFace payMentInterFace) {
         System.out.println("insertPayment");
         try {
@@ -24,11 +23,10 @@ public class paidService {
             .payCompany(payMentInterFace.getPayCompany())
             .totalPrice(payMentInterFace.getTotalPrice())
             .status("paid").build();
-           
             paidDao.save(dto);
         } catch (Exception e) {
             System.out.println("insertPayment error");
-            throw new RuntimeException("insertPayment 결제저장에 실패했습니다");
+            throw new failBuyException("결제내역 저장 실패",payMentInterFace.getPaymentId());
         }
        
     }
