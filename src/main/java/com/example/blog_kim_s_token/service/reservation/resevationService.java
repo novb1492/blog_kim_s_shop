@@ -35,6 +35,7 @@ public class resevationService {
     private final int maxPeopleOfDay=60;
     private final int maxPeopleOfTime=6;
     private final int cantFlag=100;
+  
  
 
     @Autowired
@@ -131,11 +132,7 @@ public class resevationService {
     @Transactional(rollbackFor = Exception.class)
     public JSONObject confrimContents(reservationInsertDto reservationInsertDto) {
         reservationInsertDto.setEmail(SecurityContextHolder.getContext().getAuthentication().getName());
-        reservationEnums result=confrimInsert(reservationInsertDto);
-
-        if(result.getBool()==false){
-            return utillService.makeJson(result.getBool(),result.getMessege());
-        }
+        confrimInsert(reservationInsertDto);
         return confrimPayment(reservationInsertDto);
     }
     public JSONObject confrimPayment(reservationInsertDto reservationInsertDto) {
@@ -186,21 +183,33 @@ public class resevationService {
            throw new failBuyException("예약 저장 실패",reservationInsertDto.getPaymentId());
         }
     }
-    private reservationEnums confrimInsert(reservationInsertDto reservationInsertDto){
+    private void confrimInsert(reservationInsertDto reservationInsertDto){
         System.out.println("confrimInsert");
-         List<mainReservationDto>array=SelectByEmail(reservationInsertDto.getEmail(),reservationInsertDto.getSeat());
+        try {
+            List<mainReservationDto>array=SelectByEmail(reservationInsertDto.getEmail(),reservationInsertDto.getSeat());
             if(array!=null){
                 for(mainReservationDto m:array){
                     for(int i=0;i<reservationInsertDto.getTimes().size();i++){
-                        if(m.getDateAndTime().equals(Timestamp.valueOf(reservationInsertDto.getYear()+"-"+reservationInsertDto.getMonth()+"-"+reservationInsertDto.getDate()+" "+reservationInsertDto.getTimes().get(i)+":00:00"))){
-                            System.out.println("이미 예약한 시간 발견");
-                            reservationEnums.findAlready.setMessete("이미 같은 시간에 예약이 있습니다 "+reservationInsertDto.getYear()+"-"+reservationInsertDto.getMonth()+"-"+reservationInsertDto.getDate()+" "+reservationInsertDto.getTimes().get(i)+":00:00");
-                            return reservationEnums.findAlready; 
+                        String date=reservationInsertDto.getYear()+"-"+reservationInsertDto.getMonth()+"-"+reservationInsertDto.getDate()+" "+reservationInsertDto.getTimes().get(i)+":00:00";
+                        Timestamp DateAndTime=Timestamp.valueOf(date);
+                        if(m.getDateAndTime().equals(DateAndTime)||utillService.compareDate(DateAndTime, LocalDateTime.now())){
+                            System.out.println("이미 예약한 시간 발견or지난 날짜 예약시도");
+                            throw new Exception("이미 예약한 시간 발견 이거나 지난 날짜 예약시도입니다 "+date);
+                        }  
+                        else if(getCountAlreadyInTime(DateAndTime,reservationInsertDto.getSeat())==maxPeopleOfTime){
+                            System.out.println("예약이 다찬 시간입니다");
+                            throw new Exception("이미 예약한 시간 발견 이거나 지난 날짜 예약시도입니다 "+date);
                         }
                     }
                 }
             }
-        return reservationEnums.sucInsert;
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("confrimInsert error");
+            throw new failBuyException(e.getMessage(),reservationInsertDto.getPaymentId());
+        }
+         
     }
     public List<mainReservationDto> SelectByEmail(String email,String seat) {
         try {

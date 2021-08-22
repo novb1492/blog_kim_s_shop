@@ -24,6 +24,7 @@ public class reservationInsertDto {
     @Max(value = 31,message = "일이 31보다 큽니다")
     private int date;
     @Min(value = 2021,message = "연도가 2021보다 작습니다")
+    @Max(value = 2050,message = "연도가 2050보다 큽니다")
     private int year;
 
     @NotBlank(message = "결제번호가 없습니다")
