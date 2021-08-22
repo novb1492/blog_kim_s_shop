@@ -151,7 +151,6 @@ public class restcontroller {
     @PostMapping("/auth/payment")
     public void bootPay(@RequestBody JSONObject jsonObject,HttpServletResponse response) {
         System.out.println("payment");
-        System.out.println(jsonObject.get("imp_uid"));
         System.out.println(jsonObject+" payment");
        
     }

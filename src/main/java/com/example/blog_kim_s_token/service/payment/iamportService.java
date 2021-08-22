@@ -2,13 +2,14 @@ package com.example.blog_kim_s_token.service.payment;
 
 
 
-import java.util.List;
+
 
 import com.example.blog_kim_s_token.enums.paymentEnums;
 import com.example.blog_kim_s_token.model.iamport.buyInforDto;
 import com.example.blog_kim_s_token.model.iamport.impTokenDto;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -25,11 +26,16 @@ public class iamportService {
     private HttpHeaders headers=new HttpHeaders();
     private JSONObject body=new JSONObject();
 
-    public paymentEnums confrimPayment(String impId,List<Integer>times,String seat,int totalPrice) {
+    @Autowired
+    private paidService paidService;
+
+
+    public paymentEnums confrimPayment(payMentInterFace payMentInterFace) {
         System.out.println("confrimPayment");
         String token=getToken();
-        JSONObject buyInfor=getBuyInfor(token, impId);
-        return confrimBuy(buyInfor, impId, times, seat,totalPrice);
+        JSONObject buyInfor=getBuyInfor(token, payMentInterFace.getPaymentId());
+        return confrimBuy(buyInfor,payMentInterFace);
+        
     }
     private String getToken() {
         System.out.println("getToken");
@@ -67,19 +73,21 @@ public class iamportService {
             body.clear();
         }
     }
-    private paymentEnums confrimBuy(JSONObject buyInfor,String impId,List<Integer>times,String seat,int totalPrice) {
+    private paymentEnums confrimBuy(JSONObject buyInfor,payMentInterFace payMentInterFace) {
         System.out.println("confrimBuy");
         int amount=(int) buyInfor.get("amount");
         String status=(String) buyInfor.get("status");
-        System.out.println(amount+"결제총량"+totalPrice+" 결제되어야 하는 금액"+status+" 결제상태");
-        if(totalPrice==amount&&status.equals("paid")){
+        System.out.println(amount+"결제총량"+payMentInterFace.getTotalPrice()+" 결제되어야 하는 금액"+status+" 결제상태");
+        if(payMentInterFace.getTotalPrice()==amount&&status.equals("paid")){
             System.out.println("결제 검증완료");
             paymentEnums.sucCheck.setStatus("paid");
-            return paymentEnums.valueOf("sucCheck");
+            paidService.insertPayment(payMentInterFace);
+            return paymentEnums.sucCheck;
         }
         System.out.println("결제 검증실패");
         return paymentEnums.valueOf("failCheck");
-    }
+    }    
+    
     public void cancleBuy(String impId) {
         try {
             

@@ -34,20 +34,20 @@ public class paidDto {
     @Column(name = "email",nullable = false)
     private String email;
 
-    @Column(name = "price",nullable = false)
-    private int price;
-
     @Column(name = "status",nullable = false)
     private String status;
 
-    @Column(name = "itme",nullable = false)
-    private String itme;
+    @Column(name = "name",nullable = false)
+    private String name;
 
-    @Column(name = "count",nullable = false)
-    private int count;
+    @Column(name = "payCompany",nullable = false)
+    private String payCompany;
 
-    @Column(name = "productId",nullable = false)
-    private int productId;
+    @Column(name = "totalPrice",nullable = false)
+    private int totalPrice;
+
+    @Column(name = "kind",nullable = false)
+    private String kind;
 
     @Column(name = "created")
     @CreationTimestamp

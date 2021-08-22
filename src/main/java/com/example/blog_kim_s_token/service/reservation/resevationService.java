@@ -17,7 +17,9 @@ import com.example.blog_kim_s_token.model.user.userDto;
 import com.example.blog_kim_s_token.service.priceService;
 import com.example.blog_kim_s_token.service.userService;
 import com.example.blog_kim_s_token.service.utillService;
+import com.example.blog_kim_s_token.service.payment.iamInter;
 import com.example.blog_kim_s_token.service.payment.iamportService;
+import com.example.blog_kim_s_token.service.payment.payMentInterFace;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -135,11 +137,25 @@ public class resevationService {
     }
     public JSONObject confrimPayment(reservationInsertDto reservationInsertDto) {
         System.out.println("confrimPayment");
-        String impId=reservationInsertDto.getPaymentId();
+        String email= SecurityContextHolder.getContext().getAuthentication().getName();
+        userDto userDto=userService.findEmail(email);
         String seat=reservationInsertDto.getSeat();
         List<Integer>times=reservationInsertDto.getTimes();
         int totalPrice=priceService.getTotalSeatPrice(seat,times.size());
-            paymentEnums paymentEnums=iamportService.confrimPayment(impId, times, seat, totalPrice);
+
+        reservationInsertDto.setEmail(email);
+        reservationInsertDto.setName(userDto.getName());
+        
+        iamInter inter=iamInter.builder()
+                                .BuyerEmail(email)
+                                .BuyerName(userDto.getName())
+                                .kind("reservation")
+                                .payCompany("iamport")
+                                .payMentId(reservationInsertDto.getPaymentId())
+                                .totalPrice(totalPrice)
+                                .build();
+        payMentInterFace payMentInterFace=inter;
+            paymentEnums paymentEnums=iamportService.confrimPayment(payMentInterFace);
             if(paymentEnums.getBool()==false){
                 System.out.println("confrimPayment 검증실패");
                 return utillService.makeJson(false,"결제 검증에 실패했습니다");
