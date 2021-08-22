@@ -9,7 +9,6 @@ public class iamInter implements payMentInterFace {
     private String BuyerName;
     private String BuyerEmail;
     private String kind;
-    private String payCompany;
     private int totalPrice;
 
     @Override
@@ -34,7 +33,7 @@ public class iamInter implements payMentInterFace {
 
     @Override
     public String getPayCompany() {
-        return payCompany;
+        return "iamport";
     }
 
     @Override

@@ -5,7 +5,6 @@ package com.example.blog_kim_s_token.service.payment;
 
 
 import com.example.blog_kim_s_token.customException.failBuyException;
-import com.example.blog_kim_s_token.enums.paymentEnums;
 import com.example.blog_kim_s_token.model.iamport.buyInforDto;
 import com.example.blog_kim_s_token.model.iamport.impTokenDto;
 import com.nimbusds.jose.shaded.json.JSONObject;
@@ -31,12 +30,11 @@ public class iamportService {
     private paidService paidService;
 
 
-    public paymentEnums confrimPayment(payMentInterFace payMentInterFace) {
+    public void confrimPayment(payMentInterFace payMentInterFace) {
         System.out.println("confrimPayment");
         String token=getToken();
         JSONObject buyInfor=getBuyInfor(token, payMentInterFace.getPaymentId());
-        return confrimBuy(buyInfor,payMentInterFace);
-        
+        confrimBuy(buyInfor,payMentInterFace);
     }
     private String getToken() {
         System.out.println("getToken");
@@ -74,16 +72,15 @@ public class iamportService {
             body.clear();
         }
     }
-    private paymentEnums confrimBuy(JSONObject buyInfor,payMentInterFace payMentInterFace) {
+    private void confrimBuy(JSONObject buyInfor,payMentInterFace payMentInterFace) {
         System.out.println("confrimBuy");
         int amount=(int) buyInfor.get("amount");
         String status=(String) buyInfor.get("status");
         System.out.println(amount+"결제총량"+payMentInterFace.getTotalPrice()+" 결제되어야 하는 금액"+status+" 결제상태");
         if(payMentInterFace.getTotalPrice()==amount&&status.equals("paid")){
             System.out.println("결제 검증완료");
-            paymentEnums.sucCheck.setStatus("paid");
             paidService.insertPayment(payMentInterFace);
-            return paymentEnums.sucCheck;
+            return;
         }
         System.out.println("결제 검증실패");
         throw new failBuyException("결제 검증실패",payMentInterFace.getPaymentId());

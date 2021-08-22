@@ -8,7 +8,6 @@ import java.time.YearMonth;
 import java.util.List;
 
 import com.example.blog_kim_s_token.customException.failBuyException;
-import com.example.blog_kim_s_token.enums.paymentEnums;
 import com.example.blog_kim_s_token.enums.reservationEnums;
 import com.example.blog_kim_s_token.model.reservation.*;
 import com.example.blog_kim_s_token.model.reservation.getDateDto;
@@ -153,17 +152,12 @@ public class resevationService {
                                 .BuyerEmail(reservationInsertDto.getEmail())
                                 .BuyerName(userDto.getName())
                                 .kind("reservation")
-                                .payCompany("iamport")
                                 .payMentId(reservationInsertDto.getPaymentId())
                                 .totalPrice(totalPrice)
                                 .build();
         payMentInterFace payMentInterFace=inter;
-        paymentEnums paymentEnums=iamportService.confrimPayment(payMentInterFace);
-        if(paymentEnums.getBool()==false){
-            System.out.println("confrimPayment 검증실패");
-            return utillService.makeJson(false,"결제 검증에 실패했습니다");
-        }
-        reservationInsertDto.setStatus(paymentEnums.getStatus());
+        iamportService.confrimPayment(payMentInterFace);
+        reservationInsertDto.setStatus("paid");
         return insertReservation(reservationInsertDto);
     }
     public JSONObject insertReservation(reservationInsertDto reservationInsertDto) {
