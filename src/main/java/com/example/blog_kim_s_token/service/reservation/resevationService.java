@@ -151,19 +151,17 @@ public class resevationService {
         reservationInsertDto.setUserId(userDto.getId());
         reservationInsertDto.setName(userDto.getName());
         payMentInterFace payMentInterFace=paymentService.makePaymentInter(reservationInsertDto.getPaymentId(), reservationInsertDto.getEmail(),userDto.getName(), totalPrice,kind);
-        
+    
         if(payMentInterFace.getPayCompany().equals("iamport")){
             System.out.println("아임포트 결제시도");
             iamportService.confrimPayment(payMentInterFace);
             reservationInsertDto.setStatus("paid");
-            reservationInsertDto.setUsedKind("card");
         }else{
             System.out.println("부트페이 결제시도");
             bootPayService.confrimPayment(payMentInterFace);
             reservationInsertDto.setStatus("ready");
-            reservationInsertDto.setUsedKind("vbank");
         }
-   
+        reservationInsertDto.setUsedKind(payMentInterFace.getUsedKind());
         return insertReservation(reservationInsertDto);
     }
     public JSONObject insertReservation(reservationInsertDto reservationInsertDto) {

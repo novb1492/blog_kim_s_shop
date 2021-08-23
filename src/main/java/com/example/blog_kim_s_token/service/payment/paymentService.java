@@ -67,11 +67,11 @@ public class paymentService {
         }
        
     }
-    public void insertVbankPayment(payMentInterFace payMentInterFace, String bankName,String endDate) {
+    public void insertVbankPayment(payMentInterFace payMentInterFace,String endDate) {
         System.out.println("insertVbankPayment");
         try {
             vBankReadyDto dto=vBankReadyDto.builder()
-                                            .bank(bankName)
+                                            .bank(payMentInterFace.getUsedKind())
                                             .email(payMentInterFace.getBuyerEmail())
                                             .paymentId(payMentInterFace.getPaymentId())
                                             .price(payMentInterFace.getTotalPrice())

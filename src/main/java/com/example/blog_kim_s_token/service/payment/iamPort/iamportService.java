@@ -81,8 +81,9 @@ public class iamportService {
         System.out.println(amount+"결제총량"+payInter.getTotalPrice()+" 결제되어야 하는 금액"+status+" 결제상태");
         if(payInter.getTotalPrice()==amount&&status.equals("paid")){
             System.out.println("결제 검증완료");
-            payInter.setUsedKind("card");
+            payInter.setUsedKind((String)buyInfor.get("pay_method"));
             paymentService.insertPayment(payInter);
+            
             return;
         }
         System.out.println("결제 검증실패");

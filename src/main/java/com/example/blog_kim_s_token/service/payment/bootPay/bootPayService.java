@@ -71,7 +71,8 @@ public class bootPayService {
                 System.out.println("부트페이 검증성공");
                 LinkedHashMap<String,Object>paymentData=(LinkedHashMap<String, Object>) data.get("payment_data");
                 System.out.println(paymentData.get("bankname")+" 은행이름");
-                paymentService.insertVbankPayment(payMentInterFace,(String)paymentData.get("bankname"),(String)paymentData.get("expiredate"));
+                payMentInterFace.setUsedKind((String)paymentData.get("bankname"));
+                paymentService.insertVbankPayment(payMentInterFace,(String)paymentData.get("expiredate"));
             }
         } catch (Exception e) {
            e.printStackTrace();
