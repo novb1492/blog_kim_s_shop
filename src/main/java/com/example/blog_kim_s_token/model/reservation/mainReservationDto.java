@@ -49,6 +49,9 @@ public class mainReservationDto {
     @Column(name = "status",nullable = false)
     private String status;
 
+    @Column(name = "usedPayKind",nullable = false)
+    private String usedPayKind;
+
     @Column(name="rDate")
     private Timestamp rDate;
 

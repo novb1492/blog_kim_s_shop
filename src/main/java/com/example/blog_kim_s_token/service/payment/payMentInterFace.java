@@ -8,4 +8,7 @@ public interface payMentInterFace {
     int getTotalPrice();
     String getPayCompany();
     String getKind();
+    void setUsedKind(String usedKind);
+    String getUsedKind();
+
 }

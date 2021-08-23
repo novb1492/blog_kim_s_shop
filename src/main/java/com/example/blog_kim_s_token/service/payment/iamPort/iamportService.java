@@ -1,4 +1,4 @@
-package com.example.blog_kim_s_token.service.payment;
+package com.example.blog_kim_s_token.service.payment.iamPort;
 
 
 
@@ -7,6 +7,8 @@ package com.example.blog_kim_s_token.service.payment;
 import com.example.blog_kim_s_token.customException.failBuyException;
 import com.example.blog_kim_s_token.model.iamport.buyInforDto;
 import com.example.blog_kim_s_token.model.iamport.impTokenDto;
+import com.example.blog_kim_s_token.service.payment.paidService;
+import com.example.blog_kim_s_token.service.payment.payMentInterFace;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,8 +34,7 @@ public class iamportService {
 
     public void confrimPayment(payMentInterFace payMentInterFace) {
         System.out.println("confrimPayment");
-        String token=getToken();
-        JSONObject buyInfor=getBuyInfor(token, payMentInterFace.getPaymentId());
+        JSONObject buyInfor=getBuyInfor(payMentInterFace.getPaymentId());
         confrimBuy(buyInfor,payMentInterFace);
     }
     private String getToken() {
@@ -55,8 +56,9 @@ public class iamportService {
             body.clear();
         }
     }
-    private JSONObject getBuyInfor(String token,String impId){
+    private JSONObject getBuyInfor(String impId){
         System.out.println("getBuyInfor");
+        String token=getToken();
         headers.add("Authorization", token);
         HttpEntity<JSONObject>entity=new HttpEntity<JSONObject>(headers);
         try {
@@ -72,24 +74,24 @@ public class iamportService {
             body.clear();
         }
     }
-    private void confrimBuy(JSONObject buyInfor,payMentInterFace payMentInterFace) {
+    private void confrimBuy(JSONObject buyInfor,payMentInterFace payInter) {
         System.out.println("confrimBuy");
         int amount=(int) buyInfor.get("amount");
         String status=(String) buyInfor.get("status");
-        System.out.println(amount+"결제총량"+payMentInterFace.getTotalPrice()+" 결제되어야 하는 금액"+status+" 결제상태");
-        if(payMentInterFace.getTotalPrice()==amount&&status.equals("paid")){
+        System.out.println(amount+"결제총량"+payInter.getTotalPrice()+" 결제되어야 하는 금액"+status+" 결제상태");
+        if(payInter.getTotalPrice()==amount&&status.equals("paid")){
             System.out.println("결제 검증완료");
-            paidService.insertPayment(payMentInterFace);
+            payInter.setUsedKind("card");
+            paidService.insertPayment(payInter);
             return;
         }
         System.out.println("결제 검증실패");
-        throw new failBuyException("결제 검증실패",payMentInterFace.getPaymentId());
+        throw new failBuyException("결제 검증실패",payInter.getPaymentId());
     }    
     
     public boolean cancleBuy(String impId,int zeorOrPrice) {
         try {
             String token=getToken();
-
             headers.add("Authorization",token);
             body.put("imp_uid", impId);
             

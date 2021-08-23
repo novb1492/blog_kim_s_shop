@@ -22,6 +22,26 @@ public class paidService {
             .kind(payMentInterFace.getKind())
             .payCompany(payMentInterFace.getPayCompany())
             .totalPrice(payMentInterFace.getTotalPrice())
+            .usedKind(payMentInterFace.getUsedKind())
+            .status("paid").build();
+            paidDao.save(dto);
+        } catch (Exception e) {
+            System.out.println("insertPayment error");
+            throw new failBuyException("결제내역 저장 실패",payMentInterFace.getPaymentId());
+        }
+       
+    }
+    public void insertVbankPayment(payMentInterFace payMentInterFace) {
+        System.out.println("insertPayment");
+        try {
+            paidDto dto=paidDto.builder()
+            .email(payMentInterFace.getBuyerEmail())
+            .name(payMentInterFace.getBuyerName())
+            .paymentId(payMentInterFace.getPaymentId())
+            .kind(payMentInterFace.getKind())
+            .payCompany(payMentInterFace.getPayCompany())
+            .totalPrice(payMentInterFace.getTotalPrice())
+            .usedKind(payMentInterFace.getUsedKind())
             .status("paid").build();
             paidDao.save(dto);
         } catch (Exception e) {

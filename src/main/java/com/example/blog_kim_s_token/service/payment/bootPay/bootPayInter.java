@@ -1,15 +1,18 @@
-package com.example.blog_kim_s_token.service.payment;
+package com.example.blog_kim_s_token.service.payment.bootPay;
+
+import com.example.blog_kim_s_token.service.payment.payMentInterFace;
 
 import lombok.Builder;
 
 @Builder
-public class iamInter implements payMentInterFace {
+public class bootPayInter implements payMentInterFace {
 
     private String payMentId;
     private String BuyerName;
     private String BuyerEmail;
     private String kind;
     private int totalPrice;
+    private String usedKind;
 
     @Override
     public String getPaymentId() {
@@ -33,12 +36,21 @@ public class iamInter implements payMentInterFace {
 
     @Override
     public String getPayCompany() {
-        return "iamport";
+        return "bootPay";
     }
 
     @Override
     public String getKind() {
         return kind;
+    }
+    @Override
+    public String getUsedKind() {
+        return this.usedKind;
+    }
+
+    @Override
+    public void setUsedKind(String usedKind) {
+        this.usedKind=usedKind;        
     }
     
 }

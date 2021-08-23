@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @Data
-@Table(name = "vbankready")
+@Table(name = "vbank")
 @Entity
 public class vBankReadyDto {
     @Id
@@ -40,15 +40,11 @@ public class vBankReadyDto {
     @Column(name = "status",nullable = false)
     private String status;
 
-    @Column(name = "itme",nullable = false)
-    private String itme;
+    @Column(name = "bank",nullable = false)
+    private String bank;
 
-    @Column(name = "count",nullable = false)
-    private int count;
-
-    
-    @Column(name = "productId",nullable = false)
-    private int productId;
+    @Column(name = "endDate")
+    private Timestamp endDate; 
 
     @Column(name = "created")
     @CreationTimestamp

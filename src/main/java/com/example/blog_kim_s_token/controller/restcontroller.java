@@ -152,6 +152,7 @@ public class restcontroller {
     public void bootPay(@RequestBody JSONObject jsonObject,HttpServletResponse response) {
         System.out.println("payment");
         System.out.println(jsonObject+" payment");
+        
        
     }
     @PostMapping("/auth/index2")

@@ -17,9 +17,10 @@ import com.example.blog_kim_s_token.model.user.userDto;
 import com.example.blog_kim_s_token.service.priceService;
 import com.example.blog_kim_s_token.service.userService;
 import com.example.blog_kim_s_token.service.utillService;
-import com.example.blog_kim_s_token.service.payment.iamInter;
-import com.example.blog_kim_s_token.service.payment.iamportService;
 import com.example.blog_kim_s_token.service.payment.payMentInterFace;
+import com.example.blog_kim_s_token.service.payment.paymentService;
+import com.example.blog_kim_s_token.service.payment.bootPay.bootPayService;
+import com.example.blog_kim_s_token.service.payment.iamPort.iamportService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +36,7 @@ public class resevationService {
     private final int maxPeopleOfDay=60;
     private final int maxPeopleOfTime=6;
     private final int cantFlag=100;
+    private final String kind="reservation";
   
  
 
@@ -46,6 +48,10 @@ public class resevationService {
     private iamportService iamportService;
     @Autowired
     private priceService priceService;
+    @Autowired
+    private paymentService paymentService;
+    @Autowired
+    private bootPayService bootPayService;
 
     public JSONObject getDateBySeat(getDateDto getDateDto) {
         System.out.println("getDateBySeat");
@@ -144,17 +150,20 @@ public class resevationService {
 
         reservationInsertDto.setUserId(userDto.getId());
         reservationInsertDto.setName(userDto.getName());
+        payMentInterFace payMentInterFace=paymentService.makePaymentInter(reservationInsertDto.getPaymentId(), reservationInsertDto.getEmail(),userDto.getName(), totalPrice,kind);
         
-        iamInter inter=iamInter.builder()
-                                .BuyerEmail(reservationInsertDto.getEmail())
-                                .BuyerName(userDto.getName())
-                                .kind("reservation")
-                                .payMentId(reservationInsertDto.getPaymentId())
-                                .totalPrice(totalPrice)
-                                .build();
-        payMentInterFace payMentInterFace=inter;
-        iamportService.confrimPayment(payMentInterFace);
-        reservationInsertDto.setStatus("paid");
+        if(payMentInterFace.getPayCompany().equals("iamport")){
+            System.out.println("아임포트 결제시도");
+            iamportService.confrimPayment(payMentInterFace);
+            reservationInsertDto.setStatus("paid");
+            reservationInsertDto.setUsedKind("card");
+        }else{
+            System.out.println("부트페이 결제시도");
+            bootPayService.confrimPayment(payMentInterFace);
+            reservationInsertDto.setStatus("ready");
+            reservationInsertDto.setUsedKind("vbank");
+        }
+   
         return insertReservation(reservationInsertDto);
     }
     public JSONObject insertReservation(reservationInsertDto reservationInsertDto) {
@@ -173,6 +182,7 @@ public class resevationService {
                                         .rDate(Timestamp.valueOf(reservationInsertDto.getYear()+"-"+reservationInsertDto.getMonth()+"-"+reservationInsertDto.getDate()+" 00:00:00"))
                                         .dateAndTime(Timestamp.valueOf(reservationInsertDto.getYear()+"-"+reservationInsertDto.getMonth()+"-"+reservationInsertDto.getDate()+" "+times.get(i)+":00:00"))
                                         .status(reservationInsertDto.getStatus())
+                                        .usedPayKind(reservationInsertDto.getUsedKind())
                                         .build();
                                         reservationDao.save(dto);
             }
