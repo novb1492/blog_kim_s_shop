@@ -34,8 +34,7 @@ public class iamportService {
 
     public void confrimPayment(payMentInterFace payMentInterFace) {
         System.out.println("confrimPayment");
-        JSONObject buyInfor=getBuyInfor(payMentInterFace.getPaymentId());
-        confrimBuy(buyInfor,payMentInterFace);
+        confrimBuy(getBuyInfor(payMentInterFace.getPaymentId()),payMentInterFace);
     }
     private String getToken() {
         System.out.println("getToken");
@@ -83,7 +82,6 @@ public class iamportService {
             System.out.println("결제 검증완료");
             payInter.setUsedKind((String)buyInfor.get("pay_method"));
             paymentService.insertPayment(payInter);
-            
             return;
         }
         System.out.println("결제 검증실패");
@@ -95,14 +93,11 @@ public class iamportService {
             String token=getToken();
             headers.add("Authorization",token);
             body.put("imp_uid", impId);
-            
             if(zeorOrPrice!=0){
                 body.put("amount", zeorOrPrice);
             }
-
             HttpEntity<JSONObject>entity=new HttpEntity<JSONObject>(body, headers);
             restTemplate.postForObject("https://api.iamport.kr/payments/cancel",entity,JSONObject.class);
-
             return true;
         } catch (Exception e) {
             e.printStackTrace();

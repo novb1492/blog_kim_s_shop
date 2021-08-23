@@ -13,10 +13,13 @@ import com.example.blog_kim_s_token.customException.failBuyException;
 import com.example.blog_kim_s_token.jwt.jwtService;
 import com.example.blog_kim_s_token.model.jwt.jwtDto;
 import com.example.blog_kim_s_token.service.utillService;
+import com.example.blog_kim_s_token.service.payment.bootPay.bootPayService;
 import com.example.blog_kim_s_token.service.payment.iamPort.iamportService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -29,6 +32,8 @@ public class errorRestController {
     private jwtService jwtService;
     @Autowired
     private iamportService iamportService;
+    @Autowired
+    private bootPayService bootPayService;
     
     
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -80,7 +85,11 @@ public class errorRestController {
     @ExceptionHandler(failBuyException.class)
     public JSONObject failBuyException(failBuyException exception) {
         System.out.println("failBuyException");
-        iamportService.cancleBuy(exception.getPayMentId(),0);
+        if(exception.getPayMentId().startsWith("imp")){
+            iamportService.cancleBuy(exception.getPayMentId(),0);
+        }else{
+            bootPayService.cancleBuy(exception.getPayMentId(), 0, SecurityContextHolder.getContext().getAuthentication().getName(), "결제로직 실패");
+        }
         return utillService.makeJson(true, exception.getMessage());
     }
 }
