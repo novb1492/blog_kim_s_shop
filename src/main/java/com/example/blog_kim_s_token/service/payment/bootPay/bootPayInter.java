@@ -13,6 +13,7 @@ public class bootPayInter implements payMentInterFace {
     private String kind;
     private int totalPrice;
     private String usedKind;
+    private int shortestTime;
 
     @Override
     public String getPaymentId() {
@@ -51,6 +52,11 @@ public class bootPayInter implements payMentInterFace {
     @Override
     public void setUsedKind(String usedKind) {
         this.usedKind=usedKind;        
+    }
+
+    @Override
+    public int getShortestTime() {
+        return shortestTime;
     }
     
 }

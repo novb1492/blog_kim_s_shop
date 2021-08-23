@@ -21,7 +21,7 @@ public class paymentService {
     @Autowired
     private vbankDao vbankDao;
     
-    public payMentInterFace makePaymentInter(String paymentId,String email,String name,int totalPrice,String kind) {
+    public payMentInterFace makePaymentInter(String paymentId,String email,String name,int totalPrice,String kind,int shortestTime) {
         System.out.println("makePaymentInter");
         payMentInterFace payMentInterFace=null;
         if(paymentId.startsWith("imp")){
@@ -43,6 +43,7 @@ public class paymentService {
                                             .kind(kind)
                                             .payMentId(paymentId)
                                             .totalPrice(totalPrice)
+                                            .shortestTime(shortestTime)
                                             .build();
             payMentInterFace=inter;
             return payMentInterFace;
@@ -67,7 +68,7 @@ public class paymentService {
         }
        
     }
-    public void insertVbankPayment(payMentInterFace payMentInterFace,String endDate) {
+    public void insertVbankPayment(payMentInterFace payMentInterFace,Timestamp endDate) {
         System.out.println("insertVbankPayment");
         try {
             vBankReadyDto dto=vBankReadyDto.builder()
@@ -76,7 +77,7 @@ public class paymentService {
                                             .paymentId(payMentInterFace.getPaymentId())
                                             .price(payMentInterFace.getTotalPrice())
                                             .status("ready")
-                                            .endDate(Timestamp.valueOf(endDate)).build();
+                                            .endDate(endDate).build();
                                             vbankDao.save(dto);
         } catch (Exception e) {
             e.printStackTrace();

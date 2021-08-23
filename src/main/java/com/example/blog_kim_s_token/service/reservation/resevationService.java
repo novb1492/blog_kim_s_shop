@@ -5,6 +5,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
+import java.util.Collections;
 import java.util.List;
 
 import com.example.blog_kim_s_token.customException.failBuyException;
@@ -148,9 +149,10 @@ public class resevationService {
         List<Integer>times=reservationInsertDto.getTimes();
         int totalPrice=priceService.getTotalSeatPrice(seat,times.size());
 
+        Collections.sort(times);
         reservationInsertDto.setUserId(userDto.getId());
         reservationInsertDto.setName(userDto.getName());
-        payMentInterFace payMentInterFace=paymentService.makePaymentInter(reservationInsertDto.getPaymentId(), reservationInsertDto.getEmail(),userDto.getName(), totalPrice,kind);
+        payMentInterFace payMentInterFace=paymentService.makePaymentInter(reservationInsertDto.getPaymentId(), reservationInsertDto.getEmail(),userDto.getName(), totalPrice,kind,times.get(0));
     
         if(payMentInterFace.getPayCompany().equals("iamport")){
             System.out.println("아임포트 결제시도");

@@ -1,5 +1,10 @@
 package com.example.blog_kim_s_token.service.payment.bootPay;
 
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.LinkedHashMap;
 
 
@@ -27,6 +32,8 @@ public class bootPayService {
     private RestTemplate restTemplate=new RestTemplate();
     private HttpHeaders headers=new HttpHeaders();
     private JSONObject body=new JSONObject();
+    private final int period=3;
+    private final int minusHour=5;
 
     @Autowired
     private paymentService paymentService;
@@ -79,7 +86,31 @@ public class bootPayService {
                 LinkedHashMap<String,Object>paymentData=(LinkedHashMap<String, Object>) data.get("payment_data");
                 System.out.println(paymentData.get("bankname")+" 은행이름");
                 payMentInterFace.setUsedKind((String)paymentData.get("bankname"));
-                paymentService.insertVbankPayment(payMentInterFace,(String)paymentData.get("expiredate"));
+    
+                Calendar getToday = Calendar.getInstance();
+		        getToday.setTime(new Date()); 
+                String requestDate=(String)paymentData.get("expiredate");
+                Date date = new SimpleDateFormat("yyyy-MM-dd").parse(requestDate);
+                Calendar cmpDate = Calendar.getInstance();
+                cmpDate.setTime(date);
+                long diffSec = (cmpDate.getTimeInMillis()-getToday.getTimeInMillis()) / 1000;
+                long diffDays = diffSec / (24*60*60); 
+                System.out.println(diffDays+" 날짜 차이");
+                
+                String[] splite=requestDate.split(" ");
+                Timestamp expireDate=null;
+                if(diffDays<period){
+                    splite=requestDate.split(" ");
+                    String newExpireDate=splite[0]+" "+(payMentInterFace.getShortestTime()-minusHour)+":00:00";
+                    System.out.println(payMentInterFace.getShortestTime()+" 가장작은시간");
+                    System.out.println(newExpireDate+" 새로만든 기한");
+                    expireDate=Timestamp.valueOf(newExpireDate);
+                }else{
+                    System.out.println("예약 일자가 "+period+"이상임");
+                    expireDate=Timestamp.valueOf(LocalDateTime.now().plusDays(period));
+                }
+                System.out.println(expireDate+" 입금기한");
+                paymentService.insertVbankPayment(payMentInterFace,expireDate);
                 return;
             }
             throw new Exception();

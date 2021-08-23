@@ -52,5 +52,11 @@ public class iamInter implements payMentInterFace {
     public void setUsedKind(String usedKind) {
         this.usedKind=usedKind;        
     }
+
+    @Override
+    public int getShortestTime() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
     
 }

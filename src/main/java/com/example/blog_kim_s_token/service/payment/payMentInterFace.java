@@ -10,5 +10,6 @@ public interface payMentInterFace {
     String getKind();
     void setUsedKind(String usedKind);
     String getUsedKind();
+    int getShortestTime();
 
 }
