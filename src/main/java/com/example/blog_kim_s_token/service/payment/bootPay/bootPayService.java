@@ -1,11 +1,15 @@
 package com.example.blog_kim_s_token.service.payment.bootPay;
 
-import com.example.blog_kim_s_token.model.payment.bootTokenDto;
-import com.example.blog_kim_s_token.model.payment.bootpayInforDto;
+import java.util.LinkedHashMap;
+
+
+import com.example.blog_kim_s_token.model.payment.bootPay.bootTokenDto;
+import com.example.blog_kim_s_token.model.payment.bootPay.bootpayInforDto;
 import com.example.blog_kim_s_token.service.payment.payMentInterFace;
+import com.example.blog_kim_s_token.service.payment.paymentService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -22,6 +26,9 @@ public class bootPayService {
     private RestTemplate restTemplate=new RestTemplate();
     private HttpHeaders headers=new HttpHeaders();
     private JSONObject body=new JSONObject();
+
+    @Autowired
+    private paymentService paymentService;
 
     public void confrimPayment(payMentInterFace payMentInterFace) {
        System.out.println("confrimPayment");
@@ -62,8 +69,9 @@ public class bootPayService {
 
             if((int)data.get("price")==payMentInterFace.getTotalPrice()){
                 System.out.println("부트페이 검증성공");
-                JSONObject paymentData=(JSONObject)data.get("payment_data");
-                System.out.println(paymentData);
+                LinkedHashMap<String,Object>paymentData=(LinkedHashMap<String, Object>) data.get("payment_data");
+                System.out.println(paymentData.get("bankname")+" 은행이름");
+                paymentService.insertVbankPayment(payMentInterFace,(String)paymentData.get("bankname"),(String)paymentData.get("expiredate"));
             }
         } catch (Exception e) {
            e.printStackTrace();

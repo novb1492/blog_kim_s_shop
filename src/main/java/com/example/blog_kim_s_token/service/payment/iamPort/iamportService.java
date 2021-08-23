@@ -7,8 +7,8 @@ package com.example.blog_kim_s_token.service.payment.iamPort;
 import com.example.blog_kim_s_token.customException.failBuyException;
 import com.example.blog_kim_s_token.model.iamport.buyInforDto;
 import com.example.blog_kim_s_token.model.iamport.impTokenDto;
-import com.example.blog_kim_s_token.service.payment.paidService;
 import com.example.blog_kim_s_token.service.payment.payMentInterFace;
+import com.example.blog_kim_s_token.service.payment.paymentService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +29,7 @@ public class iamportService {
     private JSONObject body=new JSONObject();
 
     @Autowired
-    private paidService paidService;
+    private paymentService paymentService;
 
 
     public void confrimPayment(payMentInterFace payMentInterFace) {
@@ -82,7 +82,7 @@ public class iamportService {
         if(payInter.getTotalPrice()==amount&&status.equals("paid")){
             System.out.println("결제 검증완료");
             payInter.setUsedKind("card");
-            paidService.insertPayment(payInter);
+            paymentService.insertPayment(payInter);
             return;
         }
         System.out.println("결제 검증실패");

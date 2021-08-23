@@ -1,4 +1,4 @@
-package com.example.blog_kim_s_token.model.payment;
+package com.example.blog_kim_s_token.model.payment.bootPay;
 
 import com.nimbusds.jose.shaded.json.JSONObject;
 
