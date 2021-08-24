@@ -38,6 +38,7 @@ public class resevationService {
     private final int maxPeopleOfTime=6;
     private final int cantFlag=100;
     private final String kind="reservation";
+    private final int minusHour=1;
   
  
 
@@ -139,6 +140,7 @@ public class resevationService {
     @Transactional(rollbackFor = Exception.class)
     public JSONObject confrimContents(reservationInsertDto reservationInsertDto) {
         reservationInsertDto.setEmail(SecurityContextHolder.getContext().getAuthentication().getName());
+        Collections.sort(reservationInsertDto.getTimes());
         confrimInsert(reservationInsertDto);
         return confrimPayment(reservationInsertDto);
     }
@@ -149,7 +151,6 @@ public class resevationService {
         List<Integer>times=reservationInsertDto.getTimes();
         int totalPrice=priceService.getTotalSeatPrice(seat,times.size());
 
-        Collections.sort(times);
         reservationInsertDto.setUserId(userDto.getId());
         reservationInsertDto.setName(userDto.getName());
         payMentInterFace payMentInterFace=paymentService.makePaymentInter(reservationInsertDto.getPaymentId(), reservationInsertDto.getEmail(),userDto.getName(), totalPrice,kind,times.get(0));
@@ -214,10 +215,23 @@ public class resevationService {
                 }
             }
             
+            if(utillService.compareDate(Timestamp.valueOf(reservationInsertDto.getYear()+"-"+reservationInsertDto.getMonth()+"-"+reservationInsertDto.getDate()+" "+reservationInsertDto.getTimes().get(0)+":00:00"), LocalDateTime.now())==false){
+                LocalDateTime shortestTime=Timestamp.valueOf(reservationInsertDto.getYear()+"-"+reservationInsertDto.getMonth()+"-"+reservationInsertDto.getDate()+" "+reservationInsertDto.getTimes().get(0)+":00:00").toLocalDateTime();
+                if(LocalDateTime.now().plusHours(minusHour).isAfter(shortestTime)){
+                    System.out.println("가상 계좌 제한시간은 최대 "+minusHour+"시간입니다");
+                    System.out.println(LocalDateTime.now().plusHours(minusHour)+" "+shortestTime+"시간");
+                    throw new Exception("가상계좌는 최대 "+minusHour+"시간 전에 가능합니다");
+                }
+            }
+            
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("confrimInsert error");
-            throw new failBuyException(e.getMessage(),reservationInsertDto.getPaymentId());
+            if(reservationInsertDto.getPaymentId().startsWith("imp")){
+                System.out.println("환불 시작");
+                throw new failBuyException(e.getMessage(),reservationInsertDto.getPaymentId());
+            }
+            throw new RuntimeException(e.getMessage());
         }
          
     }

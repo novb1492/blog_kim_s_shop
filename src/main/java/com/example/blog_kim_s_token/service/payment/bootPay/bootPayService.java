@@ -33,7 +33,7 @@ public class bootPayService {
     private HttpHeaders headers=new HttpHeaders();
     private JSONObject body=new JSONObject();
     private final int period=3;
-    private final int minusHour=5;
+    private final int minusHour=1;
 
     @Autowired
     private paymentService paymentService;
