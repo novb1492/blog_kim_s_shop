@@ -58,5 +58,28 @@ public class iamInter implements payMentInterFace {
         // TODO Auto-generated method stub
         return 0;
     }
+
+    @Override
+    public void setExiredDate(String exiredDate) {
+        // TODO Auto-generated method stub
+        
+    }
+    @Override
+    public void setVbankNum(String vbankNum) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public String getVankNum() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public String getExiredDate() {
+        // TODO Auto-generated method stub
+        return null;
+    }
     
 }

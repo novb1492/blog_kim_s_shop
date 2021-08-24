@@ -9,7 +9,6 @@ import java.util.Collections;
 import java.util.List;
 
 import com.example.blog_kim_s_token.customException.failBuyException;
-import com.example.blog_kim_s_token.enums.reservationEnums;
 import com.example.blog_kim_s_token.model.reservation.*;
 import com.example.blog_kim_s_token.model.reservation.getDateDto;
 import com.example.blog_kim_s_token.model.reservation.getTimeDto;
@@ -142,9 +141,18 @@ public class resevationService {
         reservationInsertDto.setEmail(SecurityContextHolder.getContext().getAuthentication().getName());
         Collections.sort(reservationInsertDto.getTimes());
         confrimInsert(reservationInsertDto);
-        return confrimPayment(reservationInsertDto);
+        payMentInterFace payMentInterFace=confrimPayment(reservationInsertDto);
+        insertReservation(reservationInsertDto);
+        
+        JSONObject result=new JSONObject();
+        result.put("messege","예약에 성공했습니다");
+        result.put("totalPrice",payMentInterFace.getTotalPrice());
+        result.put("vbankNum", payMentInterFace.getVankNum());
+        result.put("vbank", payMentInterFace.getUsedKind());
+        result.put("expiredDate", payMentInterFace.getExiredDate());
+        return result;
     }
-    public JSONObject confrimPayment(reservationInsertDto reservationInsertDto) {
+    public payMentInterFace confrimPayment(reservationInsertDto reservationInsertDto) {
         System.out.println("confrimPayment");
         userDto userDto=userService.findEmail(reservationInsertDto.getEmail());
         String seat=reservationInsertDto.getSeat();
@@ -165,9 +173,9 @@ public class resevationService {
             reservationInsertDto.setStatus("ready");
         }
         reservationInsertDto.setUsedKind(payMentInterFace.getUsedKind());
-        return insertReservation(reservationInsertDto);
+        return payMentInterFace;
     }
-    public JSONObject insertReservation(reservationInsertDto reservationInsertDto) {
+    public void insertReservation(reservationInsertDto reservationInsertDto) {
         System.out.println("insertReservation");
         List<Integer>times=reservationInsertDto.getTimes();
         try {  
@@ -187,7 +195,6 @@ public class resevationService {
                                         .build();
                                         reservationDao.save(dto);
             }
-            return utillService.makeJson(reservationEnums.sucInsert.getBool(), reservationEnums.sucInsert.getMessege());
         } catch (Exception e) {
            e.printStackTrace();
            System.out.println("insertReservation error");

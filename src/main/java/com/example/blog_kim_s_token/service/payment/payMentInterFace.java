@@ -11,5 +11,10 @@ public interface payMentInterFace {
     void setUsedKind(String usedKind);
     String getUsedKind();
     int getShortestTime();
+    void setExiredDate(String exiredDate);
+    String getExiredDate();
+    void setVbankNum(String vbankNum);
+    String getVankNum();
+
 
 }

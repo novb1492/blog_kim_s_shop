@@ -40,7 +40,7 @@ public class bootPayService {
 
     public void confrimPayment(payMentInterFace payMentInterFace) {
        System.out.println("confrimPayment");
-        ConfrimBuy(payMentInterFace,getBuyInfor(payMentInterFace));
+       ConfrimBuy(payMentInterFace,getBuyInfor(payMentInterFace));
     }
     public String getToken() {
         System.out.println("getToken");
@@ -105,6 +105,8 @@ public class bootPayService {
                     System.out.println(payMentInterFace.getShortestTime()+" 가장작은시간");
                     System.out.println(newExpireDate+" 새로만든 기한");
                     expireDate=Timestamp.valueOf(newExpireDate);
+                    payMentInterFace.setExiredDate(newExpireDate);
+                    payMentInterFace.setVbankNum((String)paymentData.get("account"));
                 }else{
                     System.out.println("예약 일자가 "+period+"이상임");
                     expireDate=Timestamp.valueOf(LocalDateTime.now().plusDays(period));

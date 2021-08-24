@@ -14,6 +14,8 @@ public class bootPayInter implements payMentInterFace {
     private int totalPrice;
     private String usedKind;
     private int shortestTime;
+    private String expriedDate;
+    private String vbankNum;
 
     @Override
     public String getPaymentId() {
@@ -57,6 +59,25 @@ public class bootPayInter implements payMentInterFace {
     @Override
     public int getShortestTime() {
         return shortestTime;
+    }
+
+    @Override
+    public void setExiredDate(String exiredDate) {
+        this.expriedDate=exiredDate;
+    }
+    @Override
+    public void setVbankNum(String vbankNum) {
+        this.vbankNum=vbankNum;
+    }
+
+    @Override
+    public String getVankNum() {
+        return vbankNum;
+    }
+
+    @Override
+    public String getExiredDate() {
+        return expriedDate;
     }
     
 }
