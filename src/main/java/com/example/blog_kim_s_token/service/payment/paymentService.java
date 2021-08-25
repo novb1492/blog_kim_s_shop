@@ -55,6 +55,17 @@ public class paymentService {
             return payMentInterFace;
         }
     }
+    public String confrimPayment(payMentInterFace payMentInterFace) {
+        if(payMentInterFace.getPayCompany().equals("iamport")){
+            System.out.println("아임포트 결제시도");
+            iamportService.confrimPayment(payMentInterFace);
+            return "paid";
+        }else{
+            System.out.println("부트페이 결제시도");
+            bootPayService.confrimPayment(payMentInterFace);
+            return "ready";
+        }
+    }
     public void insertPayment(payMentInterFace payMentInterFace) {
         System.out.println("insertPayment");
         try {
@@ -91,16 +102,5 @@ public class paymentService {
             throw new RuntimeException("가상계좌 저장에 실패했습니다");
         }
        
-    }
-    public String confrimPayment(payMentInterFace payMentInterFace) {
-        if(payMentInterFace.getPayCompany().equals("iamport")){
-            System.out.println("아임포트 결제시도");
-            iamportService.confrimPayment(payMentInterFace);
-            return "paid";
-        }else{
-            System.out.println("부트페이 결제시도");
-            bootPayService.confrimPayment(payMentInterFace);
-            return "ready";
-        }
     }
 }

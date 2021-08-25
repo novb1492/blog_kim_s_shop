@@ -14,7 +14,7 @@ public class priceService {
     @Autowired
     private productDao productDao;
     
-    public productDto selectProduct(String productName) {
+    private productDto selectProduct(String productName) {
         return productDao.findByProductName(productName);
     }
     public JSONObject responeTotalprice(getPriceDto getPriceDto) {
@@ -27,7 +27,7 @@ public class priceService {
         jsonObject.put("totalPrice",getTotalPrice(productDto.getPrice(),getPriceDto.getCount().size()));
         return jsonObject;
     }
-    public int getTotalPrice(int  price, int count) {
+    private int getTotalPrice(int  price, int count) {
         System.out.println("getTotalPrice");
         return price*count;
     }

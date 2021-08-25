@@ -146,7 +146,7 @@ public class resevationService {
         result.put("expiredDate", payMentInterFace.getExiredDate());
         return result;
     }
-    public payMentInterFace confrimPayment(reservationInsertDto reservationInsertDto) {
+    private payMentInterFace confrimPayment(reservationInsertDto reservationInsertDto) {
         System.out.println("confrimPayment");
         userDto userDto=userService.findEmail(reservationInsertDto.getEmail());
         List<Integer>times=reservationInsertDto.getTimes();
@@ -159,7 +159,7 @@ public class resevationService {
         reservationInsertDto.setUsedKind(payMentInterFace.getUsedKind());
         return payMentInterFace;
     }
-    public void insertReservation(reservationInsertDto reservationInsertDto) {
+    private void insertReservation(reservationInsertDto reservationInsertDto) {
         System.out.println("insertReservation");
         List<Integer>times=reservationInsertDto.getTimes();
         try {  
@@ -226,7 +226,7 @@ public class resevationService {
         }
          
     }
-    public List<mainReservationDto> SelectByEmail(String email,String seat) {
+    private List<mainReservationDto> SelectByEmail(String email,String seat) {
         try {
             return reservationDao.findByEmail(email,seat);
         } catch (Exception e) {

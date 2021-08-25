@@ -42,7 +42,7 @@ public class bootPayService {
        System.out.println("confrimPayment");
        ConfrimBuy(payMentInterFace,getBuyInfor(payMentInterFace));
     }
-    public String getToken() {
+    private String getToken() {
         System.out.println("getToken");
         try {
             headers.setContentType(MediaType.APPLICATION_JSON);
@@ -61,7 +61,7 @@ public class bootPayService {
             body.clear();
         }
     }
-    public JSONObject getBuyInfor(payMentInterFace payMentInterFace) {
+    private JSONObject getBuyInfor(payMentInterFace payMentInterFace) {
         try {
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.add("Authorization", getToken());
@@ -78,7 +78,7 @@ public class bootPayService {
            throw new RuntimeException("부트페이 결제정보 가져오기 실패");
         } 
     }
-    public void ConfrimBuy(payMentInterFace payMentInterFace,JSONObject data) {
+    private void ConfrimBuy(payMentInterFace payMentInterFace,JSONObject data) {
         System.out.println("ConfrimBuy "+payMentInterFace.getPaymentId());
         try {
             if((int)data.get("price")==payMentInterFace.getTotalPrice()){
