@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
 @Data
 @Table(name = "vbank")
 @Entity
-public class vBankReadyDto {
+public class vBankDto {
     @Id
     @Column(name="id",nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)

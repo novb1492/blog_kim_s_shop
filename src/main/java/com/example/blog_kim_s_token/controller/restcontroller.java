@@ -12,7 +12,7 @@ import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.example.blog_kim_s_token.model.confrim.emailCofrimDto;
 import com.example.blog_kim_s_token.model.confrim.phoneCofrimDto;
-import com.example.blog_kim_s_token.model.price.seatPriceDto;
+import com.example.blog_kim_s_token.model.product.getPriceDto;
 import com.example.blog_kim_s_token.model.reservation.getDateDto;
 import com.example.blog_kim_s_token.model.reservation.getTimeDto;
 import com.example.blog_kim_s_token.model.reservation.reservationInsertDto;
@@ -144,9 +144,9 @@ public class restcontroller {
        return resevationService.confrimContents(reservationInsertDto);
     }
     @PostMapping("/api/getPrice")
-    public JSONObject getPrice(@RequestBody seatPriceDto seatPriceDto,HttpServletResponse response) {
+    public JSONObject getPrice(@RequestBody getPriceDto getPriceDto,HttpServletResponse response) {
         System.out.println("getPrice");
-       return priceService.getTotalSeatPrice(seatPriceDto);
+       return priceService.responeTotalprice(getPriceDto);
     }
     @PostMapping("/auth/payment")
     public void bootPay(@RequestBody JSONObject jsonObject,HttpServletResponse response) {

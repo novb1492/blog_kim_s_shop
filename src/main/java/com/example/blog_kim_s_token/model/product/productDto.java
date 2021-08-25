@@ -14,32 +14,37 @@ import org.hibernate.annotations.CreationTimestamp;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
 @Data
-@Table(name="seatproduct")
+@Table(name="product")
 @Entity
-public class seatProduct {
+public class productDto {
     @Id
     @Column(name="id",nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "seatName",nullable = false)
-    private String seatName;
+    @Column(name = "productName",nullable = false)
+    private String productName;
     
-    @Column(name = "seatPrice",nullable = false)
-    private int seatPrice;
+    @Column(name = "price",nullable = false)
+    private int price;
 
-    @Column(name = "adminId",nullable = false)
-    private int adminId;
+    @Column(name = "count",nullable = false)
+    private int count;
 
     @Column(name = "adminEmail",nullable = false)
     private String adminEmail;
 
     @Column(name = "adminName",nullable = false)
     private String adminName;
+
+    @Column(name = "kind",nullable = false)
+    private String kind;
     
     @Column(name="created")
     @CreationTimestamp  

@@ -5,10 +5,12 @@ import java.sql.Timestamp;
 import com.example.blog_kim_s_token.customException.failBuyException;
 import com.example.blog_kim_s_token.model.payment.paidDao;
 import com.example.blog_kim_s_token.model.payment.paidDto;
-import com.example.blog_kim_s_token.model.payment.vBankReadyDto;
+import com.example.blog_kim_s_token.model.payment.vBankDto;
 import com.example.blog_kim_s_token.model.payment.vbankDao;
 import com.example.blog_kim_s_token.service.payment.bootPay.bootPayInter;
+import com.example.blog_kim_s_token.service.payment.bootPay.bootPayService;
 import com.example.blog_kim_s_token.service.payment.iamPort.iamInter;
+import com.example.blog_kim_s_token.service.payment.iamPort.iamportService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,6 +22,10 @@ public class paymentService {
     private paidDao paidDao;
     @Autowired
     private vbankDao vbankDao;
+    @Autowired
+    private iamportService iamportService;
+    @Autowired
+    private bootPayService bootPayService;
     
     public payMentInterFace makePaymentInter(String paymentId,String email,String name,int totalPrice,String kind,int shortestTime) {
         System.out.println("makePaymentInter");
@@ -71,7 +77,7 @@ public class paymentService {
     public void insertVbankPayment(payMentInterFace payMentInterFace,Timestamp endDate) {
         System.out.println("insertVbankPayment");
         try {
-            vBankReadyDto dto=vBankReadyDto.builder()
+            vBankDto dto=vBankDto.builder()
                                             .bank(payMentInterFace.getUsedKind())
                                             .email(payMentInterFace.getBuyerEmail())
                                             .paymentId(payMentInterFace.getPaymentId())
@@ -85,5 +91,16 @@ public class paymentService {
             throw new RuntimeException("가상계좌 저장에 실패했습니다");
         }
        
+    }
+    public String confrimPayment(payMentInterFace payMentInterFace) {
+        if(payMentInterFace.getPayCompany().equals("iamport")){
+            System.out.println("아임포트 결제시도");
+            iamportService.confrimPayment(payMentInterFace);
+            return "paid";
+        }else{
+            System.out.println("부트페이 결제시도");
+            bootPayService.confrimPayment(payMentInterFace);
+            return "ready";
+        }
     }
 }

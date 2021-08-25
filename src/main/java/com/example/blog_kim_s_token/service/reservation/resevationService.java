@@ -19,8 +19,6 @@ import com.example.blog_kim_s_token.service.userService;
 import com.example.blog_kim_s_token.service.utillService;
 import com.example.blog_kim_s_token.service.payment.payMentInterFace;
 import com.example.blog_kim_s_token.service.payment.paymentService;
-import com.example.blog_kim_s_token.service.payment.bootPay.bootPayService;
-import com.example.blog_kim_s_token.service.payment.iamPort.iamportService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,13 +44,9 @@ public class resevationService {
     @Autowired
     private reservationDao reservationDao;
     @Autowired
-    private iamportService iamportService;
-    @Autowired
     private priceService priceService;
     @Autowired
     private paymentService paymentService;
-    @Autowired
-    private bootPayService bootPayService;
 
     public JSONObject getDateBySeat(getDateDto getDateDto) {
         System.out.println("getDateBySeat");
@@ -155,23 +149,13 @@ public class resevationService {
     public payMentInterFace confrimPayment(reservationInsertDto reservationInsertDto) {
         System.out.println("confrimPayment");
         userDto userDto=userService.findEmail(reservationInsertDto.getEmail());
-        String seat=reservationInsertDto.getSeat();
         List<Integer>times=reservationInsertDto.getTimes();
-        int totalPrice=priceService.getTotalSeatPrice(seat,times.size());
+        int totalPrice=priceService.getTotalPrice(reservationInsertDto.getSeat(),times.size());
 
         reservationInsertDto.setUserId(userDto.getId());
         reservationInsertDto.setName(userDto.getName());
         payMentInterFace payMentInterFace=paymentService.makePaymentInter(reservationInsertDto.getPaymentId(), reservationInsertDto.getEmail(),userDto.getName(), totalPrice,kind,times.get(0));
-    
-        if(payMentInterFace.getPayCompany().equals("iamport")){
-            System.out.println("아임포트 결제시도");
-            iamportService.confrimPayment(payMentInterFace);
-            reservationInsertDto.setStatus("paid");
-        }else{
-            System.out.println("부트페이 결제시도");
-            bootPayService.confrimPayment(payMentInterFace);
-            reservationInsertDto.setStatus("ready");
-        }
+        reservationInsertDto.setStatus(paymentService.confrimPayment(payMentInterFace));
         reservationInsertDto.setUsedKind(payMentInterFace.getUsedKind());
         return payMentInterFace;
     }

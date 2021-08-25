@@ -1,23 +1,39 @@
 package com.example.blog_kim_s_token.service;
 
-import com.example.blog_kim_s_token.model.price.seatPriceDto;
+import com.example.blog_kim_s_token.model.product.getPriceDto;
+import com.example.blog_kim_s_token.model.product.productDao;
+import com.example.blog_kim_s_token.model.product.productDto;
+
 import com.nimbusds.jose.shaded.json.JSONObject;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class priceService {
+    @Autowired
+    private productDao productDao;
     
-    public JSONObject getTotalSeatPrice(seatPriceDto seatPriceDto) {
-        System.out.println("getTotalSeatPrice");
-        System.out.println(seatPriceDto.getTimes().size()+"선택 자리수 ");
+    public productDto selectProduct(String productName) {
+        return productDao.findByProductName(productName);
+    }
+    public JSONObject responeTotalprice(getPriceDto getPriceDto) {
+        System.out.println("responeTotalprice");
+        
+        productDto productDto=selectProduct(getPriceDto.getProductName());
+
         JSONObject jsonObject=new JSONObject();
-        jsonObject.put("totalPrice", getTotalSeatPrice(seatPriceDto.getSeat(), seatPriceDto.getTimes().size()));
-        jsonObject.put("price", 500);
+        jsonObject.put("price",productDto.getPrice());
+        jsonObject.put("totalPrice",getTotalPrice(productDto.getPrice(),getPriceDto.getCount().size()));
         return jsonObject;
     }
-    public int getTotalSeatPrice(String seat, int timesSize) {
-        System.out.println("getTotalSeatPrice");
-        return 500*timesSize;
+    public int getTotalPrice(int  price, int count) {
+        System.out.println("getTotalPrice");
+        return price*count;
+    }
+    public int getTotalPrice(String  productName, int count) {
+        System.out.println("getTotalPrice");
+        productDto productDto=selectProduct(productName);
+        return getTotalPrice(productDto.getPrice(),count);
     }
 }
