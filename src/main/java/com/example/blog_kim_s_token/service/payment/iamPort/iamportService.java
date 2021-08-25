@@ -89,6 +89,7 @@ public class iamportService {
     }    
     
     public boolean cancleBuy(String impId,int zeorOrPrice) {
+        System.out.println("cancleBuy");
         try {
             String token=getToken();
             headers.add("Authorization",token);
@@ -98,6 +99,7 @@ public class iamportService {
             }
             HttpEntity<JSONObject>entity=new HttpEntity<JSONObject>(body, headers);
             restTemplate.postForObject("https://api.iamport.kr/payments/cancel",entity,JSONObject.class);
+            System.out.println("아임포트 환불 성공");
             return true;
         } catch (Exception e) {
             e.printStackTrace();

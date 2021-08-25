@@ -85,8 +85,10 @@ public class errorRestController {
     public JSONObject failBuyException(failBuyException exception) {
         System.out.println("failBuyException");
         if(exception.getPayMentId().startsWith("imp")){
+            System.out.println("아임포트 환불");
             iamportService.cancleBuy(exception.getPayMentId(),0);
         }else{
+            System.out.println("부트페이 환불");
             bootPayService.cancleBuy(exception.getPayMentId(), 0, SecurityContextHolder.getContext().getAuthentication().getName(), "결제로직 실패");
         }
         return utillService.makeJson(true, exception.getMessage());
