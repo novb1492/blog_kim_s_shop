@@ -144,7 +144,7 @@ public class restcontroller {
        return resevationService.confrimContents(reservationInsertDto);
     }
     @PostMapping("/api/getPrice")
-    public JSONObject getPrice(@RequestBody getPriceDto getPriceDto,HttpServletResponse response) {
+    public JSONObject getPrice(@Valid@RequestBody getPriceDto getPriceDto,HttpServletResponse response) {
         System.out.println("getPrice");
        return priceService.responeTotalprice(getPriceDto);
     }
@@ -153,7 +153,6 @@ public class restcontroller {
         System.out.println("payment");
         System.out.println(jsonObject+" payment");
         
-       
     }
     @PostMapping("/auth/index2")
     public String hello2(@CookieValue(value = "refreshToken", required = false) Cookie rCookie,HttpServletResponse response) {

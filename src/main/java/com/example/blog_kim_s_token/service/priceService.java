@@ -19,10 +19,15 @@ public class priceService {
     }
     public JSONObject responeTotalprice(getPriceDto getPriceDto) {
         System.out.println("responeTotalprice");
-        
-        productDto productDto=selectProduct(getPriceDto.getProductName());
-
         JSONObject jsonObject=new JSONObject();
+        if(getPriceDto.getCount().size()<=0){
+            System.out.println("수량이 0임");
+            jsonObject.put("totalPrice", 0);
+            jsonObject.put("messege", "수량이 1보다 작습니다");
+            return jsonObject;
+        }
+
+        productDto productDto=selectProduct(getPriceDto.getProductName());
         jsonObject.put("price",productDto.getPrice());
         jsonObject.put("totalPrice",getTotalPrice(productDto.getPrice(),getPriceDto.getCount().size()));
         return jsonObject;

@@ -190,9 +190,14 @@ public class resevationService {
         try {
             List<mainReservationDto>array=SelectByEmail(reservationInsertDto.getEmail(),reservationInsertDto.getSeat());
             if(array!=null){
+                if(reservationInsertDto.getTimes().size()<=0){
+                    System.out.println("몇시간 쓸지 선택 되지 않음");
+                    throw new Exception("시간을 선택하지 않았습니다");
+                }
                 for(mainReservationDto m:array){
                     for(int i=0;i<reservationInsertDto.getTimes().size();i++){
-                        String date=reservationInsertDto.getYear()+"-"+reservationInsertDto.getMonth()+"-"+reservationInsertDto.getDate()+" "+reservationInsertDto.getTimes().get(i)+":00:00";
+                        int hour=reservationInsertDto.getTimes().get(i);
+                        String date=reservationInsertDto.getYear()+"-"+reservationInsertDto.getMonth()+"-"+reservationInsertDto.getDate()+" "+hour+":00:00";
                         Timestamp DateAndTime=Timestamp.valueOf(date);
                         if(m.getDateAndTime().equals(DateAndTime)||utillService.compareDate(DateAndTime, LocalDateTime.now())){
                             System.out.println("이미 예약한 시간 발견or지난 날짜 예약시도");
@@ -201,6 +206,9 @@ public class resevationService {
                         else if(getCountAlreadyInTime(DateAndTime,reservationInsertDto.getSeat())==maxPeopleOfTime){
                             System.out.println("예약이 다찬 시간입니다");
                             throw new Exception("이미 예약한 시간 발견 이거나 지난 날짜 예약시도입니다 "+date);
+                        }else if(hour<openTime||hour>closeTime){
+                            System.out.println("영업 시간외 예약시도");
+                            throw new Exception("영업 시간외 예약시도 입니다");
                         }
                     }
                 }
@@ -218,11 +226,7 @@ public class resevationService {
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("confrimInsert error");
-            if(reservationInsertDto.getPaymentId().startsWith("imp")){
-                System.out.println("환불 시작");
-                throw new failBuyException(e.getMessage(),reservationInsertDto.getPaymentId());
-            }
-            throw new RuntimeException(e.getMessage());
+            throw new failBuyException(e.getMessage(),reservationInsertDto.getPaymentId());
         }
          
     }
