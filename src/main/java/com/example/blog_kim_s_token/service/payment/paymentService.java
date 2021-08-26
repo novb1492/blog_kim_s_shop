@@ -99,7 +99,7 @@ public class paymentService {
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("insertVbankPayment error");
-            throw new RuntimeException("가상계좌 저장에 실패했습니다");
+            throw new failBuyException("가상계좌 결제내역 저장 실패",payMentInterFace.getPaymentId());
         }
        
     }

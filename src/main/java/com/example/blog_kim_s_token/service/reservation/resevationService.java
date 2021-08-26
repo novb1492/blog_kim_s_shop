@@ -1,6 +1,8 @@
 package com.example.blog_kim_s_token.service.reservation;
 
 import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -36,6 +38,7 @@ public class resevationService {
     private final int cantFlag=100;
     private final String kind="reservation";
     private final int minusHour=1;
+    private final int pagingNum=3;
   
  
 
@@ -132,19 +135,31 @@ public class resevationService {
     }
     @Transactional(rollbackFor = Exception.class)
     public JSONObject confrimContents(reservationInsertDto reservationInsertDto) {
-        reservationInsertDto.setEmail(SecurityContextHolder.getContext().getAuthentication().getName());
-        Collections.sort(reservationInsertDto.getTimes());
-        confrimInsert(reservationInsertDto);
-        payMentInterFace payMentInterFace=confrimPayment(reservationInsertDto);
-        insertReservation(reservationInsertDto);
-        
-        JSONObject result=new JSONObject();
-        result.put("messege","예약에 성공했습니다");
-        result.put("totalPrice",payMentInterFace.getTotalPrice());
-        result.put("vbankNum", payMentInterFace.getVankNum());
-        result.put("vbank", payMentInterFace.getUsedKind());
-        result.put("expiredDate", payMentInterFace.getExiredDate());
-        return result;
+        System.out.println("confrimContents");
+        try {
+            reservationInsertDto.setEmail(SecurityContextHolder.getContext().getAuthentication().getName());
+            Collections.sort(reservationInsertDto.getTimes());
+            confrimInsert(reservationInsertDto);
+            payMentInterFace payMentInterFace=confrimPayment(reservationInsertDto);
+            insertReservation(reservationInsertDto);
+            
+            JSONObject result=new JSONObject();
+            result.put("messege","예약에 성공했습니다");
+            result.put("totalPrice",payMentInterFace.getTotalPrice());
+    
+            if(reservationInsertDto.getStatus().equals("ready")){
+                System.out.println("응답에 가상계좌 추가");
+                result.put("vbankNum", payMentInterFace.getVankNum());
+                result.put("vbank", payMentInterFace.getUsedKind());
+                result.put("expiredDate", payMentInterFace.getExiredDate());
+            }
+            return result;
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("confrimContents error");
+            throw new failBuyException(e.getMessage(), reservationInsertDto.getPaymentId());
+        }
+       
     }
     private payMentInterFace confrimPayment(reservationInsertDto reservationInsertDto) {
         System.out.println("confrimPayment");
@@ -188,12 +203,12 @@ public class resevationService {
     private void confrimInsert(reservationInsertDto reservationInsertDto){
         System.out.println("confrimInsert");
         try {
-            List<mainReservationDto>array=SelectByEmail(reservationInsertDto.getEmail(),reservationInsertDto.getSeat());
+            List<mainReservationDto>array=reservationDao.findByEmailNative(reservationInsertDto.getEmail(),reservationInsertDto.getSeat());
+            if(reservationInsertDto.getTimes().size()<=0){
+                System.out.println("몇시간 쓸지 선택 되지 않음");
+                throw new Exception("시간을 선택하지 않았습니다");
+            }
             if(array!=null){
-                if(reservationInsertDto.getTimes().size()<=0){
-                    System.out.println("몇시간 쓸지 선택 되지 않음");
-                    throw new Exception("시간을 선택하지 않았습니다");
-                }
                 for(mainReservationDto m:array){
                     for(int i=0;i<reservationInsertDto.getTimes().size();i++){
                         int hour=reservationInsertDto.getTimes().get(i);
@@ -202,8 +217,7 @@ public class resevationService {
                         if(m.getDateAndTime().equals(DateAndTime)||utillService.compareDate(DateAndTime, LocalDateTime.now())){
                             System.out.println("이미 예약한 시간 발견or지난 날짜 예약시도");
                             throw new Exception("이미 예약한 시간 발견 이거나 지난 날짜 예약시도입니다 "+date);
-                        }  
-                        else if(getCountAlreadyInTime(DateAndTime,reservationInsertDto.getSeat())==maxPeopleOfTime){
+                        }else if(getCountAlreadyInTime(DateAndTime,reservationInsertDto.getSeat())==maxPeopleOfTime){
                             System.out.println("예약이 다찬 시간입니다");
                             throw new Exception("이미 예약한 시간 발견 이거나 지난 날짜 예약시도입니다 "+date);
                         }else if(hour<openTime||hour>closeTime){
@@ -213,7 +227,6 @@ public class resevationService {
                     }
                 }
             }
-            
             if(utillService.compareDate(Timestamp.valueOf(reservationInsertDto.getYear()+"-"+reservationInsertDto.getMonth()+"-"+reservationInsertDto.getDate()+" "+reservationInsertDto.getTimes().get(0)+":00:00"), LocalDateTime.now())==false){
                 LocalDateTime shortestTime=Timestamp.valueOf(reservationInsertDto.getYear()+"-"+reservationInsertDto.getMonth()+"-"+reservationInsertDto.getDate()+" "+reservationInsertDto.getTimes().get(0)+":00:00").toLocalDateTime();
                 if(LocalDateTime.now().plusHours(minusHour).isAfter(shortestTime)){
@@ -227,16 +240,38 @@ public class resevationService {
             e.printStackTrace();
             System.out.println("confrimInsert error");
             throw new failBuyException(e.getMessage(),reservationInsertDto.getPaymentId());
-        }
-         
+        }  
     }
-    private List<mainReservationDto> SelectByEmail(String email,String seat) {
+    public JSONObject getClientReservation(JSONObject JSONObject) {
+        System.out.println("getClientReservation");
         try {
-            return reservationDao.findByEmail(email,seat);
+            int nowPage=Integer.parseInt((String)JSONObject.get("nowPage"));
+            String email=SecurityContextHolder.getContext().getAuthentication().getName();
+            int totalPage=reservationDao.countByEmail(email)/pagingNum;
+            List<mainReservationDto>dtoArray=reservationDao.findByEmailOrderByIdDescNative(email,nowPage,totalPage);
+
+            JSONObject respone=new JSONObject();
+            String[][] array=new String[dtoArray.size()][5];
+            int temp=0;
+            DateFormat dateFormat=new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+            for(mainReservationDto m:dtoArray){
+                array[temp][0]=Integer.toString(m.getId());
+                array[temp][1]=m.getSeat();
+                array[temp][2]=dateFormat.format(m.getCreated());
+                array[temp][3]=dateFormat.format(m.getDateAndTime());
+                array[temp][4]=Integer.toString(cantFlag);
+                temp++;
+            }
+            respone.put("totalPage", totalPage);
+            respone.put("nowPage", nowPage);
+            respone.put("reservations", array);
+            return respone;
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("SelectByEmail error");
-            throw new RuntimeException("SelectByEmail error");
+            System.out.println("getClientReservation error");
+            throw new RuntimeException("예약조회에 실패했습니다");
         }
     }
+    
+
 }

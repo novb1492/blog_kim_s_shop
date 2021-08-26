@@ -25,7 +25,7 @@ public class priceService {
         System.out.println("responeTotalprice");
         productDto productDto=selectProduct(getPriceDto.getProductName());
         JSONObject jsonObject=new JSONObject();
-        priceEnums priceEnums=confrimProudct(productDto, getPriceDto.getCount().size());
+        priceEnums priceEnums=confrimProduct(productDto, getPriceDto.getCount().size());
         
         if(priceEnums.gettotalPrice()==0){
             jsonObject.put("totalPrice", errorPrice);
@@ -36,16 +36,15 @@ public class priceService {
         }
         return jsonObject;
     }
-    private priceEnums confrimProudct(productDto productDto,int count) {
-        System.out.println("confrimProudct");
+    private priceEnums confrimProduct(productDto productDto,int count) {
+        System.out.println("confrimProduct");
         String messege=null;
         String selectEnum="failConfrimPrice";
         int enumPrice=errorPrice;
         if(count<=0){
             System.out.println("요청 수량이 0임"); 
             messege="요청 수량이 1보다 작습니다";
-        }
-        else if(productDto==null){
+        }else if(productDto==null){
             System.out.println("존재하지 않는 상품"); 
             messege="존재하지 않는 상품입니다";
         }else if(productDto.getCount()<=0){
