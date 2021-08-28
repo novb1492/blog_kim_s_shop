@@ -245,10 +245,11 @@ public class resevationService {
     public JSONObject getClientReservation(JSONObject JSONObject) {
         System.out.println("getClientReservation");
         try {
-            int nowPage=Integer.parseInt((String)JSONObject.get("nowPage"));
+            int nowPage=(int) JSONObject.get("nowPage");
             String email=SecurityContextHolder.getContext().getAuthentication().getName();
-            int totalPage=reservationDao.countByEmail(email)/pagingNum;
-            List<mainReservationDto>dtoArray=reservationDao.findByEmailOrderByIdDescNative(email,nowPage,totalPage);
+            int totalPage=utillService.getTotalpages(reservationDao.countByEmail(email), pagingNum);
+            int fisrt=utillService.getFirst(nowPage, pagingNum);
+            List<mainReservationDto>dtoArray=reservationDao.findByEmailOrderByIdDescNative(email,fisrt-1,utillService.getEnd(fisrt, pagingNum)-fisrt+1);
 
             JSONObject respone=new JSONObject();
             String[][] array=new String[dtoArray.size()][5];

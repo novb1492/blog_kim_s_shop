@@ -95,6 +95,21 @@ public class utillService {
         }
         return num;
     } 
+    public static int getTotalpages(int totalCount,int pagesize) {
+        int totalpage=0;
+        totalpage=totalCount/pagesize;
+        if(totalCount%pagesize>0){
+            totalpage++;
+        }
+        System.out.println(totalpage);
+        return totalpage;
+    }
+    public static int getFirst(int page,int pagesize) {
+        return (page-1)*pagesize+1;
+    }
+    public static int getEnd(int fisrt,int pagesize) {
+        return fisrt+pagesize-1;
+    }
 
 
 }

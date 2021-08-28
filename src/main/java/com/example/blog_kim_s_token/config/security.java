@@ -61,7 +61,7 @@ public class security extends WebSecurityConfigurerAdapter {
         .addFilter(new jwtAuthorizationFilter(authenticationManager(),dao,jwtService,csrfDao))
         .addFilter(new jwtLoginFilter(jwtService,csrfTokenService))
         .authorizeRequests()
-        .antMatchers("/","/auth/**","/login")////이 링크들은
+        .antMatchers("/","/auth/**","/login","/static/**")////이 링크들은
         .permitAll()///허용한다
         .antMatchers("/api/v1/user/**")
         .access("hasRole('ROLE_USER') or hasRole('ROLE_MANAGE') or hasRole('ROLE_ADMIN')")

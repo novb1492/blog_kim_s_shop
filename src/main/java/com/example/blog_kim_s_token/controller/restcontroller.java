@@ -10,6 +10,7 @@ import javax.validation.Valid;
 
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
+import com.example.blog_kim_s_token.model.article.insertArticleDto;
 import com.example.blog_kim_s_token.model.confrim.emailCofrimDto;
 import com.example.blog_kim_s_token.model.confrim.phoneCofrimDto;
 import com.example.blog_kim_s_token.model.product.getPriceDto;
@@ -33,6 +34,7 @@ import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 
 @RestController
@@ -157,6 +159,11 @@ public class restcontroller {
     public void bootPay(@RequestBody JSONObject jsonObject,HttpServletResponse response) {
         System.out.println("payment");
         System.out.println(jsonObject+" payment");  
+    }
+    @PostMapping("/api/imageUpload")
+    public void imageUpload(HttpServletRequest request,HttpServletResponse response) {
+        System.out.println("imageUpload");
+        
     }
     @PostMapping("/auth/index2")
     public String hello2(@CookieValue(value = "refreshToken", required = false) Cookie rCookie,HttpServletResponse response) {
