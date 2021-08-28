@@ -7,6 +7,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -22,6 +23,7 @@ import com.example.blog_kim_s_token.service.userService;
 import com.example.blog_kim_s_token.service.utillService;
 import com.example.blog_kim_s_token.service.payment.payMentInterFace;
 import com.example.blog_kim_s_token.service.payment.paymentService;
+import com.example.blog_kim_s_token.service.payment.iamPort.iamportService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -288,14 +290,30 @@ public class resevationService {
     public JSONObject deleteReservation(JSONObject jsonObject) {
         System.out.println("deleteReservation");
         try {
-            List<Integer>ridArray=(List<Integer>)jsonObject.get("rid");
-            for(int i:ridArray){
-                reservationEnums enums=confrimCancle(i);
+            List<String>ridArray=(List<String>)jsonObject.get("rid");
+            if(ridArray.size()<=0){
+                System.out.println("선택한 예약이없습니다");
+                return utillService.makeJson(false, "선택한 예약이 없습니다"); 
+            }
+            List<mainReservationDto>dtoArray=new ArrayList<>();
+            for(int i=0;i<ridArray.size();i++){
+                System.out.println(ridArray.get(i)+" 취소예약시도 번호");
+                dtoArray.add(reservationDao.findById(Integer.parseInt(ridArray.get(i))).orElseThrow(()->new IllegalArgumentException("존재하지 않는 게시글입니다")));
+            }
+            for(mainReservationDto dto:dtoArray){
+                reservationEnums enums=confrimCancle(dto);
                 if(enums.getBool()==false){
+                    System.out.println("예약환불 중 조건에 맞지 않는 예약발견");
                     throw new Exception(enums.getMessege());
                 }
-                reservationDao.deleteById(i);
+                String paymentId=dto.getPaymentId();
+                String seat=dto.getSeat();
+                reservationDao.delete(dto);
+                if(dto.getStatus().equals("paid")){
+                    paymentService.cancleBuy(paymentId, priceService.getTotalPrice(seat,1));
+                }
             }
+          
             return utillService.makeJson(true, "예약취소 성공");
         } catch (Exception e) {
             e.printStackTrace();
@@ -303,14 +321,11 @@ public class resevationService {
             throw new RuntimeException(e.getMessage());
         }
     }
-    private reservationEnums confrimCancle(int id) {
+    private reservationEnums confrimCancle(mainReservationDto mainReservationDto) {
         String messege=null;
         String enumValue="fail";
         String email=SecurityContextHolder.getContext().getAuthentication().getName();
-        mainReservationDto mainReservationDto=reservationDao.findById(id).orElseThrow(()->new IllegalArgumentException("존재하지 않는 게시글입니다"));
-        if(mainReservationDto==null){
-            messege="존재하는 예약이 없습니다";
-        }else if(LocalDateTime.now().plusHours(limitedCancleHour).isAfter(mainReservationDto.getDateAndTime().toLocalDateTime())){
+        if(LocalDateTime.now().plusHours(limitedCancleHour).isAfter(mainReservationDto.getDateAndTime().toLocalDateTime())){
             messege="예약시간 한시간 전까지 취소가능합니다";
         }else if(!email.equals(mainReservationDto.getEmail())){
             messege="예약과 예약자 이메일이 다릅니다";

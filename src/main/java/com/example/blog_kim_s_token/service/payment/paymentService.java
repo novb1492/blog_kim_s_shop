@@ -103,4 +103,8 @@ public class paymentService {
         }
        
     }
+    public void cancleBuy(String paymentId,int price) {
+        System.out.println("cancleBuy");
+        iamportService.cancleBuy(paymentId, price);
+    }
 }
