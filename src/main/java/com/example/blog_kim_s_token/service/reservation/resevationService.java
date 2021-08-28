@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.List;
 
 import com.example.blog_kim_s_token.customException.failBuyException;
+import com.example.blog_kim_s_token.enums.reservationEnums;
 import com.example.blog_kim_s_token.model.reservation.*;
 import com.example.blog_kim_s_token.model.reservation.getDateDto;
 import com.example.blog_kim_s_token.model.reservation.getTimeDto;
@@ -39,6 +40,7 @@ public class resevationService {
     private final String kind="reservation";
     private final int minusHour=1;
     private final int pagingNum=3;
+    private final int limitedCancleHour=1;
   
  
 
@@ -110,7 +112,7 @@ public class resevationService {
                 timesArray[i][0]=i+openTime;
                 timesArray[i][1]=count;
                 System.out.println(count);
-                if(LocalDateTime.now().getDayOfMonth()==getTimeDto.getDate()){
+                if(LocalDateTime.now().getDayOfMonth()==getTimeDto.getDate()&&LocalDate.now().getYear()==getTimeDto.getYear()){
                     if((i+openTime)<=LocalDateTime.now().getHour()){
                         System.out.println("지난시간");
                         timesArray[i][2]=cantFlag;
@@ -245,13 +247,18 @@ public class resevationService {
     public JSONObject getClientReservation(JSONObject JSONObject) {
         System.out.println("getClientReservation");
         try {
+            JSONObject respone=new JSONObject();
             int nowPage=(int) JSONObject.get("nowPage");
+            if(nowPage<=0){
+                respone.put("bool", false);
+                respone.put("messege", "페이지가 0보다 작습니다");
+                return respone;
+            }
             String email=SecurityContextHolder.getContext().getAuthentication().getName();
             int totalPage=utillService.getTotalpages(reservationDao.countByEmail(email), pagingNum);
             int fisrt=utillService.getFirst(nowPage, pagingNum);
             List<mainReservationDto>dtoArray=reservationDao.findByEmailOrderByIdDescNative(email,fisrt-1,utillService.getEnd(fisrt, pagingNum)-fisrt+1);
 
-            JSONObject respone=new JSONObject();
             String[][] array=new String[dtoArray.size()][5];
             int temp=0;
             DateFormat dateFormat=new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
@@ -260,9 +267,13 @@ public class resevationService {
                 array[temp][1]=m.getSeat();
                 array[temp][2]=dateFormat.format(m.getCreated());
                 array[temp][3]=dateFormat.format(m.getDateAndTime());
-                array[temp][4]=Integer.toString(cantFlag);
+                if(LocalDateTime.now().plusHours(limitedCancleHour).isAfter(m.getDateAndTime().toLocalDateTime())){
+                    System.out.println("현재시간이 사용시간 이후입니다");
+                    array[temp][4]=Integer.toString(cantFlag);
+                }
                 temp++;
             }
+            respone.put("bool", true);
             respone.put("totalPage", totalPage);
             respone.put("nowPage", nowPage);
             respone.put("reservations", array);
@@ -273,6 +284,40 @@ public class resevationService {
             throw new RuntimeException("예약조회에 실패했습니다");
         }
     }
-    
-
+    @Transactional(rollbackFor = Exception.class)
+    public JSONObject deleteReservation(JSONObject jsonObject) {
+        System.out.println("deleteReservation");
+        try {
+            List<Integer>ridArray=(List<Integer>)jsonObject.get("rid");
+            for(int i:ridArray){
+                reservationEnums enums=confrimCancle(i);
+                if(enums.getBool()==false){
+                    throw new Exception(enums.getMessege());
+                }
+                reservationDao.deleteById(i);
+            }
+            return utillService.makeJson(true, "예약취소 성공");
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println(e.getMessage());
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+    private reservationEnums confrimCancle(int id) {
+        String messege=null;
+        String enumValue="fail";
+        String email=SecurityContextHolder.getContext().getAuthentication().getName();
+        mainReservationDto mainReservationDto=reservationDao.findById(id).orElseThrow(()->new IllegalArgumentException("존재하지 않는 게시글입니다"));
+        if(mainReservationDto==null){
+            messege="존재하는 예약이 없습니다";
+        }else if(LocalDateTime.now().plusHours(limitedCancleHour).isAfter(mainReservationDto.getDateAndTime().toLocalDateTime())){
+            messege="예약시간 한시간 전까지 취소가능합니다";
+        }else if(!email.equals(mainReservationDto.getEmail())){
+            messege="예약과 예약자 이메일이 다릅니다";
+        }else{
+            enumValue="can";
+        }
+        reservationEnums.valueOf(enumValue).setMessete(messege);
+        return reservationEnums.valueOf(enumValue);
+    }
 }

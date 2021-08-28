@@ -1,9 +1,10 @@
 package com.example.blog_kim_s_token.enums;
 
 public enum reservationEnums {
-    sucInsert("예약되었습니다",true),
-    findAlready("",false);
-
+    sucInsert("",true),
+    findAlready("",false),
+    fail("",false),
+    can("",true);
     private  String messege;
     private  boolean bool;
    
