@@ -3,8 +3,10 @@ package com.example.blog_kim_s_token.service.fileUpload;
 import java.io.File;
 import java.util.UUID;
 
+import com.example.blog_kim_s_token.service.fileUpload.aws.awsService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -12,7 +14,18 @@ import org.springframework.web.multipart.MultipartFile;
 public class fileUploadService {
     private final String windowLocal="C:/Users/Administrator/Desktop/blog/blog_kim_s_shop/src/main/resources/static/image/";
     private final String serverImageUploadUrl="http://localhost:8080/static/image/";
+    private final String awsS3Url="https://s3.ap-northeast-2.amazonaws.com/kimsshop/images/";
     JSONObject respone = new JSONObject();
+
+    @Autowired
+    private awsService awsService;
+
+    public JSONObject awsS3ImageUpload(MultipartFile multipartFile) {
+        String saveName=awsService.uploadAws(multipartFile);
+        respone.put("bool",true );
+        respone.put("url",awsS3Url+saveName);
+        return respone;
+    }
     public JSONObject localImageUpload(MultipartFile multipartFile) {
         System.out.println("localImageUpload");
         try {
