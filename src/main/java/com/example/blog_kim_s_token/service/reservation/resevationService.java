@@ -145,12 +145,18 @@ public class resevationService {
             Collections.sort(reservationInsertDto.getTimes());
             confrimInsert(reservationInsertDto);
             payMentInterFace payMentInterFace=confrimPayment(reservationInsertDto);
+            System.out.println(reservationInsertDto.getStatus()+" ready라면 가상계좌");
+            if(reservationInsertDto.getStatus().equals("ready")){
+                reservationEnums enums=checkVankTime(reservationInsertDto);
+                if(enums.getBool()){
+                    throw new Exception(enums.getMessege());
+                }
+            }
             insertReservation(reservationInsertDto);
             
             JSONObject result=new JSONObject();
             result.put("messege","예약에 성공했습니다");
             result.put("totalPrice",payMentInterFace.getTotalPrice());
-    
             if(reservationInsertDto.getStatus().equals("ready")){
                 System.out.println("응답에 가상계좌 추가");
                 result.put("vbankNum", payMentInterFace.getVankNum());
@@ -218,7 +224,7 @@ public class resevationService {
                         int hour=reservationInsertDto.getTimes().get(i);
                         String date=reservationInsertDto.getYear()+"-"+reservationInsertDto.getMonth()+"-"+reservationInsertDto.getDate()+" "+hour+":00:00";
                         Timestamp DateAndTime=Timestamp.valueOf(date);
-                        if(m.getDateAndTime().equals(DateAndTime)||utillService.compareDate(DateAndTime, LocalDateTime.now())){
+                        if(m.getDateAndTime().equals(DateAndTime)&&utillService.compareDate(DateAndTime, LocalDateTime.now())){
                             System.out.println("이미 예약한 시간 발견or지난 날짜 예약시도");
                             throw new Exception("이미 예약한 시간 발견 이거나 지난 날짜 예약시도입니다 "+date);
                         }else if(getCountAlreadyInTime(DateAndTime,reservationInsertDto.getSeat())==maxPeopleOfTime){
@@ -231,20 +237,27 @@ public class resevationService {
                     }
                 }
             }
-            if(utillService.compareDate(Timestamp.valueOf(reservationInsertDto.getYear()+"-"+reservationInsertDto.getMonth()+"-"+reservationInsertDto.getDate()+" "+reservationInsertDto.getTimes().get(0)+":00:00"), LocalDateTime.now())==false){
-                LocalDateTime shortestTime=Timestamp.valueOf(reservationInsertDto.getYear()+"-"+reservationInsertDto.getMonth()+"-"+reservationInsertDto.getDate()+" "+reservationInsertDto.getTimes().get(0)+":00:00").toLocalDateTime();
-                if(LocalDateTime.now().plusHours(minusHour).isAfter(shortestTime)){
-                    System.out.println("가상 계좌 제한시간은 최대 "+minusHour+"시간입니다");
-                    System.out.println(LocalDateTime.now().plusHours(minusHour)+" "+shortestTime+"시간");
-                    throw new Exception("가상계좌는 최대 "+minusHour+"시간 전에 가능합니다");
-                }
-            }
+ 
             
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("confrimInsert error");
             throw new failBuyException(e.getMessage(),reservationInsertDto.getPaymentId());
         }  
+    }
+    private reservationEnums checkVankTime(reservationInsertDto reservationInsertDto) {
+        System.out.println("checkVankTime");
+
+        if(utillService.compareDate(Timestamp.valueOf(reservationInsertDto.getYear()+"-"+reservationInsertDto.getMonth()+"-"+reservationInsertDto.getDate()+" "+reservationInsertDto.getTimes().get(0)+":00:00"), LocalDateTime.now())==false){
+            LocalDateTime shortestTime=Timestamp.valueOf(reservationInsertDto.getYear()+"-"+reservationInsertDto.getMonth()+"-"+reservationInsertDto.getDate()+" "+reservationInsertDto.getTimes().get(0)+":00:00").toLocalDateTime();
+            if(LocalDateTime.now().plusHours(minusHour).isAfter(shortestTime)){
+                System.out.println("가상 계좌 제한시간은 최대 "+minusHour+"시간입니다");
+                System.out.println(LocalDateTime.now().plusHours(minusHour)+" "+shortestTime+"시간");
+                reservationEnums.yes.setMessete("가상 계좌 제한시간은 최대 "+minusHour+"시간입니다");
+                return reservationEnums.yes;
+            }
+        }
+        return reservationEnums.no;
     }
     public JSONObject getClientReservation(JSONObject JSONObject) {
         System.out.println("getClientReservation");

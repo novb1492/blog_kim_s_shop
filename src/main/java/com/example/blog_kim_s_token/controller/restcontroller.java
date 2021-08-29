@@ -26,19 +26,21 @@ import com.example.blog_kim_s_token.service.userService;
 import com.example.blog_kim_s_token.service.ApiServies.kakao.kakaoLoginservice;
 import com.example.blog_kim_s_token.service.ApiServies.naver.naverLoginService;
 import com.example.blog_kim_s_token.service.confrim.confrimService;
+import com.example.blog_kim_s_token.service.fileUpload.fileUploadService;
 import com.example.blog_kim_s_token.service.reservation.resevationService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 
 
 @RestController
 public class restcontroller {
-
     @Autowired
     private userService userService;
     @Autowired
@@ -51,6 +53,8 @@ public class restcontroller {
     private resevationService resevationService;
     @Autowired
     private priceService priceService;
+    @Autowired
+    private fileUploadService fileUploadService;
 
     @PostMapping("/auth/confrimEmail")
     public boolean confrimEmail(HttpServletRequest request,HttpServletResponse response) {
@@ -164,9 +168,10 @@ public class restcontroller {
         System.out.println("cancleReservation"); 
         resevationService.deleteReservation(jsonObject);
     }
-    @PostMapping("/auth/imageUpload")
-    public void imageUpload(@RequestBody JSONObject jsonObject,HttpServletRequest request,HttpServletResponse response) {
+    @PostMapping("/api/imageUpload")
+    public JSONObject imageUpload(@RequestParam("file")MultipartFile multipartFile,HttpServletRequest request,HttpServletResponse response) {
         System.out.println("imageUpload"); 
+        return fileUploadService.localImageUpload(multipartFile);
     }
     @PostMapping("/auth/index2")
     public String hello2(@CookieValue(value = "refreshToken", required = false) Cookie rCookie,HttpServletResponse response) {

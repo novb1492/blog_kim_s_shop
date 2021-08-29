@@ -4,7 +4,9 @@ public enum reservationEnums {
     sucInsert("",true),
     findAlready("",false),
     fail("",false),
-    can("",true);
+    can("",true),
+    yes("",true),
+    no("",false);
     private  String messege;
     private  boolean bool;
    

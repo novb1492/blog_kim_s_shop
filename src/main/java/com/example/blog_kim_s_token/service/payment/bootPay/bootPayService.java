@@ -119,7 +119,7 @@ public class bootPayService {
         } catch (Exception e) {
            e.printStackTrace();
            System.out.println("ConfrimBuy error");
-           throw new RuntimeException("부트페이 결제정보 가져오기 실패");
+           throw new RuntimeException("부트페이 검증  실패");
         }
     }
     public void cancleBuy(String paymentId,int zeorOrPrice,String cancleName,String reason) {
