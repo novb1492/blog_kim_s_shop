@@ -16,7 +16,7 @@ public class fileUploadService {
     private final String serverImageUploadUrl="http://localhost:8080/static/image/";
     private final String awsS3Url="https://s3.ap-northeast-2.amazonaws.com/kimsshop/images/";
     private final String  imageBucktetName="kimsshop/images";
-    private final String  fileBucktetName="kimsshop/file";
+   
 
     JSONObject respone = new JSONObject();
 
@@ -25,13 +25,8 @@ public class fileUploadService {
 
     public JSONObject awsS3ImageUpload(MultipartFile multipartFile) {
         String saveName=awsService.uploadAws(multipartFile,imageBucktetName);
-        respone.put("uploaded",true );
-        respone.put("url",awsS3Url+saveName);
-        return respone;
-    }
-    public JSONObject awsS3fileUpload(MultipartFile multipartFile) {
-        String saveName=awsService.uploadAws(multipartFile,fileBucktetName);
-        respone.put("uploaded",true );
+        respone.put("uploaded",true ); //ckeditor5
+        //respone.put("bool",true );// summernote
         respone.put("url",awsS3Url+saveName);
         return respone;
     }
@@ -45,7 +40,8 @@ public class fileUploadService {
             System.out.println(localLocation+" locallocation");
             System.out.println(savename+"sa");
             multipartFile.transferTo(new File(localLocation));
-            respone.put("bool",true );
+            //respone.put("uploaded",true ); //ckeditor5
+            respone.put("bool",true );// summernote
             respone.put("url",serverImageUploadUrl+savename);
             return respone;
         } catch (Exception e) {
