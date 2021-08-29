@@ -171,7 +171,7 @@ public class restcontroller {
     @PostMapping("/api/imageUpload")
     public JSONObject imageUpload(@RequestParam("file")MultipartFile multipartFile,HttpServletRequest request,HttpServletResponse response) {
         System.out.println("imageUpload"); 
-        return fileUploadService.awsS3ImageUpload(multipartFile);
+        return fileUploadService.localImageUpload(multipartFile);
     }
     @PostMapping("/auth/index2")
     public String hello2(@CookieValue(value = "refreshToken", required = false) Cookie rCookie,HttpServletResponse response) {

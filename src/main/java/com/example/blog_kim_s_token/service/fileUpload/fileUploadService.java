@@ -17,6 +17,7 @@ public class fileUploadService {
     private final String awsS3Url="https://s3.ap-northeast-2.amazonaws.com/kimsshop/images/";
     private final String  imageBucktetName="kimsshop/images";
     private final String  fileBucktetName="kimsshop/file";
+
     JSONObject respone = new JSONObject();
 
     @Autowired
@@ -24,13 +25,13 @@ public class fileUploadService {
 
     public JSONObject awsS3ImageUpload(MultipartFile multipartFile) {
         String saveName=awsService.uploadAws(multipartFile,imageBucktetName);
-        respone.put("bool",true );
+        respone.put("uploaded",true );
         respone.put("url",awsS3Url+saveName);
         return respone;
     }
     public JSONObject awsS3fileUpload(MultipartFile multipartFile) {
         String saveName=awsService.uploadAws(multipartFile,fileBucktetName);
-        respone.put("bool",true );
+        respone.put("uploaded",true );
         respone.put("url",awsS3Url+saveName);
         return respone;
     }
@@ -43,10 +44,7 @@ public class fileUploadService {
             String localLocation=windowLocal+savename;
             System.out.println(localLocation+" locallocation");
             System.out.println(savename+"sa");
-                
             multipartFile.transferTo(new File(localLocation));
-            Thread.sleep(1000);
-
             respone.put("bool",true );
             respone.put("url",serverImageUploadUrl+savename);
             return respone;
