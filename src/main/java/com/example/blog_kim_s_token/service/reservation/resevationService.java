@@ -114,7 +114,8 @@ public class resevationService {
                 timesArray[i][0]=i+openTime;
                 timesArray[i][1]=count;
                 System.out.println(count);
-                if(LocalDateTime.now().getDayOfMonth()==getTimeDto.getDate()&&LocalDate.now().getYear()==getTimeDto.getYear()){
+                if(LocalDateTime.now().getDayOfMonth()==getTimeDto.getDate()&&LocalDate.now().getYear()==getTimeDto.getYear()&&LocalDate.now().getMonthValue()==getTimeDto.getMonth()){
+                    System.out.println(getTimeDto.getDate()+" "+getTimeDto.getYear()+"월년");
                     if((i+openTime)<=LocalDateTime.now().getHour()){
                         System.out.println("지난시간");
                         timesArray[i][2]=cantFlag;
