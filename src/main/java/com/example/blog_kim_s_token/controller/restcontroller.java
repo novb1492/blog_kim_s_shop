@@ -171,9 +171,9 @@ public class restcontroller {
         System.out.println(jsonObject+" payment");  
     }
     @PostMapping("/api/cancleReservation")
-    public void cancleReservation(@RequestBody JSONObject jsonObject,HttpServletRequest request,HttpServletResponse response) {
+    public JSONObject cancleReservation(@RequestBody JSONObject jsonObject,HttpServletRequest request,HttpServletResponse response) {
         System.out.println("cancleReservation"); 
-        resevationService.deleteReservation(jsonObject);
+        return resevationService.deleteReservation(jsonObject);
     }
     @PostMapping("/api/imageUpload")
     public JSONObject imageUpload(@RequestParam("file")MultipartFile multipartFile,HttpServletRequest request,HttpServletResponse response) {
