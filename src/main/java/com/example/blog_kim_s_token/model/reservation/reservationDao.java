@@ -20,6 +20,9 @@ public interface reservationDao extends JpaRepository<mainReservationDto,Integer
     @Query(value = "select *from reservation where email=? order by id desc limit ?,?",nativeQuery = true)
     List<mainReservationDto>findByEmailOrderByIdDescNative(String email,int nowPage,int totalPage);
 
+    @Query(value = "select *from reservation where email=? and r_date between ? and ? order by id desc limit ?,?",nativeQuery = true)
+    List<mainReservationDto>findByEmailOrderByIdBetweenDescNative(String email,Timestamp startDate,Timestamp endDate,int nowPage,int totalPage);
+
     int countByEmail(String email);
 }
    

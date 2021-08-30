@@ -25,8 +25,8 @@ public class fileUploadService {
 
     public JSONObject awsS3ImageUpload(MultipartFile multipartFile) {
         String saveName=awsService.uploadAws(multipartFile,imageBucktetName);
-        respone.put("uploaded",true ); //ckeditor5
-        //respone.put("bool",true );// summernote
+        //respone.put("uploaded",true ); //ckeditor5
+        respone.put("bool",true );// summernote
         respone.put("url",awsS3Url+saveName);
         return respone;
     }

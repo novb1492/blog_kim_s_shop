@@ -262,6 +262,10 @@ public class resevationService {
     }
     public JSONObject getClientReservation(JSONObject JSONObject) {
         System.out.println("getClientReservation");
+        System.out.println("시작일"+JSONObject.get("startDate"));
+        System.out.println("종료일"+JSONObject.get("endDate"));
+        String startDate=(String) JSONObject.get("startDate");
+        String endDate=(String) JSONObject.get("endDate");
         try {
             JSONObject respone=new JSONObject();
             int nowPage=(int) JSONObject.get("nowPage");
@@ -273,7 +277,13 @@ public class resevationService {
             String email=SecurityContextHolder.getContext().getAuthentication().getName();
             int totalPage=utillService.getTotalpages(reservationDao.countByEmail(email), pagingNum);
             int fisrt=utillService.getFirst(nowPage, pagingNum);
-            List<mainReservationDto>dtoArray=reservationDao.findByEmailOrderByIdDescNative(email,fisrt-1,utillService.getEnd(fisrt, pagingNum)-fisrt+1);
+            List<mainReservationDto>dtoArray=new ArrayList<>();
+            if(startDate.isEmpty()&&endDate.isEmpty()){
+                dtoArray=reservationDao.findByEmailOrderByIdDescNative(email,fisrt-1,utillService.getEnd(fisrt, pagingNum)-fisrt+1);
+            }else{
+                dtoArray=reservationDao.findByEmailOrderByIdBetweenDescNative(email,Timestamp.valueOf(startDate+" "+"00:00:00"),Timestamp.valueOf(endDate+" 00:00:00"),fisrt-1,utillService.getEnd(fisrt, pagingNum)-fisrt+1);
+            }
+            
 
             String[][] array=new String[dtoArray.size()][5];
             int temp=0;
