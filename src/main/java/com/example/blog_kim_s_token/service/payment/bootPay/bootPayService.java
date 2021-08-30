@@ -106,11 +106,12 @@ public class bootPayService {
                     System.out.println(newExpireDate+" 새로만든 기한");
                     expireDate=Timestamp.valueOf(newExpireDate);
                     payMentInterFace.setExiredDate(newExpireDate);
-                    payMentInterFace.setVbankNum((String)paymentData.get("account"));
                 }else{
                     System.out.println("예약 일자가 "+period+"이상임");
                     expireDate=Timestamp.valueOf(LocalDateTime.now().plusDays(period));
+                    payMentInterFace.setExiredDate(expireDate.toString());
                 }
+                payMentInterFace.setVbankNum((String)paymentData.get("account"));
                 System.out.println(expireDate+" 입금기한");
                 paymentService.insertVbankPayment(payMentInterFace,expireDate);
                 return;

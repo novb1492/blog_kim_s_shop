@@ -158,6 +158,7 @@ public class resevationService {
             JSONObject result=new JSONObject();
             result.put("messege","예약에 성공했습니다");
             result.put("totalPrice",payMentInterFace.getTotalPrice());
+            System.out.println(payMentInterFace.getExiredDate()+ "제일위");
             if(reservationInsertDto.getStatus().equals("ready")){
                 System.out.println("응답에 가상계좌 추가");
                 result.put("vbankNum", payMentInterFace.getVankNum());
@@ -181,7 +182,9 @@ public class resevationService {
         reservationInsertDto.setUserId(userDto.getId());
         reservationInsertDto.setName(userDto.getName());
         payMentInterFace payMentInterFace=paymentService.makePaymentInter(reservationInsertDto.getPaymentId(), reservationInsertDto.getEmail(),userDto.getName(), totalPrice,kind,times.get(0));
-        reservationInsertDto.setStatus(paymentService.confrimPayment(payMentInterFace));
+        String status=paymentService.confrimPayment(payMentInterFace);
+        System.out.println(status+" status+");
+        reservationInsertDto.setStatus(status);
         reservationInsertDto.setUsedKind(payMentInterFace.getUsedKind());
         return payMentInterFace;
     }
