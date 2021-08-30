@@ -275,12 +275,16 @@ public class resevationService {
                 return respone;
             }
             String email=SecurityContextHolder.getContext().getAuthentication().getName();
-            int totalPage=utillService.getTotalpages(reservationDao.countByEmail(email), pagingNum);
-            int fisrt=utillService.getFirst(nowPage, pagingNum);
+            int totalPage=0;
+            int fisrt=0;
             List<mainReservationDto>dtoArray=new ArrayList<>();
             if(startDate.isEmpty()&&endDate.isEmpty()){
+                totalPage=utillService.getTotalpages(reservationDao.countByEmail(email), pagingNum);
+                fisrt=utillService.getFirst(nowPage, pagingNum);
                 dtoArray=reservationDao.findByEmailOrderByIdDescNative(email,fisrt-1,utillService.getEnd(fisrt, pagingNum)-fisrt+1);
             }else{
+                totalPage=utillService.getTotalpages(reservationDao.countByEmailNative(email,Timestamp.valueOf(startDate+" "+"00:00:00"),Timestamp.valueOf(endDate+" 00:00:00")), pagingNum);
+                fisrt=utillService.getFirst(nowPage, pagingNum);
                 dtoArray=reservationDao.findByEmailOrderByIdBetweenDescNative(email,Timestamp.valueOf(startDate+" "+"00:00:00"),Timestamp.valueOf(endDate+" 00:00:00"),fisrt-1,utillService.getEnd(fisrt, pagingNum)-fisrt+1);
             }
             
@@ -322,7 +326,7 @@ public class resevationService {
             List<mainReservationDto>dtoArray=new ArrayList<>();
             for(int i=0;i<ridArray.size();i++){
                 System.out.println(ridArray.get(i)+" 취소예약시도 번호");
-                dtoArray.add(reservationDao.findById(Integer.parseInt(ridArray.get(i))).orElseThrow(()->new IllegalArgumentException("존재하지 않는 게시글입니다")));
+                dtoArray.add(reservationDao.findById(Integer.parseInt(ridArray.get(i))).orElseThrow(()->new IllegalArgumentException("존재하지 않는 예약입니다")));
             }
             for(mainReservationDto dto:dtoArray){
                 reservationEnums enums=confrimCancle(dto);
