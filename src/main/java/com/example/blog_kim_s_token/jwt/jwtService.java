@@ -51,7 +51,7 @@ public class jwtService {
 
     public  String getJwtToken(int id) {
         System.out.println("getJwtToken 토큰 제작시작");
-        return JWT.create().withSubject(jwtTokenName).withExpiresAt(new Date(System.currentTimeMillis()+(1000*30))).withClaim("id",id).sign(Algorithm.HMAC512(jwtSing));
+        return JWT.create().withSubject(jwtTokenName).withExpiresAt(new Date(System.currentTimeMillis()+(1000))).withClaim("id",id).sign(Algorithm.HMAC512(jwtSing));
     }
     public  String getJwtToken() {
         System.out.println("getJwtToken 리프레시 토큰 제작시작");
@@ -67,6 +67,7 @@ public class jwtService {
         return null;
     }
     public int onpenJwtToken(String jwtToken) {
+        System.out.println("onpenJwtToken");
         return JWT.require(Algorithm.HMAC512(jwtSing)).build().verify(jwtToken).getClaim("id").asInt();
     }
     public Authentication confrimAuthenticate(userDto dto) {

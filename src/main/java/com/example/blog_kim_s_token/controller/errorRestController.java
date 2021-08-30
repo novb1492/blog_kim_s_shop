@@ -3,7 +3,7 @@ package com.example.blog_kim_s_token.controller;
 import java.util.ArrayList;
 import java.util.List;
 
-
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -13,6 +13,7 @@ import com.example.blog_kim_s_token.customException.failBuyException;
 import com.example.blog_kim_s_token.jwt.jwtService;
 import com.example.blog_kim_s_token.model.jwt.jwtDto;
 import com.example.blog_kim_s_token.service.utillService;
+import com.example.blog_kim_s_token.service.cookie.cookieService;
 import com.example.blog_kim_s_token.service.payment.bootPay.bootPayService;
 import com.example.blog_kim_s_token.service.payment.iamPort.iamportService;
 import com.nimbusds.jose.shaded.json.JSONObject;
@@ -52,17 +53,26 @@ public class errorRestController {
     @ExceptionHandler(TokenExpiredException.class)
     public JSONObject TokenExpiredException(TokenExpiredException exception,HttpServletRequest request,HttpServletResponse response) {
         System.out.println("TokenExpiredException 토큰 재발급시작");
-        String refreshToken=request.getHeader("refreshToken");
+        String refreshToken=null;
+        Cookie[] cookies=request.getCookies();
+            for(Cookie c:cookies){
+                if(c.getName().equals("refreshToken")){
+                    refreshToken=c.getValue();
+                }
+            }
         System.out.println(refreshToken+" 리프레시 토큰");
   
-            refreshToken=refreshToken.replace("Bearer ", "");
             jwtDto jwtDto=jwtService.getRefreshToken(refreshToken);
             String newJwtToken=jwtService.getNewJwtToken(jwtDto);
             System.out.println(newJwtToken+" 새 토큰");
-
+            String[][] cookiesNamesAndValues=new String[1][3];
+            cookiesNamesAndValues[0][0]="Authorization";
+            cookiesNamesAndValues[0][1]=newJwtToken;
+            cookiesNamesAndValues[0][2]="httponly";
+            cookieService.cookieFactory(response, cookiesNamesAndValues);
             JSONObject jsonObject=new JSONObject();
-            jsonObject.put("Authorization", newJwtToken);
-            jsonObject.put("refreshToken", refreshToken);
+            jsonObject.put("status", "newJwtToken");
+            System.out.println("새토큰 발급완료");
             return jsonObject;
     }
     @ExceptionHandler(JWTDecodeException.class)

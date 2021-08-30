@@ -5,6 +5,7 @@ import java.io.IOException;
 import javax.servlet.FilterChain;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -34,10 +35,9 @@ public class jwtAuthorizationFilter  extends BasicAuthenticationFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)throws IOException, ServletException {
-        System.out.println("doFilterInternal 입장 "+request.getHeader("Authorization"));
+        System.out.println("doFilterInternal 입장 ");
         System.out.println(request.getRequestURL()+" url");
         System.out.println(request.getHeader("REFERER")+" 도메인");
-
         String uri=request.getRequestURI();
         if(request.getHeader("REFERER")==null){
             System.out.println("도메인이 없습니다"+uri);
@@ -59,21 +59,32 @@ public class jwtAuthorizationFilter  extends BasicAuthenticationFilter {
             System.out.println("도에민이 다릅니다"+request.getRequestURI()+request.getRequestURL());
             return;
         }
-
-        if(request.getHeader("Authorization")==null||!request.getHeader("Authorization").startsWith("Bearer")){
-            System.out.println("헤더 없음");
+        String token=null;
+        String csrfToken=null;
+        try {
+            Cookie[] cookies=request.getCookies();
+            for(Cookie c:cookies){
+                if(c.getName().equals("Authorization")){
+                    token=c.getValue();
+                }else if(c.getName().equals("csrfToken")){
+                    csrfToken=c.getValue();
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("토큰없음");
+        }
+        if(token==null){
+            System.out.println("토큰 없음");
             chain.doFilter(request, response);
         }else{
-            String jwtToken=request.getHeader("Authorization");
-            if(jwtToken.startsWith("Bearer")){
-                jwtToken=jwtToken.replace("Bearer ", "");
+            String jwtToken=token;
                 System.out.println(jwtToken+"토큰받음");
                 try {
                     int userid=jwtService.onpenJwtToken(jwtToken);
                     System.out.println(userid+"토큰해제");
                     
                     csrfDto csrfDto=csrfDao.findByUserId(userid);
-                    String csrfToken=request.getHeader("csrfToken");
                     System.out.println(csrfToken+"csrfToken"+csrfDto.getCsrfToken());
                     if(csrfDto==null||!csrfToken.equals(csrfDto.getCsrfToken())){
                         System.out.println("csrf 토큰이 없거나 조작됨");
@@ -94,7 +105,6 @@ public class jwtAuthorizationFilter  extends BasicAuthenticationFilter {
                     System.out.println("베리어 다음 토큰이 없음");
                     goToError("/auth/onlyBearer", request, response);
                 }
-            } 
         }
     }
     private void goToError(String errorUrl,HttpServletRequest request,HttpServletResponse response) {

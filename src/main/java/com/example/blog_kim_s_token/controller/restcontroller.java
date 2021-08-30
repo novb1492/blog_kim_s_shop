@@ -23,6 +23,7 @@ import com.example.blog_kim_s_token.model.user.singupDto;
 import com.example.blog_kim_s_token.model.user.userDto;
 import com.example.blog_kim_s_token.service.priceService;
 import com.example.blog_kim_s_token.service.userService;
+import com.example.blog_kim_s_token.service.utillService;
 import com.example.blog_kim_s_token.service.ApiServies.kakao.kakaoLoginservice;
 import com.example.blog_kim_s_token.service.ApiServies.naver.naverLoginService;
 import com.example.blog_kim_s_token.service.confrim.confrimService;
@@ -104,6 +105,12 @@ public class restcontroller {
     public userDto getUserInfor(HttpServletRequest request,HttpServletResponse response) {
         return userService.sendUserDto();
     }
+    @PostMapping("/api/email")
+    public JSONObject getEmail(HttpServletRequest request,HttpServletResponse response) {
+        JSONObject jsonObject=new JSONObject();
+        jsonObject.put("email", userService.sendUserDto().getEmail());
+        return jsonObject;
+    }
     @PostMapping("/auth/jwtex")
     public void TokenExpired() {
         System.out.println("auth/jwtex");
@@ -173,13 +180,41 @@ public class restcontroller {
         System.out.println("imageUpload"); 
         return fileUploadService.awsS3ImageUpload(multipartFile);
     }
-    @PostMapping("/auth/index2")
-    public String hello2(@CookieValue(value = "refreshToken", required = false) Cookie rCookie,HttpServletResponse response) {
-        System.out.println("index2");
-        System.out.println(rCookie.getValue()); 
-        return "index2";
+    @PostMapping("/auth/test")
+    public JSONObject test(HttpServletRequest request,HttpServletResponse response) {
+        System.out.println("test");
+        Cookie[] cookies=request.getCookies();
+        if(cookies==null){
+            Cookie cookie=new Cookie("test","123");
+            response.addCookie(cookie);
+            return null;
+        }else{
+            System.out.println("기존쿠키 교체");
+            Cookie cookie=new Cookie("test","456");
+            response.addCookie(cookie);
+        }
+        if(cookies!=null){
+            for(Cookie c:cookies){
+                if(c.getName().equals("test")){
+                    System.out.println(c.getValue());
+                }
+            }
+         }
+        return null;
     }
-
+    @PostMapping("/auth/test2")
+    public void test2(HttpServletRequest request,HttpServletResponse response) {
+        System.out.println("test2");
+        Cookie[] cookies=request.getCookies();
+        if(cookies!=null){
+           for(Cookie c:cookies){
+               if(c.getName().equals("test")){
+                   System.out.println(c.getValue());
+               }
+           }
+        }
+    
+    }
     @PostMapping("/api/v1/user/test")
     public JSONObject  user(HttpServletRequest request,HttpServletResponse response) {
         System.out.println("user 입장");
