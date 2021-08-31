@@ -134,7 +134,7 @@ public class restcontroller {
         System.out.println("updatePwd");
         return userService.updatePwd(pwdDto);
     }
-    @PostMapping("/auth/onlyBearer")
+    @PostMapping("/auth/failOpenToken")
     public void onlyBearer() {
         throw new JWTDecodeException(null);
     }

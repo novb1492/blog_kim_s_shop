@@ -94,6 +94,7 @@ public class paymentService {
                                             .paymentId(payMentInterFace.getPaymentId())
                                             .price(payMentInterFace.getTotalPrice())
                                             .status("ready")
+                                            .bankNum(payMentInterFace.getVankNum())
                                             .endDate(endDate).build();
                                             vbankDao.save(dto);
         } catch (Exception e) {
@@ -106,5 +107,8 @@ public class paymentService {
     public void cancleBuy(String paymentId,int price) {
         System.out.println("cancleBuy");
         iamportService.cancleBuy(paymentId, price);
+    }
+    public vBankDto selectVbankProduct(String paymentId) {
+        return vbankDao.findByPaymentId(paymentId);
     }
 }

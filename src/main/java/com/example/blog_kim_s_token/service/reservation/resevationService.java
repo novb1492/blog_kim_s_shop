@@ -13,6 +13,7 @@ import java.util.List;
 
 import com.example.blog_kim_s_token.customException.failBuyException;
 import com.example.blog_kim_s_token.enums.reservationEnums;
+import com.example.blog_kim_s_token.model.payment.vBankDto;
 import com.example.blog_kim_s_token.model.reservation.*;
 import com.example.blog_kim_s_token.model.reservation.getDateDto;
 import com.example.blog_kim_s_token.model.reservation.getTimeDto;
@@ -293,7 +294,7 @@ public class resevationService {
             }
             
 
-            String[][] array=new String[dtoArray.size()][5];
+            String[][] array=new String[dtoArray.size()][7];
             int temp=0;
             DateFormat dateFormat=new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
             for(mainReservationDto m:dtoArray){
@@ -304,6 +305,16 @@ public class resevationService {
                 if(LocalDateTime.now().plusHours(limitedCancleHour).isAfter(m.getDateAndTime().toLocalDateTime())){
                     System.out.println("현재시간이 사용시간 이후입니다");
                     array[temp][4]=Integer.toString(cantFlag);
+                }
+                if(m.getStatus().equals("ready")){
+                    vBankDto vBankDto=paymentService.selectVbankProduct(m.getPaymentId());
+                    array[temp][4]="미입금";
+                    array[temp][5]=vBankDto.getBank()+" "+vBankDto.getBankNum();
+                    array[temp][6]=vBankDto.getEndDate().toString();
+                }else{
+                    array[temp][4]="결제완료";
+                    array[temp][5]="결제가 완료된 상태입니다";
+                    array[temp][6]="결제가 완료된 상태입니다";
                 }
                 temp++;
             }

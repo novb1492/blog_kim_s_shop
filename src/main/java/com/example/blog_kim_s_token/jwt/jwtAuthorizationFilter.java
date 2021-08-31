@@ -88,7 +88,7 @@ public class jwtAuthorizationFilter  extends BasicAuthenticationFilter {
                     System.out.println(csrfToken+"csrfToken"+csrfDto.getCsrfToken());
                     if(csrfDto==null||!csrfToken.equals(csrfDto.getCsrfToken())){
                         System.out.println("csrf 토큰이 없거나 조작됨");
-                        return;
+                        throw new JWTDecodeException(null);
                     }
 
                     userDto userDto=dao.findById(userid).orElseThrow(()->new RuntimeException("존재하지 않는 회원입니다"));
@@ -102,8 +102,8 @@ public class jwtAuthorizationFilter  extends BasicAuthenticationFilter {
                     goToError("/auth/jwtex", request, response);
                 }catch(JWTDecodeException e){
                     e.printStackTrace();
-                    System.out.println("베리어 다음 토큰이 없음");
-                    goToError("/auth/onlyBearer", request, response);
+                    System.out.println("토큰변환실패");
+                    goToError("/auth/failOpenToken", request, response);
                 }
         }
     }

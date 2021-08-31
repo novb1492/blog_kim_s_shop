@@ -43,7 +43,10 @@ public class vBankDto {
     @Column(name = "bank",nullable = false)
     private String bank;
 
-    @Column(name = "endDate")
+    @Column(name = "bankNum",nullable = false)
+    private String bankNum;
+
+    @Column(name = "endDate",nullable = false)
     private Timestamp endDate; 
 
     @Column(name = "created")
