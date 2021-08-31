@@ -140,8 +140,7 @@ public class paymentService {
                 System.out.println(expiredDate+" 새로만든 기한");
                 String[]temp=expiredDate.split(" ");
                 String time=temp[1];
-                expiredDate=temp[0];
-                temp=expiredDate.split("-");
+                temp=temp[0].split("-");
                 if(Integer.parseInt(temp[1])<10){
                     System.out.println("10월보다작음");
                     temp[1]="0"+temp[1];
