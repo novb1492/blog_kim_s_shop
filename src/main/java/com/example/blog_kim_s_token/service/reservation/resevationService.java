@@ -363,13 +363,9 @@ public class resevationService {
                     array[temp][5]=vBankDto.getBank()+" "+vBankDto.getBankNum();
                     array[temp][6]=vBankDto.getEndDate().toString();
                 }else{
-                    paidDto paidDto=paymentService.selectPaidProduct(m.getPaymentId());
-                    if(paidDto.getUsedKind().equals("point")){
-                        paidDto.setUsedKind("카카오페이");
-                    }
                     array[temp][4]="결제완료";
-                    array[temp][5]=paidDto.getUsedKind();
-                    array[temp][6]=paidDto.getCreated().toString();
+                    array[temp][5]=m.getUsedPayKind();
+                    array[temp][6]=m.getCreated().toString();
                 }
                 temp++;
             }

@@ -80,14 +80,23 @@ public class iamportService {
         System.out.println(amount+"결제총량"+payInter.getTotalPrice()+" 결제되어야 하는 금액"+status+" 결제상태");
         if(payInter.getTotalPrice()==amount&&status.equals("paid")){
             System.out.println("결제 검증완료");
-            payInter.setUsedKind((String)buyInfor.get("pay_method"));
+            selectPayCompany(buyInfor,payInter);
             paymentService.insertPayment(payInter);
             return;
         }
         System.out.println("결제 검증실패");
         throw new failBuyException("결제 검증실패",payInter.getPaymentId());
     }    
-    
+    private void selectPayCompany(JSONObject buyInfor,payMentInterFace payMentInterFace) {
+        String paymentMethod=(String)buyInfor.get("pay_method");
+        String paymentCompany=null;
+        if(paymentMethod.equals("point")){
+            paymentCompany=(String)buyInfor.get("emb_pg_provider");
+        }else if(paymentMethod.equals("card")){
+            paymentCompany=(String)buyInfor.get("card_name");
+        }
+        payMentInterFace.setUsedKind(paymentCompany);
+    }
     public boolean cancleBuy(String impId,int zeorOrPrice) {
         System.out.println("cancleBuy");
         try {
