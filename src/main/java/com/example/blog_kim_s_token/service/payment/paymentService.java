@@ -89,6 +89,7 @@ public class paymentService {
             .kind(payMentInterFace.getKind())
             .payCompany(payMentInterFace.getPayCompany())
             .totalPrice(payMentInterFace.getTotalPrice())
+            .payMethod(payMentInterFace.getPayMethod())
             .usedKind(payMentInterFace.getUsedKind())
             .status("paid").build();
             paidDao.save(dto);

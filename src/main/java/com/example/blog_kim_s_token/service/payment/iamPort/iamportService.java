@@ -92,8 +92,10 @@ public class iamportService {
         String paymentCompany=null;
         if(paymentMethod.equals("point")){
             paymentCompany=(String)buyInfor.get("emb_pg_provider");
+            payMentInterFace.setPayMethod(paymentMethod);
         }else if(paymentMethod.equals("card")){
             paymentCompany=(String)buyInfor.get("card_name");
+            payMentInterFace.setPayMethod(paymentMethod);
         }
         payMentInterFace.setUsedKind(paymentCompany);
     }

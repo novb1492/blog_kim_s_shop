@@ -52,6 +52,9 @@ public class paidDto {
     @Column(name = "usedKind",nullable = false)
     private String usedKind;
 
+    @Column(name = "payMethod",nullable = false)
+    private String payMethod;
+
     @Column(name = "created")
     @CreationTimestamp
     private Timestamp created;   

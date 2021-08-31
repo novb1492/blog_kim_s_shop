@@ -13,6 +13,7 @@ public class iamInter implements payMentInterFace {
     private String kind;
     private int totalPrice;
     private String usedKind;
+    private String paymethod;
 
     @Override
     public String getPaymentId() {
@@ -80,6 +81,18 @@ public class iamInter implements payMentInterFace {
     public String getExiredDate() {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    @Override
+    public void setPayMethod(String PayMethod) {
+        this.paymethod=PayMethod;
+        
+    }
+
+    @Override
+    public String getPayMethod() {
+       
+        return paymethod;
     }
     
 }

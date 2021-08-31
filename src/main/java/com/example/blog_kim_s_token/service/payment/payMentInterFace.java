@@ -15,6 +15,8 @@ public interface payMentInterFace {
     String getExiredDate();
     void setVbankNum(String vbankNum);
     String getVankNum();
+    void setPayMethod(String PayMethod);
+    String getPayMethod();
 
 
 }
