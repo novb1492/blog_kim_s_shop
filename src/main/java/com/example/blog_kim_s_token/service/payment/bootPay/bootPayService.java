@@ -10,6 +10,7 @@ import java.util.LinkedHashMap;
 
 import com.example.blog_kim_s_token.model.payment.bootPay.bootTokenDto;
 import com.example.blog_kim_s_token.model.payment.bootPay.bootpayInforDto;
+import com.example.blog_kim_s_token.service.utillService;
 import com.example.blog_kim_s_token.service.payment.payMentInterFace;
 import com.example.blog_kim_s_token.service.payment.paymentService;
 import com.nimbusds.jose.shaded.json.JSONObject;
@@ -94,29 +95,12 @@ public class bootPayService {
                 Calendar getToday = Calendar.getInstance();
 		        getToday.setTime(new Date()); 
                 String requestDate=(String)paymentData.get("expiredate");
-                Date date = new SimpleDateFormat("yyyy-MM-dd").parse(requestDate);
-                Calendar cmpDate = Calendar.getInstance();
-                cmpDate.setTime(date);
-                long diffSec = (cmpDate.getTimeInMillis()-getToday.getTimeInMillis()) / 1000;
-                long diffDays = diffSec / (24*60*60); 
-                System.out.println(diffDays+" 날짜 차이");
-                
-                String[] splite=requestDate.split(" ");
-                Timestamp expireDate=null;
-                if(diffDays<period){
-                    splite=requestDate.split(" ");
-                    String newExpireDate=splite[0]+" "+(payMentInterFace.getShortestTime()-minusHour)+":00:00";
-                    System.out.println(payMentInterFace.getShortestTime()+" 가장작은시간");
-                    System.out.println(newExpireDate+" 새로만든 기한");
-                    expireDate=Timestamp.valueOf(newExpireDate);
-                    payMentInterFace.setExiredDate(newExpireDate);
-                }else{
-                    System.out.println("예약 일자가 "+period+"이상임");
-                    expireDate=Timestamp.valueOf(LocalDateTime.now().plusDays(period));
-                    payMentInterFace.setExiredDate(expireDate.toString());
-                }
-                payMentInterFace.setVbankNum((String)paymentData.get("account"));
+                long diffDays = utillService.getDateGap(getToday, requestDate); 
+                String[] splitDate=requestDate.split(" ");
+                Timestamp expireDate=Timestamp.valueOf(paymentService.getVbankDate(diffDays, payMentInterFace.getShortestTime(), splitDate[0]));
                 System.out.println(expireDate+" 입금기한");
+                
+                payMentInterFace.setVbankNum((String)paymentData.get("account"));
                 paymentService.insertVbankPayment(payMentInterFace,expireDate);
                 return;
             }

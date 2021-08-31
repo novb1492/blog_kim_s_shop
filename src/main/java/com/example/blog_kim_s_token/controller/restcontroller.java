@@ -163,7 +163,7 @@ public class restcontroller {
         return priceService.responeTotalprice(getPriceDto);
     }
     @PostMapping("/api/getVankDate")
-    public JSONObject getVankDate(@RequestBody getVankDateDto getVankDateDto,HttpServletResponse response) {
+    public JSONObject getVankDate(@Valid @RequestBody getVankDateDto getVankDateDto,HttpServletResponse response) {
         System.out.println("getVankDate");
         return paymentService.getVbankDate(getVankDateDto);
     }
