@@ -3,6 +3,7 @@ package com.example.blog_kim_s_token.service.payment;
 import java.sql.Timestamp;
 
 import com.example.blog_kim_s_token.customException.failBuyException;
+import com.example.blog_kim_s_token.model.payment.getVankDateDto;
 import com.example.blog_kim_s_token.model.payment.paidDao;
 import com.example.blog_kim_s_token.model.payment.paidDto;
 import com.example.blog_kim_s_token.model.payment.vBankDto;
@@ -110,5 +111,8 @@ public class paymentService {
     }
     public vBankDto selectVbankProduct(String paymentId) {
         return vbankDao.findByPaymentId(paymentId);
+    }
+    public void getVbankDate(getVankDateDto getVankDateDto) {
+        
     }
 }

@@ -269,8 +269,6 @@ public class resevationService {
         System.out.println("getClientReservation");
         System.out.println("시작일"+JSONObject.get("startDate"));
         System.out.println("종료일"+JSONObject.get("endDate"));
-        String startDate=(String) JSONObject.get("startDate");
-        String endDate=(String) JSONObject.get("endDate");
         try {
             JSONObject respone=new JSONObject();
             int nowPage=(int) JSONObject.get("nowPage");
@@ -279,10 +277,27 @@ public class resevationService {
                 respone.put("messege", "페이지가 0보다 작습니다");
                 return respone;
             }
-            String email=SecurityContextHolder.getContext().getAuthentication().getName();
-            int totalPage=0;
-            int fisrt=0;
-            List<mainReservationDto>dtoArray=new ArrayList<>();
+            List<mainReservationDto>dtoArray=getClientReservationDTO(JSONObject, nowPage,respone);
+            String[][] array=makeResponse(respone, dtoArray);
+
+            respone.put("bool", true);
+            respone.put("nowPage", nowPage);
+            respone.put("reservations", array);
+            return respone;
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("getClientReservation error");
+            throw new RuntimeException("예약조회에 실패했습니다");
+        }
+    }
+    private List<mainReservationDto>getClientReservationDTO(JSONObject jsonObject,int nowPage,JSONObject respone){
+        System.out.println("getClientReservationDTO");
+        String startDate=(String) jsonObject.get("startDate");
+        String endDate=(String) jsonObject.get("endDate");
+        List<mainReservationDto>dtoArray=new ArrayList<>();
+        String email=SecurityContextHolder.getContext().getAuthentication().getName();
+        int totalPage=0;
+        int fisrt=0;
             if(startDate.isEmpty()&&endDate.isEmpty()){
                 totalPage=utillService.getTotalpages(reservationDao.countByEmail(email), pagingNum);
                 fisrt=utillService.getFirst(nowPage, pagingNum);
@@ -292,9 +307,12 @@ public class resevationService {
                 fisrt=utillService.getFirst(nowPage, pagingNum);
                 dtoArray=reservationDao.findByEmailOrderByIdBetweenDescNative(email,Timestamp.valueOf(startDate+" "+"00:00:00"),Timestamp.valueOf(endDate+" 00:00:00"),fisrt-1,utillService.getEnd(fisrt, pagingNum)-fisrt+1);
             }
-            
-
-            String[][] array=new String[dtoArray.size()][7];
+        respone.put("totalPage", totalPage);
+        return dtoArray;
+    }
+    private String[][] makeResponse(JSONObject jsonObject,List<mainReservationDto>dtoArray) {
+        System.out.println("makeResponse");
+        String[][] array=new String[dtoArray.size()][7];
             int temp=0;
             DateFormat dateFormat=new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
             for(mainReservationDto m:dtoArray){
@@ -318,16 +336,7 @@ public class resevationService {
                 }
                 temp++;
             }
-            respone.put("bool", true);
-            respone.put("totalPage", totalPage);
-            respone.put("nowPage", nowPage);
-            respone.put("reservations", array);
-            return respone;
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("getClientReservation error");
-            throw new RuntimeException("예약조회에 실패했습니다");
-        }
+        return array;
     }
     @Transactional(rollbackFor = Exception.class)
     public JSONObject deleteReservation(JSONObject jsonObject) {
