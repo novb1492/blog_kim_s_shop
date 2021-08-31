@@ -3,6 +3,8 @@ package com.example.blog_kim_s_token.controller;
 
 
 
+import java.util.List;
+
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -10,6 +12,9 @@ import javax.validation.Valid;
 
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
+import com.example.blog_kim_s_token.model.article.articleDto;
+import com.example.blog_kim_s_token.model.article.getArticleDto;
+import com.example.blog_kim_s_token.model.article.insertArticleDto;
 import com.example.blog_kim_s_token.model.confrim.emailCofrimDto;
 import com.example.blog_kim_s_token.model.confrim.phoneCofrimDto;
 import com.example.blog_kim_s_token.model.payment.getVankDateDto;
@@ -22,8 +27,10 @@ import com.example.blog_kim_s_token.model.user.phoneDto;
 import com.example.blog_kim_s_token.model.user.pwdDto;
 import com.example.blog_kim_s_token.model.user.singupDto;
 import com.example.blog_kim_s_token.model.user.userDto;
+import com.example.blog_kim_s_token.service.boardService;
 import com.example.blog_kim_s_token.service.priceService;
 import com.example.blog_kim_s_token.service.userService;
+import com.example.blog_kim_s_token.service.utillService;
 import com.example.blog_kim_s_token.service.ApiServies.kakao.kakaoLoginservice;
 import com.example.blog_kim_s_token.service.ApiServies.naver.naverLoginService;
 import com.example.blog_kim_s_token.service.confrim.confrimService;
@@ -58,6 +65,8 @@ public class restcontroller {
     private fileUploadService fileUploadService;
     @Autowired
     private paymentService paymentService;
+    @Autowired
+    private boardService boardService;
 
     @PostMapping("/auth/confrimEmail")
     public boolean confrimEmail(HttpServletRequest request,HttpServletResponse response) {
@@ -186,6 +195,21 @@ public class restcontroller {
     public JSONObject imageUpload(@RequestParam("file")MultipartFile multipartFile,HttpServletRequest request,HttpServletResponse response) {
         System.out.println("imageUpload"); 
         return fileUploadService.awsS3ImageUpload(multipartFile);
+    }
+    @PostMapping("/api/insertArticle")
+    public JSONObject insertArticle(@Valid @RequestBody insertArticleDto insertArticleDto,HttpServletResponse response) {
+        System.out.println("insertArticle"); 
+        return boardService.insertArticle(insertArticleDto);
+    }
+    @PostMapping("/api/getArticle")
+    public articleDto getArticle(@Valid @RequestBody getArticleDto getArticleDto,HttpServletResponse response) {
+        System.out.println("getArticle"); 
+        return boardService.getArticle(getArticleDto);
+    }
+    @PostMapping("/api/getAllArticle")
+    public List<articleDto> getAllArticle(HttpServletRequest request,HttpServletResponse response) {
+        System.out.println("getAllArticle"); 
+        return boardService.getArticle();
     }
     @PostMapping("/auth/test")
     public JSONObject test(HttpServletRequest request,HttpServletResponse response) {
