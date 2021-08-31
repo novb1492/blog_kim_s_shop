@@ -15,6 +15,7 @@ import com.example.blog_kim_s_token.service.payment.paymentService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -32,8 +33,11 @@ public class bootPayService {
     private RestTemplate restTemplate=new RestTemplate();
     private HttpHeaders headers=new HttpHeaders();
     private JSONObject body=new JSONObject();
-    private final int period=3;
-    private final int minusHour=1;
+
+    @Value("${payment.period}")
+    private  int period;
+    @Value("${payment.minusHour}")
+    private  int minusHour;
 
     @Autowired
     private paymentService paymentService;

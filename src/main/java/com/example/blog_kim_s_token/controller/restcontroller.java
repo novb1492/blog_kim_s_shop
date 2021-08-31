@@ -12,6 +12,7 @@ import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.example.blog_kim_s_token.model.confrim.emailCofrimDto;
 import com.example.blog_kim_s_token.model.confrim.phoneCofrimDto;
+import com.example.blog_kim_s_token.model.payment.getVankDateDto;
 import com.example.blog_kim_s_token.model.product.getPriceDto;
 import com.example.blog_kim_s_token.model.reservation.getDateDto;
 import com.example.blog_kim_s_token.model.reservation.getTimeDto;
@@ -27,6 +28,7 @@ import com.example.blog_kim_s_token.service.ApiServies.kakao.kakaoLoginservice;
 import com.example.blog_kim_s_token.service.ApiServies.naver.naverLoginService;
 import com.example.blog_kim_s_token.service.confrim.confrimService;
 import com.example.blog_kim_s_token.service.fileUpload.fileUploadService;
+import com.example.blog_kim_s_token.service.payment.paymentService;
 import com.example.blog_kim_s_token.service.reservation.resevationService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +56,8 @@ public class restcontroller {
     private priceService priceService;
     @Autowired
     private fileUploadService fileUploadService;
+    @Autowired
+    private paymentService paymentService;
 
     @PostMapping("/auth/confrimEmail")
     public boolean confrimEmail(HttpServletRequest request,HttpServletResponse response) {
@@ -157,6 +161,11 @@ public class restcontroller {
     public JSONObject getPrice(@Valid@RequestBody getPriceDto getPriceDto,HttpServletResponse response) {
         System.out.println("getPrice");
         return priceService.responeTotalprice(getPriceDto);
+    }
+    @PostMapping("/api/getVankDate")
+    public JSONObject getVankDate(@RequestBody getVankDateDto getVankDateDto,HttpServletResponse response) {
+        System.out.println("getVankDate");
+        return paymentService.getVbankDate(getVankDateDto);
     }
     @PostMapping("/api/getClientReservation")
     public JSONObject getClientReservation(@RequestBody JSONObject JSONObject,HttpServletResponse response) {

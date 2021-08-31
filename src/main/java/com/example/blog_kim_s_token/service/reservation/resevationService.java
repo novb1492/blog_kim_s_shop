@@ -25,10 +25,10 @@ import com.example.blog_kim_s_token.service.userService;
 import com.example.blog_kim_s_token.service.utillService;
 import com.example.blog_kim_s_token.service.payment.payMentInterFace;
 import com.example.blog_kim_s_token.service.payment.paymentService;
-import com.example.blog_kim_s_token.service.payment.iamPort.iamportService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,9 +42,13 @@ public class resevationService {
     private final int maxPeopleOfTime=6;
     private final int cantFlag=100;
     private final String kind="reservation";
-    private final int minusHour=1;
     private final int pagingNum=3;
-    private final int limitedCancleHour=1;
+
+    @Value("${payment.minusHour}")
+    private  int minusHour;
+   
+    @Value("${payment.limitedCancleHour}")
+    private  int limitedCancleHour;
   
  
 

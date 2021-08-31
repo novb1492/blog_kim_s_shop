@@ -1,6 +1,10 @@
 package com.example.blog_kim_s_token.service.payment;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
 
 import com.example.blog_kim_s_token.customException.failBuyException;
 import com.example.blog_kim_s_token.model.payment.getVankDateDto;
@@ -8,12 +12,15 @@ import com.example.blog_kim_s_token.model.payment.paidDao;
 import com.example.blog_kim_s_token.model.payment.paidDto;
 import com.example.blog_kim_s_token.model.payment.vBankDto;
 import com.example.blog_kim_s_token.model.payment.vbankDao;
+import com.example.blog_kim_s_token.service.utillService;
 import com.example.blog_kim_s_token.service.payment.bootPay.bootPayInter;
 import com.example.blog_kim_s_token.service.payment.bootPay.bootPayService;
 import com.example.blog_kim_s_token.service.payment.iamPort.iamInter;
 import com.example.blog_kim_s_token.service.payment.iamPort.iamportService;
+import com.nimbusds.jose.shaded.json.JSONObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -27,6 +34,11 @@ public class paymentService {
     private iamportService iamportService;
     @Autowired
     private bootPayService bootPayService;
+    @Value("${payment.period}")
+    private  int period;
+    @Value("${payment.minusHour}")
+    private  int minusHour;
+    
     
     public payMentInterFace makePaymentInter(String paymentId,String email,String name,int totalPrice,String kind,int shortestTime) {
         System.out.println("makePaymentInter");
@@ -112,7 +124,33 @@ public class paymentService {
     public vBankDto selectVbankProduct(String paymentId) {
         return vbankDao.findByPaymentId(paymentId);
     }
-    public void getVbankDate(getVankDateDto getVankDateDto) {
-        
+    public JSONObject  getVbankDate(getVankDateDto getVankDateDto) {
+        System.out.println("getVbankDate");
+        try { 
+            Calendar getToday = Calendar.getInstance();
+            getToday.setTime(new Date()); 
+            String requestDate=getVankDateDto.getYear()+"-"+getVankDateDto.getMonth()+"-"+getVankDateDto.getDate();
+            long diffDays = utillService.getDateGap(getToday, requestDate);
+            String expiredDate=null;
+            Collections.sort(getVankDateDto.getTimes());
+            int shortestTime=getVankDateDto.getTimes().get(0);
+            if(diffDays<period){
+                System.out.println(shortestTime+" 가장작은시간");
+                expiredDate=requestDate+" "+(shortestTime-minusHour)+":00:00";
+                System.out.println(expiredDate+" 새로만든 기한");
+     
+            }else{
+                System.out.println("예약 일자가 "+period+"이상임");
+                expiredDate=LocalDateTime.now().plusDays(period).toString();
+                expiredDate=expiredDate.replace("T", " ");
+            }
+            String[]temp=expiredDate.split(" ");
+            expiredDate=temp[0];
+            return utillService.makeJson(true, expiredDate);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("getVbankDate error "+e.getMessage());
+            throw new RuntimeException("가상계좌 일짜 계산 실패");
+        }
     }
 }

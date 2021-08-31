@@ -1,7 +1,12 @@
 package com.example.blog_kim_s_token.service;
 
 import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
@@ -110,6 +115,23 @@ public class utillService {
     public static int getEnd(int fisrt,int pagesize) {
         return fisrt+pagesize-1;
     }
+    public static long getDateGap(Calendar requestDate,String requestDate2) {
+        Date date;
+        try {
+            date = new SimpleDateFormat("yyyy-MM-dd").parse(requestDate2);
+            Calendar cmpDate = Calendar.getInstance();
+            cmpDate.setTime(date);
+            long diffSec = (cmpDate.getTimeInMillis()-requestDate.getTimeInMillis()) / 1000;
+            long diffDays = diffSec / (24*60*60); 
+            System.out.println(diffDays+" 날짜 차이");
+            return diffDays;
+        }catch (ParseException e) {
+            e.printStackTrace();
+            System.out.println("getDateGap error");
+            throw new RuntimeException();
+        }
+    }
+
 
 
 }
