@@ -7,6 +7,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -267,17 +268,19 @@ public class resevationService {
     }
     public JSONObject getClientReservation(JSONObject JSONObject) {
         System.out.println("getClientReservation");
-        System.out.println("시작일"+JSONObject.get("startDate"));
-        System.out.println("종료일"+JSONObject.get("endDate"));
+        String startDate=(String) JSONObject.get("startDate");
+        String endDate=(String) JSONObject.get("endDate");
+        System.out.println("시작일"+startDate);
+        System.out.println("종료일"+endDate);
         try {
             JSONObject respone=new JSONObject();
             int nowPage=(int) JSONObject.get("nowPage");
-            if(nowPage<=0){
-                respone.put("bool", false);
-                respone.put("messege", "페이지가 0보다 작습니다");
-                return respone;
+            reservationEnums enums=confrimDateAndPage(nowPage,startDate,endDate);
+            if(enums.getBool()==false){
+                System.out.println("조건 안맞음");
+                return utillService.makeJson(enums.getBool(), enums.getMessege());
             }
-            List<mainReservationDto>dtoArray=getClientReservationDTO(JSONObject, nowPage,respone);
+            List<mainReservationDto>dtoArray=getClientReservationDTO(startDate,endDate,nowPage,respone);
             String[][] array=makeResponse(respone, dtoArray);
 
             respone.put("bool", true);
@@ -290,10 +293,35 @@ public class resevationService {
             throw new RuntimeException("예약조회에 실패했습니다");
         }
     }
-    private List<mainReservationDto>getClientReservationDTO(JSONObject jsonObject,int nowPage,JSONObject respone){
+    private reservationEnums confrimDateAndPage(int nowPage,String startDate,String endDate){
+        System.out.println("confrimDate");
+        String enumName="fail";
+        String messege=null;
+        if(nowPage<=0){
+            System.out.println("페이지가 0보다 작거나 같습니다 ");
+            messege="페이지가 0보다 작거나 같습니다";
+        }
+        else if(startDate.isEmpty()&&!endDate.isEmpty()){
+            System.out.println("시작날이 없습니다 ");
+            messege="시작날이 없습니다";
+        }else if(!startDate.isEmpty()&&endDate.isEmpty()){
+            System.out.println("끝나는 날이 없습니다 ");
+            messege="끝나는 날이 없습니다";
+        }else if(!startDate.isEmpty()&&!endDate.isEmpty()){
+            if(LocalDate.parse(startDate, DateTimeFormatter.ISO_DATE).isAfter(LocalDate.parse(endDate, DateTimeFormatter.ISO_DATE))){
+                System.out.println("날짜 선택이 잘못되었습니다 ");
+                messege="날짜 선택이 잘못되었습니다";
+            }else{
+                enumName="yes";
+            }
+        }else{
+            enumName="yes";
+        }
+        reservationEnums.valueOf(enumName).setMessete(messege);
+        return reservationEnums.valueOf(enumName);
+    }
+    private List<mainReservationDto>getClientReservationDTO(String startDate,String endDate,int nowPage,JSONObject respone){
         System.out.println("getClientReservationDTO");
-        String startDate=(String) jsonObject.get("startDate");
-        String endDate=(String) jsonObject.get("endDate");
         List<mainReservationDto>dtoArray=new ArrayList<>();
         String email=SecurityContextHolder.getContext().getAuthentication().getName();
         int totalPage=0;
