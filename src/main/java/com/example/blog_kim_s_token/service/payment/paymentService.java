@@ -124,6 +124,9 @@ public class paymentService {
     public vBankDto selectVbankProduct(String paymentId) {
         return vbankDao.findByPaymentId(paymentId);
     }
+    public paidDto selectPaidProduct(String paymentId) {
+        return paidDao.findByPaymentId(paymentId);
+    }
     public JSONObject  getVbankDate(getVankDateDto getVankDateDto) {
         System.out.println("getVbankDate");
         try { 

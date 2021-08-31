@@ -14,6 +14,7 @@ import java.util.List;
 
 import com.example.blog_kim_s_token.customException.failBuyException;
 import com.example.blog_kim_s_token.enums.reservationEnums;
+import com.example.blog_kim_s_token.model.payment.paidDto;
 import com.example.blog_kim_s_token.model.payment.vBankDto;
 import com.example.blog_kim_s_token.model.reservation.*;
 import com.example.blog_kim_s_token.model.reservation.getDateDto;
@@ -362,9 +363,13 @@ public class resevationService {
                     array[temp][5]=vBankDto.getBank()+" "+vBankDto.getBankNum();
                     array[temp][6]=vBankDto.getEndDate().toString();
                 }else{
+                    paidDto paidDto=paymentService.selectPaidProduct(m.getPaymentId());
+                    if(paidDto.getUsedKind().equals("point")){
+                        paidDto.setUsedKind("카카오페이");
+                    }
                     array[temp][4]="결제완료";
-                    array[temp][5]="결제가 완료된 상태입니다";
-                    array[temp][6]="결제가 완료된 상태입니다";
+                    array[temp][5]=paidDto.getUsedKind();
+                    array[temp][6]=paidDto.getCreated().toString();
                 }
                 temp++;
             }
