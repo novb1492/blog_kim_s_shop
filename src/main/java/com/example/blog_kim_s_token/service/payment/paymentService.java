@@ -138,14 +138,26 @@ public class paymentService {
                 System.out.println(shortestTime+" 가장작은시간");
                 expiredDate=requestDate+" "+(shortestTime-minusHour)+":00:00";
                 System.out.println(expiredDate+" 새로만든 기한");
+                String[]temp=expiredDate.split(" ");
+                String time=temp[1];
+                expiredDate=temp[0];
+                temp=expiredDate.split("-");
+                if(Integer.parseInt(temp[1])<10){
+                    System.out.println("10월보다작음");
+                    temp[1]="0"+temp[1];
+                }
+                if(Integer.parseInt(temp[2])<10){
+                    System.out.println("10일보다작음");
+                    temp[2]="0"+temp[2];
+                }
+                expiredDate=temp[0]+"-"+temp[1]+"-"+temp[2]+" "+time;
      
             }else{
                 System.out.println("예약 일자가 "+period+"이상임");
                 expiredDate=LocalDateTime.now().plusDays(period).toString();
                 expiredDate=expiredDate.replace("T", " ");
             }
-            String[]temp=expiredDate.split(" ");
-            expiredDate=temp[0];
+            System.out.println(expiredDate+" 기한일");
             return utillService.makeJson(true, expiredDate);
         } catch (Exception e) {
             e.printStackTrace();
