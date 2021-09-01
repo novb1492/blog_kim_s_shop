@@ -105,10 +105,7 @@ public class iamportService {
                 vbankPayment.setStatus("ready");
                 paymentabstract=vbankPayment;
             }
-            Authentication authentication=SecurityContextHolder.getContext().getAuthentication();
-            
-            principaldetail principaldetail=(com.example.blog_kim_s_token.config.principaldetail) authentication.getPrincipal(); 
-            userDto userDto= principaldetail.getUserDto();
+            userDto userDto=userService.sendUserDto();
             paymentabstract.setEmail(userDto.getEmail());
             paymentabstract.setName(userDto.getName());
             return paymentabstract;

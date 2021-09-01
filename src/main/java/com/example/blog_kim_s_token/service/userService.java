@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 
+import com.example.blog_kim_s_token.config.principaldetail;
 import com.example.blog_kim_s_token.config.security;
 import com.example.blog_kim_s_token.enums.confirmEnums;
 import com.example.blog_kim_s_token.enums.role;
@@ -114,7 +115,8 @@ public class userService {
     }
     public userDto sendUserDto() {
         System.out.println("sendUserDto");
-        userDto userDto=userDao.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
+        principaldetail principaldetail=(com.example.blog_kim_s_token.config.principaldetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal(); 
+        userDto userDto= principaldetail.getUserDto();
         userDto.setPwd(null);
         return userDto;
     }
@@ -175,6 +177,7 @@ public class userService {
             throw new RuntimeException("updatePwd 에러발생");
         }
     }
+
     
 
 }
