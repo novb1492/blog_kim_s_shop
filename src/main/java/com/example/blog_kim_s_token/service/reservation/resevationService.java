@@ -23,8 +23,8 @@ import com.example.blog_kim_s_token.model.user.userDto;
 import com.example.blog_kim_s_token.service.priceService;
 import com.example.blog_kim_s_token.service.userService;
 import com.example.blog_kim_s_token.service.utillService;
-import com.example.blog_kim_s_token.service.payment.payMentInterFace;
 import com.example.blog_kim_s_token.service.payment.paymentService;
+import com.example.blog_kim_s_token.service.payment.iamPort.iamportService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +49,9 @@ public class resevationService {
    
     @Value("${payment.limitedCancleHour}")
     private  int limitedCancleHour;
+
+    @Autowired
+    private iamportService iamportService;
   
  
 
@@ -148,10 +151,11 @@ public class resevationService {
     public JSONObject confrimContents(reservationInsertDto reservationInsertDto) {
         System.out.println("confrimContents");
         try {
-            reservationInsertDto.setEmail(SecurityContextHolder.getContext().getAuthentication().getName());
             Collections.sort(reservationInsertDto.getTimes());
+            List<Integer>times=reservationInsertDto.getTimes();
+            int totalPrice=priceService.getTotalPrice(reservationInsertDto.getSeat(),times.size());
             confrimInsert(reservationInsertDto);
-            payMentInterFace payMentInterFace=confrimPayment(reservationInsertDto);
+            iamportService.confrimPayment(reservationInsertDto.getPaymentId(), totalPrice);
             System.out.println(reservationInsertDto.getStatus()+" ready라면 가상계좌");
             if(reservationInsertDto.getStatus().equals("ready")){
                 reservationEnums enums=checkVankTime(reservationInsertDto);
@@ -159,40 +163,15 @@ public class resevationService {
                     throw new Exception(enums.getMessege());
                 }
             }
-            insertReservation(reservationInsertDto);
-            
-            JSONObject result=new JSONObject();
-            result.put("messege","예약에 성공했습니다");
-            result.put("totalPrice",payMentInterFace.getTotalPrice());
-            System.out.println(payMentInterFace.getExiredDate()+ "제일위");
-            if(reservationInsertDto.getStatus().equals("ready")){
-                System.out.println("응답에 가상계좌 추가");
-                result.put("vbankNum", payMentInterFace.getVankNum());
-                result.put("vbank", payMentInterFace.getUsedKind());
-                result.put("expiredDate", payMentInterFace.getExiredDate());
-            }
-            return result;
+            //insertReservation(reservationInsertDto);
+        
+            return null;
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("confrimContents error");
             throw new failBuyException(e.getMessage(), reservationInsertDto.getPaymentId());
         }
        
-    }
-    private payMentInterFace confrimPayment(reservationInsertDto reservationInsertDto) {
-        System.out.println("confrimPayment");
-        userDto userDto=userService.findEmail(reservationInsertDto.getEmail());
-        List<Integer>times=reservationInsertDto.getTimes();
-        int totalPrice=priceService.getTotalPrice(reservationInsertDto.getSeat(),times.size());
-
-        reservationInsertDto.setUserId(userDto.getId());
-        reservationInsertDto.setName(userDto.getName());
-        payMentInterFace payMentInterFace=paymentService.makePaymentInter(reservationInsertDto.getPaymentId(), reservationInsertDto.getEmail(),userDto.getName(), totalPrice,kind,times.get(0));
-        String status=paymentService.confrimPayment(payMentInterFace);
-        System.out.println(status+" status+");
-        reservationInsertDto.setStatus(status);
-        reservationInsertDto.setUsedKind(payMentInterFace.getUsedKind());
-        return payMentInterFace;
     }
     private void insertReservation(reservationInsertDto reservationInsertDto) {
         System.out.println("insertReservation");

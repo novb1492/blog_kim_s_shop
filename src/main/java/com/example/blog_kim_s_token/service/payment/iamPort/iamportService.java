@@ -4,10 +4,12 @@ package com.example.blog_kim_s_token.service.payment.iamPort;
 
 
 
+
 import com.example.blog_kim_s_token.customException.failBuyException;
 import com.example.blog_kim_s_token.model.iamport.buyInforDto;
 import com.example.blog_kim_s_token.model.iamport.impTokenDto;
-import com.example.blog_kim_s_token.service.payment.payMentInterFace;
+import com.example.blog_kim_s_token.model.user.userDto;
+import com.example.blog_kim_s_token.service.userService;
 import com.example.blog_kim_s_token.service.payment.paymentService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
@@ -15,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -30,11 +33,13 @@ public class iamportService {
 
     @Autowired
     private paymentService paymentService;
+    @Autowired
+    private userService userService;
 
 
-    public void confrimPayment(payMentInterFace payMentInterFace) {
+    public void confrimPayment(String impId,int totalPrice) {
         System.out.println("confrimPayment");
-        confrimBuy(getBuyInfor(payMentInterFace.getPaymentId()),payMentInterFace);
+        confrimBuy(getBuyInfor(impId),totalPrice);
     }
     private String getToken() {
         System.out.println("getToken");
@@ -73,32 +78,41 @@ public class iamportService {
             body.clear();
         }
     }
-    private void confrimBuy(JSONObject buyInfor,payMentInterFace payInter) {
+    private void confrimBuy(JSONObject buyInfor,int totalPrice) {
         System.out.println("confrimBuy");
         int amount=(int) buyInfor.get("amount");
         String status=(String) buyInfor.get("status");
-        System.out.println(amount+"결제총량"+payInter.getTotalPrice()+" 결제되어야 하는 금액"+status+" 결제상태");
-        if(payInter.getTotalPrice()==amount&&status.equals("paid")){
-            System.out.println("결제 검증완료");
-            selectPayCompany(buyInfor,payInter);
-            paymentService.insertPayment(payInter);
-            return;
+        System.out.println(amount+"결제총량"+totalPrice+" 결제되어야 하는 금액"+status+" 결제상태");
+        if(totalPrice==amount){
+            userDto userDto=userService.findEmail(SecurityContextHolder.getContext().getAuthentication().getName());
+            if(status.equals("paid")){
+                System.out.println("결제된 상품");
+                nomalPayment nomalPayment=new nomalPayment();
+                nomalPayment.setEmail(userDto.getEmail());
+                nomalPayment.setName(userDto.getName());
+                nomalPayment.setPaymentid("paymentid");
+                selectPayCompany(buyInfor,nomalPayment);
+            }
         }
         System.out.println("결제 검증실패");
-        throw new failBuyException("결제 검증실패",payInter.getPaymentId());
+        throw new failBuyException("결제 검증실패","123");
     }    
-    private void selectPayCompany(JSONObject buyInfor,payMentInterFace payMentInterFace) {
+    private void selectPayCompany(JSONObject buyInfor,nomalPayment nomalPayment) {
+        System.out.println("selectPayCompany");
         String paymentMethod=(String)buyInfor.get("pay_method");
-        String paymentCompany=null;
+        String usedKind=null;
         if(paymentMethod.equals("point")){
-            paymentCompany=(String)buyInfor.get("emb_pg_provider");
-            payMentInterFace.setPayMethod(paymentMethod);
+            System.out.println("카카오결제");
+            usedKind=(String)buyInfor.get("emb_pg_provider");
         }else if(paymentMethod.equals("card")){
-            paymentCompany=(String)buyInfor.get("card_name");
-            payMentInterFace.setPayMethod(paymentMethod);
+            System.out.println("카드결제");
+            usedKind=(String)buyInfor.get("card_name");
         }
-        payMentInterFace.setUsedKind(paymentCompany);
+        nomalPayment.setPayMethod(paymentMethod);
+        nomalPayment.setStatus("paid");
+        nomalPayment.setUsedKind(usedKind);
     }
+
     public boolean cancleBuy(String impId,int zeorOrPrice) {
         System.out.println("cancleBuy");
         try {
