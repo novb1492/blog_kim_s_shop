@@ -14,4 +14,5 @@ public abstract class paymentabstract {
     private String paymentid;
     private String status;
     private String usedKind;
+    private String kind;
 }

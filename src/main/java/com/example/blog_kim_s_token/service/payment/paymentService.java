@@ -12,8 +12,11 @@ import com.example.blog_kim_s_token.model.payment.paidDao;
 import com.example.blog_kim_s_token.model.payment.paidDto;
 import com.example.blog_kim_s_token.model.payment.vBankDto;
 import com.example.blog_kim_s_token.model.payment.vbankDao;
+import com.example.blog_kim_s_token.model.user.userDto;
 import com.example.blog_kim_s_token.service.utillService;
 import com.example.blog_kim_s_token.service.payment.iamPort.iamportService;
+import com.example.blog_kim_s_token.service.payment.iamPort.nomalPayment;
+import com.example.blog_kim_s_token.service.payment.iamPort.vbankPayment;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +47,37 @@ public class paymentService {
     }
     public paidDto selectPaidProduct(String paymentId) {
         return paidDao.findByPaymentId(paymentId);
+    }
+    public void insertPayment(nomalPayment nomalPayment,userDto userDto,int totalPrice) {
+        System.out.println("insertPayment");
+        paidDto dto=paidDto.builder().email(userDto.getEmail())
+                                    .kind(nomalPayment.getKind())
+                                    .name(userDto.getName())
+                                    .payMethod(nomalPayment.getPayMethod())
+                                    .paymentId(nomalPayment.getPaymentid())
+                                    .status(nomalPayment.getStatus())
+                                    .usedKind(nomalPayment.getUsedKind())
+                                    .totalPrice(totalPrice)
+                                    .build();
+                                    paidDao.save(dto);
+                                    System.out.println("결제테이블 저장 완료");
+
+    }
+    public void insertPayment(vbankPayment vbankPayment,userDto userDto,int totalPrice) {
+        System.out.println("insertPayment");
+        vBankDto dto=vBankDto.builder().email(userDto.getEmail())
+                                    .name(userDto.getName())
+                                    .bank(vbankPayment.getBank())
+                                    .bankNum(vbankPayment.getVbankNum())
+                                    .endDate(Timestamp.valueOf(vbankPayment.getEndDate()))
+                                    .paymentId(vbankPayment.getPaymentid())
+                                    .status("ready")
+                                    .price(totalPrice)
+                                    .build();
+                                    
+                                    vbankDao.save(dto);
+                                    System.out.println("vbnk테이블 저장 완료");
+
     }
     public JSONObject  getVbankDate(getVankDateDto getVankDateDto) {
         System.out.println("getVbankDate");
@@ -78,6 +112,11 @@ public class paymentService {
             if(temp[2].length()<2){
                 System.out.println("10일보다작음");
                 temp[2]="0"+temp[2];
+            }
+            String[] splitTime=time.split(":");
+            if(splitTime[0].length()<2){
+                splitTime[0]="0"+splitTime[0];
+                time=splitTime[0]+":"+splitTime[1]+":"+splitTime[2];
             }
             expiredDate=temp[0]+"-"+temp[1]+"-"+temp[2]+" "+time;
  

@@ -34,6 +34,9 @@ public class vBankDto {
     @Column(name = "email",nullable = false)
     private String email;
 
+    @Column(name = "name",nullable = false)
+    private String name;
+
     @Column(name = "price",nullable = false)
     private int price;
 

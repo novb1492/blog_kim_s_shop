@@ -156,7 +156,7 @@ public class resevationService {
             List<Integer>times=reservationInsertDto.getTimes();
             int totalPrice=priceService.getTotalPrice(reservationInsertDto.getSeat(),times.size());
             confrimInsert(reservationInsertDto);
-            paymentabstract paymentabstract=iamportService.confrimPayment(reservationInsertDto.getPaymentId(), totalPrice);
+            paymentabstract paymentabstract=iamportService.confrimPayment(reservationInsertDto.getPaymentId(), totalPrice,"reservation");
             reservationInsertDto.setStatus(paymentabstract.getStatus());
             reservationInsertDto.setUsedKind(paymentabstract.getUsedKind());
             reservationInsertDto.setEmail(paymentabstract.getEmail());
@@ -207,38 +207,38 @@ public class resevationService {
     private void confrimInsert(reservationInsertDto reservationInsertDto){
         System.out.println("confrimInsert");
         try {
+            String paymentID=reservationInsertDto.getPaymentId();
             List<mainReservationDto>array=reservationDao.findByEmailNative(reservationInsertDto.getEmail(),reservationInsertDto.getSeat());
             System.out.println(array.toString()+" 내역들");
             if(reservationInsertDto.getTimes().size()<=0){
                 System.out.println("몇시간 쓸지 선택 되지 않음");
-                throw new Exception("시간을 선택하지 않았습니다");
+                throw new failBuyException("시간을 선택하지 않았습니다",paymentID);
             }
             if(array!=null){
+                System.out.println("show");
                 for(mainReservationDto m:array){
                     for(int i=0;i<reservationInsertDto.getTimes().size();i++){
                         int hour=reservationInsertDto.getTimes().get(i);
                         String date=reservationInsertDto.getYear()+"-"+reservationInsertDto.getMonth()+"-"+reservationInsertDto.getDate()+" "+hour+":00:00";
                         Timestamp DateAndTime=Timestamp.valueOf(date);
+                        System.out.println(DateAndTime+" show");
                         if(m.getDateAndTime().equals(DateAndTime)||utillService.compareDate(DateAndTime, LocalDateTime.now())){
                             System.out.println("이미 예약한 시간 발견or지난 날짜 예약시도");
-                            throw new Exception("이미 예약한 시간 발견 이거나 지난 날짜 예약시도입니다 "+date);
+                            throw new failBuyException("이미 예약한 시간 발견 이거나 지난 날짜 예약시도입니다 "+date,paymentID);
                         }else if(getCountAlreadyInTime(DateAndTime,reservationInsertDto.getSeat())==maxPeopleOfTime){
                             System.out.println("예약이 다찬 시간입니다");
-                            throw new Exception("예약이 가득찬 시간입니다 "+date);
+                            throw new failBuyException("예약이 가득찬 시간입니다 "+date,paymentID);
                         }else if(hour<openTime||hour>closeTime){
                             System.out.println("영업 시간외 예약시도");
-                            throw new Exception("영업 시간외 예약시도 입니다");
+                            throw new failBuyException("영업 시간외 예약시도 입니다",paymentID);
                         }
                     }
                 }
             }
- 
-            
         } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("confrimInsert error");
-            throw new failBuyException(e.getMessage(),reservationInsertDto.getPaymentId());
-        }  
+               e.printStackTrace();
+               throw new failBuyException(e.getMessage(), reservationInsertDto.getPaymentId());
+        }
     }
     private reservationEnums checkVankTime(reservationInsertDto reservationInsertDto) {
         System.out.println("checkVankTime");

@@ -5,6 +5,12 @@ package com.example.blog_kim_s_token.service.payment.iamPort;
 
 
 
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.Date;
+import java.util.TimeZone;
+
 import com.example.blog_kim_s_token.config.principaldetail;
 import com.example.blog_kim_s_token.customException.failBuyException;
 import com.example.blog_kim_s_token.model.iamport.buyInforDto;
@@ -40,9 +46,9 @@ public class iamportService {
     private userService userService;
 
 
-    public paymentabstract confrimPayment(String impId,int totalPrice) {
+    public paymentabstract confrimPayment(String impId,int totalPrice,String kind) {
         System.out.println("confrimPayment");
-        return confrimBuy(getBuyInfor(impId),totalPrice);
+        return confrimBuy(getBuyInfor(impId),totalPrice,kind);
     }
     private String getToken() {
         System.out.println("getToken");
@@ -81,38 +87,52 @@ public class iamportService {
             body.clear();
         }
     }
-    private paymentabstract confrimBuy(JSONObject buyInfor,int totalPrice) {
+    private paymentabstract confrimBuy(JSONObject buyInfor,int totalPrice,String kind) {
         System.out.println("confrimBuy");
         int amount=(int) buyInfor.get("amount");
         String status=(String) buyInfor.get("status");
         System.out.println(amount+"결제총량"+totalPrice+" 결제되어야 하는 금액"+status+" 결제상태");
         if(totalPrice==amount){
             paymentabstract paymentabstract=null;
+            userDto userDto=userService.sendUserDto();
             if(status.equals("paid")){
                 System.out.println("결제된 상품");
                 nomalPayment nomalPayment=new nomalPayment();
                 selectPayCompany(buyInfor,nomalPayment);
                 nomalPayment.setPaymentid((String)buyInfor.get("imp_uid"));
                 nomalPayment.setPaymentid("paymentid");
+                nomalPayment.setKind(kind);
+                paymentService.insertPayment(nomalPayment, userDto, totalPrice);
                 paymentabstract=nomalPayment;
             }else if(status.equals("ready")){
                 System.out.println("가상계좌 요청 상품");
                 vbankPayment vbankPayment=new vbankPayment();
                 vbankPayment.setBank((String)buyInfor.get("vbank_name"));
-                vbankPayment.setVbankNum("vbank_num");
+                vbankPayment.setVbankNum((String)buyInfor.get("vbank_num"));
                 vbankPayment.setPaymentid((String)buyInfor.get("imp_uid"));
                 vbankPayment.setPayMethod("pay_method");
                 vbankPayment.setStatus("ready");
+                vbankPayment.setKind(kind);
+                vbankPayment.setEndDate(unixtimeToString(Long.parseLong(buyInfor.get("vbank_date").toString())));
+                vbankPayment.setUsedKind((String)buyInfor.get("vbank_name"));
+                paymentService.insertPayment(vbankPayment, userDto, totalPrice);
                 paymentabstract=vbankPayment;
             }
-            userDto userDto=userService.sendUserDto();
             paymentabstract.setEmail(userDto.getEmail());
             paymentabstract.setName(userDto.getName());
             return paymentabstract;
         }
         System.out.println("결제 검증실패");
-        throw new failBuyException("결제 검증실패","123");
-    }    
+        throw new failBuyException("결제 검증실패",(String)buyInfor.get("imp_uid"));
+    }   
+    private String unixtimeToString(long unixTime) {
+        System.out.println("unixtimeToString");
+        Date date = new Date(unixTime*1000L); 
+        SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); 
+        sdf.setTimeZone(TimeZone.getTimeZone("GMT+9")); 
+        String formattedDate = sdf.format(date);
+        return formattedDate;
+    } 
     private void selectPayCompany(JSONObject buyInfor,nomalPayment nomalPayment) {
         System.out.println("selectPayCompany");
         String paymentMethod=(String)buyInfor.get("pay_method");
