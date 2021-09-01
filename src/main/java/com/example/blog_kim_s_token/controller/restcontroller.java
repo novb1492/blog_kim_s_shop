@@ -12,6 +12,7 @@ import javax.validation.Valid;
 
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
+import com.example.blog_kim_s_token.config.principaldetail;
 import com.example.blog_kim_s_token.model.article.articleDto;
 import com.example.blog_kim_s_token.model.article.getArticleDto;
 import com.example.blog_kim_s_token.model.article.insertArticleDto;
@@ -39,6 +40,7 @@ import com.example.blog_kim_s_token.service.payment.paymentService;
 import com.example.blog_kim_s_token.service.reservation.resevationService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -162,7 +164,7 @@ public class restcontroller {
         return resevationService.getTimeByDate(getTimeDto);
     }
     @PostMapping("/api/insertReservation")
-    public JSONObject insertReservation(@Valid @RequestBody reservationInsertDto reservationInsertDto,HttpServletResponse response) {
+    public JSONObject insertReservation(@Valid @RequestBody reservationInsertDto reservationInsertDto,HttpServletResponse response){
         System.out.println("insertReservation");
        return resevationService.confrimContents(reservationInsertDto);
     }

@@ -5,18 +5,21 @@ package com.example.blog_kim_s_token.service.payment.iamPort;
 
 
 
+import com.example.blog_kim_s_token.config.principaldetail;
 import com.example.blog_kim_s_token.customException.failBuyException;
 import com.example.blog_kim_s_token.model.iamport.buyInforDto;
 import com.example.blog_kim_s_token.model.iamport.impTokenDto;
 import com.example.blog_kim_s_token.model.user.userDto;
 import com.example.blog_kim_s_token.service.userService;
 import com.example.blog_kim_s_token.service.payment.paymentService;
+import com.example.blog_kim_s_token.service.payment.paymentabstract;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -37,9 +40,9 @@ public class iamportService {
     private userService userService;
 
 
-    public void confrimPayment(String impId,int totalPrice) {
+    public paymentabstract confrimPayment(String impId,int totalPrice) {
         System.out.println("confrimPayment");
-        confrimBuy(getBuyInfor(impId),totalPrice);
+        return confrimBuy(getBuyInfor(impId),totalPrice);
     }
     private String getToken() {
         System.out.println("getToken");
@@ -78,21 +81,37 @@ public class iamportService {
             body.clear();
         }
     }
-    private void confrimBuy(JSONObject buyInfor,int totalPrice) {
+    private paymentabstract confrimBuy(JSONObject buyInfor,int totalPrice) {
         System.out.println("confrimBuy");
         int amount=(int) buyInfor.get("amount");
         String status=(String) buyInfor.get("status");
         System.out.println(amount+"결제총량"+totalPrice+" 결제되어야 하는 금액"+status+" 결제상태");
         if(totalPrice==amount){
-            userDto userDto=userService.findEmail(SecurityContextHolder.getContext().getAuthentication().getName());
+            paymentabstract paymentabstract=null;
             if(status.equals("paid")){
                 System.out.println("결제된 상품");
                 nomalPayment nomalPayment=new nomalPayment();
-                nomalPayment.setEmail(userDto.getEmail());
-                nomalPayment.setName(userDto.getName());
-                nomalPayment.setPaymentid("paymentid");
                 selectPayCompany(buyInfor,nomalPayment);
+                nomalPayment.setPaymentid((String)buyInfor.get("imp_uid"));
+                nomalPayment.setPaymentid("paymentid");
+                paymentabstract=nomalPayment;
+            }else if(status.equals("ready")){
+                System.out.println("가상계좌 요청 상품");
+                vbankPayment vbankPayment=new vbankPayment();
+                vbankPayment.setBank((String)buyInfor.get("vbank_name"));
+                vbankPayment.setVbankNum("vbank_num");
+                vbankPayment.setPaymentid((String)buyInfor.get("imp_uid"));
+                vbankPayment.setPayMethod("pay_method");
+                vbankPayment.setStatus("ready");
+                paymentabstract=vbankPayment;
             }
+            Authentication authentication=SecurityContextHolder.getContext().getAuthentication();
+            
+            principaldetail principaldetail=(com.example.blog_kim_s_token.config.principaldetail) authentication.getPrincipal(); 
+            userDto userDto= principaldetail.getUserDto();
+            paymentabstract.setEmail(userDto.getEmail());
+            paymentabstract.setName(userDto.getName());
+            return paymentabstract;
         }
         System.out.println("결제 검증실패");
         throw new failBuyException("결제 검증실패","123");

@@ -40,9 +40,6 @@ public class paidDto {
     @Column(name = "name",nullable = false)
     private String name;
 
-    @Column(name = "payCompany",nullable = false)
-    private String payCompany;
-
     @Column(name = "totalPrice",nullable = false)
     private int totalPrice;
 

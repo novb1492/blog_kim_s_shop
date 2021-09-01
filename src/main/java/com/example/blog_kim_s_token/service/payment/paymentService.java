@@ -13,9 +13,6 @@ import com.example.blog_kim_s_token.model.payment.paidDto;
 import com.example.blog_kim_s_token.model.payment.vBankDto;
 import com.example.blog_kim_s_token.model.payment.vbankDao;
 import com.example.blog_kim_s_token.service.utillService;
-import com.example.blog_kim_s_token.service.payment.bootPay.bootPayInter;
-import com.example.blog_kim_s_token.service.payment.bootPay.bootPayService;
-import com.example.blog_kim_s_token.service.payment.iamPort.iamInter;
 import com.example.blog_kim_s_token.service.payment.iamPort.iamportService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
@@ -32,92 +29,12 @@ public class paymentService {
     private vbankDao vbankDao;
     @Autowired
     private iamportService iamportService;
-    @Autowired
-    private bootPayService bootPayService;
     @Value("${payment.period}")
     private  int period;
     @Value("${payment.minusHour}")
     private  int minusHour;
     
     
-    public payMentInterFace makePaymentInter(String paymentId,String email,String name,int totalPrice,String kind,int shortestTime) {
-        System.out.println("makePaymentInter");
-        payMentInterFace payMentInterFace=null;
-        if(paymentId.startsWith("imp")){
-            System.out.println("아임포트 interface생성시도");
-            iamInter inter=iamInter.builder()
-                                .BuyerEmail(email)
-                                .BuyerName(name)
-                                .kind(kind)
-                                .payMentId(paymentId)
-                                .totalPrice(totalPrice)
-                                .build();
-            payMentInterFace=inter;
-            return payMentInterFace;
-        }else{
-            System.out.println("부트페이 interface생성시도");
-            bootPayInter inter=bootPayInter.builder()
-                                            .BuyerEmail(email)
-                                            .BuyerName(name)
-                                            .kind(kind)
-                                            .payMentId(paymentId)
-                                            .totalPrice(totalPrice)
-                                            .shortestTime(shortestTime)
-                                            .build();
-            payMentInterFace=inter;
-            return payMentInterFace;
-        }
-    }
-    public String confrimPayment(payMentInterFace payMentInterFace) {
-        if(payMentInterFace.getPayCompany().equals("iamport")){
-            System.out.println("아임포트 결제시도");
-            iamportService.confrimPayment(payMentInterFace);
-            return "paid";
-        }else{
-            System.out.println("부트페이 결제시도");
-            bootPayService.confrimPayment(payMentInterFace);
-            return "ready";
-        }
-    }
-    public void insertPayment(payMentInterFace payMentInterFace) {
-        System.out.println("insertPayment");
-        try {
-            paidDto dto=paidDto.builder()
-            .email(payMentInterFace.getBuyerEmail())
-            .name(payMentInterFace.getBuyerName())
-            .paymentId(payMentInterFace.getPaymentId())
-            .kind(payMentInterFace.getKind())
-            .payCompany(payMentInterFace.getPayCompany())
-            .totalPrice(payMentInterFace.getTotalPrice())
-            .payMethod(payMentInterFace.getPayMethod())
-            .usedKind(payMentInterFace.getUsedKind())
-            .status("paid").build();
-            paidDao.save(dto);
-        } catch (Exception e) {
-            System.out.println("insertPayment error");
-            throw new failBuyException("결제내역 저장 실패",payMentInterFace.getPaymentId());
-        }
-       
-    }
-    public void insertVbankPayment(payMentInterFace payMentInterFace,Timestamp endDate) {
-        System.out.println("insertVbankPayment");
-        try {
-            vBankDto dto=vBankDto.builder()
-                                            .bank(payMentInterFace.getUsedKind())
-                                            .email(payMentInterFace.getBuyerEmail())
-                                            .paymentId(payMentInterFace.getPaymentId())
-                                            .price(payMentInterFace.getTotalPrice())
-                                            .status("ready")
-                                            .bankNum(payMentInterFace.getVankNum())
-                                            .endDate(endDate).build();
-                                            vbankDao.save(dto);
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("insertVbankPayment error");
-            throw new failBuyException("가상계좌 결제내역 저장 실패",payMentInterFace.getPaymentId());
-        }
-       
-    }
     public void cancleBuy(String paymentId,int price) {
         System.out.println("cancleBuy");
         iamportService.cancleBuy(paymentId, price);

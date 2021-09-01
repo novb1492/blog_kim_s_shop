@@ -9,6 +9,9 @@ import lombok.Setter;
 @NoArgsConstructor
 @Setter
 @Getter
-public class nomalPayment extends paymentabstract{
+public class vbankPayment extends paymentabstract {
+    private String bank;
+    private String vbankNum;
+    private String endDate; 
     private String payMethod;
 }

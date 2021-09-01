@@ -24,6 +24,7 @@ import com.example.blog_kim_s_token.service.priceService;
 import com.example.blog_kim_s_token.service.userService;
 import com.example.blog_kim_s_token.service.utillService;
 import com.example.blog_kim_s_token.service.payment.paymentService;
+import com.example.blog_kim_s_token.service.payment.paymentabstract;
 import com.example.blog_kim_s_token.service.payment.iamPort.iamportService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
@@ -155,7 +156,11 @@ public class resevationService {
             List<Integer>times=reservationInsertDto.getTimes();
             int totalPrice=priceService.getTotalPrice(reservationInsertDto.getSeat(),times.size());
             confrimInsert(reservationInsertDto);
-            iamportService.confrimPayment(reservationInsertDto.getPaymentId(), totalPrice);
+            paymentabstract paymentabstract=iamportService.confrimPayment(reservationInsertDto.getPaymentId(), totalPrice);
+            reservationInsertDto.setStatus(paymentabstract.getStatus());
+            reservationInsertDto.setUsedKind(paymentabstract.getUsedKind());
+            reservationInsertDto.setEmail(paymentabstract.getEmail());
+            reservationInsertDto.setName(paymentabstract.getName());
             System.out.println(reservationInsertDto.getStatus()+" ready라면 가상계좌");
             if(reservationInsertDto.getStatus().equals("ready")){
                 reservationEnums enums=checkVankTime(reservationInsertDto);
@@ -163,9 +168,9 @@ public class resevationService {
                     throw new Exception(enums.getMessege());
                 }
             }
-            //insertReservation(reservationInsertDto);
+            insertReservation(reservationInsertDto);
         
-            return null;
+            return utillService.makeJson(true, "예약이 완료되었습니다");
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("confrimContents error");

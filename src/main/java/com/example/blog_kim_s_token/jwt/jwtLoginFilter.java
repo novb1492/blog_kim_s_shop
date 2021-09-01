@@ -7,7 +7,6 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import com.example.blog_kim_s_token.config.principaldetail;
 import com.example.blog_kim_s_token.model.jwt.jwtDto;
 import com.example.blog_kim_s_token.model.user.userDto;
@@ -54,6 +53,7 @@ public class jwtLoginFilter extends UsernamePasswordAuthenticationFilter {
 
         principaldetail principaldetail=(principaldetail)authResult.getPrincipal();
         int userId=principaldetail.getUserDto().getId();
+
 
         String jwtToken=jwtService.getJwtToken(userId);
         jwtDto jwtDto=jwtService.getRefreshToken(userId);

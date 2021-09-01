@@ -14,7 +14,6 @@ import com.example.blog_kim_s_token.jwt.jwtService;
 import com.example.blog_kim_s_token.model.jwt.jwtDto;
 import com.example.blog_kim_s_token.service.utillService;
 import com.example.blog_kim_s_token.service.cookie.cookieService;
-import com.example.blog_kim_s_token.service.payment.bootPay.bootPayService;
 import com.example.blog_kim_s_token.service.payment.iamPort.iamportService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
@@ -32,9 +31,7 @@ public class errorRestController {
     private jwtService jwtService;
     @Autowired
     private iamportService iamportService;
-    @Autowired
-    private bootPayService bootPayService;
-    
+
     
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public JSONObject processValidationError(MethodArgumentNotValidException exception) {
@@ -95,13 +92,7 @@ public class errorRestController {
     public JSONObject failBuyException(failBuyException exception) {
         System.out.println("failBuyException 환불시작");
         try {
-            if(exception.getPayMentId().startsWith("imp")){
-                System.out.println("아임포트 환불");
-                iamportService.cancleBuy(exception.getPayMentId(),0);
-            }else{
-                System.out.println("부트페이 환불");
-                bootPayService.cancleBuy(exception.getPayMentId(), 0, SecurityContextHolder.getContext().getAuthentication().getName(), "결제로직 실패");
-            }
+            iamportService.cancleBuy(exception.getPayMentId(),0);
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println(e.getMessage());

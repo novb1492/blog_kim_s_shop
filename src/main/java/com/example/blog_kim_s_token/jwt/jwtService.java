@@ -83,9 +83,10 @@ public class jwtService {
     public Authentication makeAuthentication(userDto userDto) {
         System.out.println(userDto.getEmail()+" makeAuthentication 강제로그인");
         principaldetail principaldetail=new principaldetail(userDto);
-        return new UsernamePasswordAuthenticationToken(userDto.getEmail(),userDto.getPwd(),principaldetail.getAuthorities());
+        return new UsernamePasswordAuthenticationToken(principaldetail,null,principaldetail.getAuthorities());
     }
     public void setSecuritySession(Authentication authentication) {
+        System.out.println("setSecuritySession");
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
     public jwtDto getRefreshToken(String refreshToken) {

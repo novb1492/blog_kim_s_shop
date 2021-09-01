@@ -13,4 +13,5 @@ public abstract class paymentabstract {
     private String name;
     private String paymentid;
     private String status;
+    private String usedKind;
 }
