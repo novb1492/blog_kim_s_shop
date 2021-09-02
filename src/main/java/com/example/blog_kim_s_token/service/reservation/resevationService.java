@@ -186,6 +186,7 @@ public class resevationService {
                                         .usedPayKind(reservationInsertDto.getUsedKind())
                                         .build();
                                         reservationDao.save(dto);
+                                        throw new Exception();
             }
         } catch (Exception e) {
            e.printStackTrace();

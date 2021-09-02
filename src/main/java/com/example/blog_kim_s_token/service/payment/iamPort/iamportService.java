@@ -163,8 +163,8 @@ public class iamportService {
                 body.put("amount", zeorOrPrice);
             }
             HttpEntity<JSONObject>entity=new HttpEntity<JSONObject>(body, headers);
-            restTemplate.postForObject("https://api.iamport.kr/payments/cancel",entity,JSONObject.class);
-            System.out.println("아임포트 환불 성공");
+            JSONObject respone= restTemplate.postForObject("https://api.iamport.kr/payments/cancel",entity,JSONObject.class);
+            System.out.println("아임포트 환불 성공"+respone);
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -175,6 +175,15 @@ public class iamportService {
             body.clear();
 
         }
+
+    }
+    public void cancleVbank(String paymentId) {
+        try {
+            String token=getToken();  
+        } catch (Exception e) {
+            
+        }
+    
 
     }
 

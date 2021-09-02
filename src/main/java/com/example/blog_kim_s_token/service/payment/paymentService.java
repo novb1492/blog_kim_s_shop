@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Date;
 
 import com.example.blog_kim_s_token.customException.failBuyException;
+import com.example.blog_kim_s_token.enums.paymentEnums;
 import com.example.blog_kim_s_token.model.payment.getVankDateDto;
 import com.example.blog_kim_s_token.model.payment.paidDao;
 import com.example.blog_kim_s_token.model.payment.paidDto;
@@ -108,19 +109,32 @@ public class paymentService {
             long diffDays = utillService.getDateGap(getToday, requestDate);
             Collections.sort(getVankDateDto.getTimes());
             int shortestTime=getVankDateDto.getTimes().get(0);
-            return utillService.makeJson(true, getVbankDate(diffDays, shortestTime, requestDate));
+            paymentEnums enums=checkTime(getVankDateDto);
+            if(enums.getBool()==false){
+                return utillService.makeJson(enums.getBool(), enums.getperiod());
+            }
+            return utillService.makeJson(true,getVbankDate(diffDays, shortestTime, requestDate));
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("getVbankDate error "+e.getMessage());
             throw new RuntimeException("가상계좌 일짜 계산 실패");
         }
     }
-    public String getVbankDate(long diffDays,int shortestTime,String requestDate) {
+    private paymentEnums checkTime(getVankDateDto getVankDateDto) {
+        System.out.println("checkTime");
+        if(Timestamp.valueOf(getVankDateDto.getYear()+"-"+getVankDateDto.getMonth()+"-"+getVankDateDto.getDate()+" "+(getVankDateDto.getTimes().get(0)-minusHour)+":00:00").toLocalDateTime().isBefore(LocalDateTime.now())){
+            paymentEnums.failCheck.setperiod("가상계좌는 최소 "+minusHour+"전에 가능합니다");
+            return paymentEnums.failCheck;
+        }
+        return paymentEnums.sucCheck;
+    }
+    private String getVbankDate(long diffDays,int shortestTime,String requestDate) {
         System.out.println("getVbankDate");   
         String expiredDate=null;
+        int expiredTime=shortestTime-minusHour;
         if(diffDays<period){
             System.out.println(shortestTime+" 가장작은시간");
-            expiredDate=requestDate+" "+(shortestTime-minusHour)+":00:00";
+            expiredDate=requestDate+" "+(expiredTime)+":00:00";
             System.out.println(expiredDate+" 새로만든 기한");
             String[]temp=expiredDate.split(" ");
             String time=temp[1];
@@ -158,7 +172,7 @@ public class paymentService {
         System.out.println("vbankOk");
         System.out.println(jsonObject+" payment");
         try {
-            String status=(String) jsonObject.get("status");
+        String status=(String) jsonObject.get("status");
         String merchantUid=(String) jsonObject.get("merchant_uid");
         if(status.equals("paid")&&merchantUid.startsWith("vbank")){
             System.out.println("가상계좌가 입금 확인됨");

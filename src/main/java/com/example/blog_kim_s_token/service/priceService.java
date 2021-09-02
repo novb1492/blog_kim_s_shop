@@ -27,7 +27,7 @@ public class priceService {
         JSONObject jsonObject=new JSONObject();
         priceEnums priceEnums=confrimProduct(productDto, getPriceDto.getCount().size());
         
-        if(priceEnums.gettotalPrice()==0){
+        if(priceEnums.gettotalPrice()==errorPrice){
             jsonObject.put("totalPrice", errorPrice);
             jsonObject.put("messege", priceEnums.getMessege());
         }else{
