@@ -382,4 +382,12 @@ public class resevationService {
         reservationEnums.valueOf(enumValue).setMessete(messege);
         return reservationEnums.valueOf(enumValue);
     }
+    public void readyTopaid(String paymentId) {
+        System.out.println("readyTopaid");
+        List<mainReservationDto>array=reservationDao.findByPaymentId(paymentId);
+        for(mainReservationDto m:array){
+            m.setStatus("piad");
+        }
+        System.out.println("예약테이블 paid로 변경완료");
+    }
 }

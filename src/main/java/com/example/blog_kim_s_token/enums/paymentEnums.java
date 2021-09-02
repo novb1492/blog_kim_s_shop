@@ -1,26 +1,26 @@
 package com.example.blog_kim_s_token.enums;
 
-import java.sql.Timestamp;
+
 
 public enum paymentEnums {
-    sucCheck(null,""),
-    failCheck(null,"");
+    sucCheck(null,true),
+    failCheck(null,false);
 
-    private  Timestamp period;
-    private  String bool;
+    private  String messege;
+    private  Boolean bool;
    
 
-    paymentEnums(Timestamp period,String bool){
-        this.period=period;
+    paymentEnums(String messege,Boolean bool){
+        this.messege=messege;
         this.bool=bool;
     }
-    public void setperiod(Timestamp period) {
-        this.period=period;
+    public void setperiod(String messege) {
+        this.messege=messege;
     }
-    public Timestamp getperiod() {
-        return period;
+    public String getperiod() {
+        return messege;
     }
-    public String getBool() {
+    public Boolean getBool() {
         return bool;
     }
 }

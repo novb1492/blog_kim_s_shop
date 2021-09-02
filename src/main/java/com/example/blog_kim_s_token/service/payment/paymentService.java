@@ -17,11 +17,13 @@ import com.example.blog_kim_s_token.service.utillService;
 import com.example.blog_kim_s_token.service.payment.iamPort.iamportService;
 import com.example.blog_kim_s_token.service.payment.iamPort.nomalPayment;
 import com.example.blog_kim_s_token.service.payment.iamPort.vbankPayment;
+import com.example.blog_kim_s_token.service.reservation.resevationService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class paymentService {
@@ -32,6 +34,8 @@ public class paymentService {
     private vbankDao vbankDao;
     @Autowired
     private iamportService iamportService;
+    @Autowired
+    private resevationService resevationService;
     @Value("${payment.period}")
     private  int period;
     @Value("${payment.minusHour}")
@@ -63,6 +67,21 @@ public class paymentService {
                                     System.out.println("결제테이블 저장 완료");
 
     }
+    public void insertPayment(nomalPayment nomalPayment,int totalPrice) {
+        System.out.println("insertPayment");
+        paidDto dto=paidDto.builder().email(nomalPayment.getEmail())
+                                    .kind(nomalPayment.getKind())
+                                    .name(nomalPayment.getName())
+                                    .payMethod(nomalPayment.getPayMethod())
+                                    .paymentId(nomalPayment.getPaymentid())
+                                    .status(nomalPayment.getStatus())
+                                    .usedKind(nomalPayment.getUsedKind())
+                                    .totalPrice(totalPrice)
+                                    .build();
+                                    paidDao.save(dto);
+                                    System.out.println("결제테이블 저장 완료");
+
+    }
     public void insertPayment(vbankPayment vbankPayment,userDto userDto,int totalPrice) {
         System.out.println("insertPayment");
         vBankDto dto=vBankDto.builder().email(userDto.getEmail())
@@ -72,6 +91,7 @@ public class paymentService {
                                     .endDate(Timestamp.valueOf(vbankPayment.getEndDate()))
                                     .paymentId(vbankPayment.getPaymentid())
                                     .status("ready")
+                                    .kind(vbankPayment.getKind())
                                     .price(totalPrice)
                                     .build();
                                     
@@ -132,5 +152,41 @@ public class paymentService {
         String expiredDate=LocalDateTime.now().plusDays(period).toString();
         expiredDate=expiredDate.replace("T", " ");
         return expiredDate;
+    }
+    @Transactional(rollbackFor = Exception.class)
+    public void vbankOk(JSONObject jsonObject) {
+        System.out.println("vbankOk");
+        System.out.println(jsonObject+" payment");
+        try {
+            String status=(String) jsonObject.get("status");
+        String merchantUid=(String) jsonObject.get("merchant_uid");
+        if(status.equals("paid")&&merchantUid.startsWith("vbank")){
+            System.out.println("가상계좌가 입금 확인됨");
+            String paymentId=(String) jsonObject.get("imp_uid");
+            vBankDto vBankDto=vbankDao.findByPaymentId(paymentId);
+            if(vBankDto.getKind().equals("reservation")){
+                System.out.println("예약시도 가상계좌였습니다");
+                resevationService.readyTopaid(paymentId);
+            }else{
+                System.out.println("상품시도 가상계좌였습니다");
+            }
+            nomalPayment nomalPayment=new nomalPayment();
+            nomalPayment.setEmail(vBankDto.getEmail());
+            nomalPayment.setName(vBankDto.getName());
+            nomalPayment.setUsedKind(vBankDto.getBank()+" "+vBankDto.getBankNum());
+            nomalPayment.setPayMethod("vbank");
+            nomalPayment.setKind(vBankDto.getKind());
+            nomalPayment.setPaymentid(vBankDto.getPaymentId());
+            nomalPayment.setStatus("paid");
+            insertPayment(nomalPayment, vBankDto.getPrice());
+            vbankDao.delete(vBankDto);
+            return;
+        }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("vbankOk error"+e.getMessage());
+            throw new failBuyException(e.getMessage(),(String) jsonObject.get("imp_uid"));
+        }
+        
     }
 }

@@ -27,5 +27,7 @@ public interface reservationDao extends JpaRepository<mainReservationDto,Integer
     int countByEmailNative(String email,Timestamp startDate,Timestamp endDate);
 
     int countByEmail(String email);
+
+    List<mainReservationDto> findByPaymentId(String paymentId);
 }
    

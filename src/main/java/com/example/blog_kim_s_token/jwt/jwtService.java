@@ -78,6 +78,7 @@ public class jwtService {
         }else{
             pwd=dto.getPwd();
         }
+        //authenticationManager.authenticate() config/userDetailService/loadUserByUsername실행시켜 아이디비번검사
         return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(dto.getEmail(),pwd,principaldetail.getAuthorities()));
     }
     public Authentication makeAuthentication(userDto userDto) {

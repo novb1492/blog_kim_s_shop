@@ -28,7 +28,7 @@ public class vBankDto {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "paymentId",nullable = false)
+    @Column(name = "paymentId",nullable = false,unique = true)
     private String paymentId;
 
     @Column(name = "email",nullable = false)
@@ -45,6 +45,9 @@ public class vBankDto {
 
     @Column(name = "bank",nullable = false)
     private String bank;
+
+    @Column(name = "kind",nullable = false)
+    private String kind;
 
     @Column(name = "bankNum",nullable = false)
     private String bankNum;

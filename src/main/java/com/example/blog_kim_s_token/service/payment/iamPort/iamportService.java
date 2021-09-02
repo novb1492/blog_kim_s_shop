@@ -6,12 +6,8 @@ package com.example.blog_kim_s_token.service.payment.iamPort;
 
 
 import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.TimeZone;
-
-import com.example.blog_kim_s_token.config.principaldetail;
 import com.example.blog_kim_s_token.customException.failBuyException;
 import com.example.blog_kim_s_token.model.iamport.buyInforDto;
 import com.example.blog_kim_s_token.model.iamport.impTokenDto;
@@ -25,8 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -89,12 +83,11 @@ public class iamportService {
     }
     private paymentabstract confrimBuy(JSONObject buyInfor,int totalPrice,String kind) {
         System.out.println("confrimBuy");
-        int amount=(int) buyInfor.get("amount");
         String status=(String) buyInfor.get("status");
-        System.out.println(amount+"결제총량"+totalPrice+" 결제되어야 하는 금액"+status+" 결제상태");
-        if(totalPrice==amount){
+        System.out.println(buyInfor.get("amount")+"결제총량"+totalPrice+" 결제되어야 하는 금액"+ status+" 결제상태");
+        userDto userDto=userService.sendUserDto();
+        if(confrimBuyerinfor(userDto, buyInfor, totalPrice)){
             paymentabstract paymentabstract=null;
-            userDto userDto=userService.sendUserDto();
             if(status.equals("paid")){
                 System.out.println("결제된 상품");
                 nomalPayment nomalPayment=new nomalPayment();
@@ -124,14 +117,25 @@ public class iamportService {
         }
         System.out.println("결제 검증실패");
         throw new failBuyException("결제 검증실패",(String)buyInfor.get("imp_uid"));
-    }   
+    } 
+    private boolean confrimBuyerinfor(userDto userDto,JSONObject buyerInfor,int totalPrice) {
+        if(totalPrice!=(int)buyerInfor.get("amount")){
+            System.out.println("총액이 맞지않음");
+        }else if(!userDto.getEmail().equals((String)buyerInfor.get("buyer_email"))){
+            System.out.println("이메일이 일치하지않음");
+        }else if(!userDto.getName().equals((String)buyerInfor.get("buyer_name"))){
+            System.out.println("이름이 일치하지않음");
+        }else{
+            return true;
+        }
+        return false;
+    }  
     private String unixtimeToString(long unixTime) {
         System.out.println("unixtimeToString");
         Date date = new Date(unixTime*1000L); 
         SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); 
         sdf.setTimeZone(TimeZone.getTimeZone("GMT+9")); 
-        String formattedDate = sdf.format(date);
-        return formattedDate;
+        return sdf.format(date);
     } 
     private void selectPayCompany(JSONObject buyInfor,nomalPayment nomalPayment) {
         System.out.println("selectPayCompany");

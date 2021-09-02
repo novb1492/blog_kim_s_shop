@@ -12,7 +12,6 @@ import javax.validation.Valid;
 
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
-import com.example.blog_kim_s_token.config.principaldetail;
 import com.example.blog_kim_s_token.model.article.articleDto;
 import com.example.blog_kim_s_token.model.article.getArticleDto;
 import com.example.blog_kim_s_token.model.article.insertArticleDto;
@@ -31,7 +30,6 @@ import com.example.blog_kim_s_token.model.user.userDto;
 import com.example.blog_kim_s_token.service.boardService;
 import com.example.blog_kim_s_token.service.priceService;
 import com.example.blog_kim_s_token.service.userService;
-import com.example.blog_kim_s_token.service.utillService;
 import com.example.blog_kim_s_token.service.ApiServies.kakao.kakaoLoginservice;
 import com.example.blog_kim_s_token.service.ApiServies.naver.naverLoginService;
 import com.example.blog_kim_s_token.service.confrim.confrimService;
@@ -40,7 +38,6 @@ import com.example.blog_kim_s_token.service.payment.paymentService;
 import com.example.blog_kim_s_token.service.reservation.resevationService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -186,7 +183,7 @@ public class restcontroller {
     @PostMapping("/auth/payment")
     public void bootPay(@RequestBody JSONObject jsonObject,HttpServletResponse response) {
         System.out.println("payment");
-        System.out.println(jsonObject+" payment");  
+        paymentService.vbankOk(jsonObject);
     }
     @PostMapping("/api/cancleReservation")
     public JSONObject cancleReservation(@RequestBody JSONObject jsonObject,HttpServletRequest request,HttpServletResponse response) {

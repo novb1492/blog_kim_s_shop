@@ -28,7 +28,7 @@ public class paidDto {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "paymentId",nullable = false)
+    @Column(name = "paymentId",nullable = false,unique = true)
     private String paymentId;
 
     @Column(name = "email",nullable = false)
