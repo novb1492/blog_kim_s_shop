@@ -15,21 +15,18 @@ public class scanVbank implements Tasklet,StepExecutionListener  {
     
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-       System.out.println("hello dsd");
+       System.out.println("hello execute");
         return RepeatStatus.FINISHED;
     }
 
     @Override
     public void beforeStep(StepExecution stepExecution) {
-    System.out.println("hello dsd") ;  
-        for(int i=1;i<9;i++){
-            System.out.println(i);
-        }     
+        System.out.println("hello beforeStep") ; 
     }
 
     @Override
     public ExitStatus afterStep(StepExecution stepExecution) {
-            System.out.println("hello dsd") ;       
+            System.out.println("hello afterStep") ;       
             return null;
     }
     

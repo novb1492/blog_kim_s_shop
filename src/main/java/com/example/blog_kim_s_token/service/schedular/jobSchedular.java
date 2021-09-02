@@ -1,12 +1,9 @@
 package com.example.blog_kim_s_token.service.schedular;
 
-import java.time.LocalDate;
-import java.util.Date;
-import java.util.UUID;
 
+
+import java.time.LocalDateTime;
 import com.example.blog_kim_s_token.config.vbankConfig;
-
-import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
@@ -21,12 +18,12 @@ public class jobSchedular {
     @Autowired
     private vbankConfig vbankConfig;
 
-    @Scheduled(fixedDelay = 1000) // scheduler 끝나는 시간 기준으로 1000 간격으로 실행
-    public void scheduleFixedDelayTask() {
+    @Scheduled(fixedDelay = 1000*3) // scheduler 끝나는 시간 기준으로 1000 간격으로 실행
+    public void deletevbank() {
+        System.out.println("deletevbank");
         try {
-            JobParameters aaa=new JobParametersBuilder().addString("key",UUID.randomUUID().toString()).toJobParameters();
-      
-            jobLauncher.run(vbankConfig.job(),aaa);
+            JobParameters JobParameters=new JobParametersBuilder().addString("key","vbank"+LocalDateTime.now().toString()).toJobParameters();
+            jobLauncher.run(vbankConfig.job(),JobParameters);
 
         } catch (Exception e) {
 
