@@ -19,7 +19,6 @@ import com.example.blog_kim_s_token.model.reservation.*;
 import com.example.blog_kim_s_token.model.reservation.getDateDto;
 import com.example.blog_kim_s_token.model.reservation.getTimeDto;
 import com.example.blog_kim_s_token.model.reservation.reservationInsertDto;
-import com.example.blog_kim_s_token.model.user.userDto;
 import com.example.blog_kim_s_token.service.priceService;
 import com.example.blog_kim_s_token.service.userService;
 import com.example.blog_kim_s_token.service.utillService;
@@ -54,10 +53,7 @@ public class resevationService {
     @Autowired
     private iamportService iamportService;
   
- 
 
-    @Autowired
-    private userService userService;
     @Autowired
     private reservationDao reservationDao;
     @Autowired
@@ -155,19 +151,12 @@ public class resevationService {
             Collections.sort(reservationInsertDto.getTimes());
             List<Integer>times=reservationInsertDto.getTimes();
             int totalPrice=priceService.getTotalPrice(reservationInsertDto.getSeat(),times.size());
-            confrimInsert(reservationInsertDto);
-            paymentabstract paymentabstract=iamportService.confrimPayment(reservationInsertDto.getPaymentId(), totalPrice,"reservation");
+            paymentabstract paymentabstract=iamportService.confrimPayment(reservationInsertDto.getPaymentId(), totalPrice,kind);
             reservationInsertDto.setStatus(paymentabstract.getStatus());
             reservationInsertDto.setUsedKind(paymentabstract.getUsedKind());
             reservationInsertDto.setEmail(paymentabstract.getEmail());
             reservationInsertDto.setName(paymentabstract.getName());
-            System.out.println(reservationInsertDto.getStatus()+" ready라면 가상계좌");
-            if(reservationInsertDto.getStatus().equals("ready")){
-                reservationEnums enums=checkVankTime(reservationInsertDto);
-                if(enums.getBool()){
-                    throw new Exception(enums.getMessege());
-                }
-            }
+            confrimInsert(reservationInsertDto);
             insertReservation(reservationInsertDto);
         
             return utillService.makeJson(true, "예약이 완료되었습니다");
@@ -201,58 +190,48 @@ public class resevationService {
         } catch (Exception e) {
            e.printStackTrace();
            System.out.println("insertReservation error");
-           throw new failBuyException("예약 저장 실패",reservationInsertDto.getPaymentId());
+           throw new RuntimeException("예약 저장 실패");
         }
     }
     private void confrimInsert(reservationInsertDto reservationInsertDto){
         System.out.println("confrimInsert");
-        try {
-            String paymentID=reservationInsertDto.getPaymentId();
             List<mainReservationDto>array=reservationDao.findByEmailNative(reservationInsertDto.getEmail(),reservationInsertDto.getSeat());
             System.out.println(array.toString()+" 내역들");
             if(reservationInsertDto.getTimes().size()<=0){
                 System.out.println("몇시간 쓸지 선택 되지 않음");
-                throw new failBuyException("시간을 선택하지 않았습니다",paymentID);
+                throw new RuntimeException("시간을 선택하지 않았습니다");
             }
             if(array!=null){
+                List<Integer>times=reservationInsertDto.getTimes();
                 System.out.println("show");
                 for(mainReservationDto m:array){
-                    for(int i=0;i<reservationInsertDto.getTimes().size();i++){
-                        int hour=reservationInsertDto.getTimes().get(i);
-                        String date=reservationInsertDto.getYear()+"-"+reservationInsertDto.getMonth()+"-"+reservationInsertDto.getDate()+" "+hour+":00:00";
+                    for(int i:times){
+                        String date=reservationInsertDto.getYear()+"-"+reservationInsertDto.getMonth()+"-"+reservationInsertDto.getDate()+" "+i+":00:00";
                         Timestamp DateAndTime=Timestamp.valueOf(date);
                         System.out.println(DateAndTime+" show");
                         if(m.getDateAndTime().equals(DateAndTime)||utillService.compareDate(DateAndTime, LocalDateTime.now())){
                             System.out.println("이미 예약한 시간 발견or지난 날짜 예약시도");
-                            throw new failBuyException("이미 예약한 시간 발견 이거나 지난 날짜 예약시도입니다 "+date,paymentID);
+                            throw new RuntimeException("이미 예약한 시간 발견 이거나 지난 날짜 예약시도입니다 "+date);
                         }else if(getCountAlreadyInTime(DateAndTime,reservationInsertDto.getSeat())==maxPeopleOfTime){
                             System.out.println("예약이 다찬 시간입니다");
-                            throw new failBuyException("예약이 가득찬 시간입니다 "+date,paymentID);
-                        }else if(hour<openTime||hour>closeTime){
+                            throw new RuntimeException("예약이 가득찬 시간입니다 "+date);
+                        }else if(i<openTime||i>closeTime){
                             System.out.println("영업 시간외 예약시도");
-                            throw new failBuyException("영업 시간외 예약시도 입니다",paymentID);
+                            throw new RuntimeException("영업 시간외 예약시도 입니다");
                         }
                     }
                 }
             }
-        } catch (Exception e) {
-               e.printStackTrace();
-               throw new failBuyException(e.getMessage(), reservationInsertDto.getPaymentId());
-        }
-    }
-    private reservationEnums checkVankTime(reservationInsertDto reservationInsertDto) {
-        System.out.println("checkVankTime");
-
-        if(utillService.compareDate(Timestamp.valueOf(reservationInsertDto.getYear()+"-"+reservationInsertDto.getMonth()+"-"+reservationInsertDto.getDate()+" "+reservationInsertDto.getTimes().get(0)+":00:00"), LocalDateTime.now())==false){
-            LocalDateTime shortestTime=Timestamp.valueOf(reservationInsertDto.getYear()+"-"+reservationInsertDto.getMonth()+"-"+reservationInsertDto.getDate()+" "+reservationInsertDto.getTimes().get(0)+":00:00").toLocalDateTime();
-            if(LocalDateTime.now().plusHours(minusHour).isAfter(shortestTime)){
-                System.out.println("가상 계좌 제한시간은 최대 "+minusHour+"시간입니다");
-                System.out.println(LocalDateTime.now().plusHours(minusHour)+" "+shortestTime+"시간");
-                reservationEnums.yes.setMessete("가상 계좌 제한시간은 최대 "+minusHour+"시간입니다");
-                return reservationEnums.yes;
+            if(reservationInsertDto.getStatus().equals("ready")){
+                System.out.println("가상계좌 시간 검증");
+                if(utillService.compareDate(Timestamp.valueOf(reservationInsertDto.getYear()+"-"+reservationInsertDto.getMonth()+"-"+reservationInsertDto.getDate()+" "+reservationInsertDto.getTimes().get(0)+":00:00"), LocalDateTime.now())==false){
+                    LocalDateTime shortestTime=Timestamp.valueOf(reservationInsertDto.getYear()+"-"+reservationInsertDto.getMonth()+"-"+reservationInsertDto.getDate()+" "+reservationInsertDto.getTimes().get(0)+":00:00").toLocalDateTime();
+                    if(LocalDateTime.now().plusHours(minusHour).isAfter(shortestTime)){
+                        System.out.println("가상 계좌 제한시간은 최대 "+minusHour+"시간입니다");
+                        throw new RuntimeException("가상 계좌 제한시간은 최대 "+minusHour+"시간입니다");
+                    }
+                }
             }
-        }
-        return reservationEnums.no;
     }
     public JSONObject getClientReservation(JSONObject JSONObject) {
         System.out.println("getClientReservation");

@@ -122,10 +122,15 @@ public class paymentService {
  
         }else{
             System.out.println("예약 일자가 "+period+"이상임");
-            expiredDate=LocalDateTime.now().plusDays(period).toString();
-            expiredDate=expiredDate.replace("T", " ");
+            expiredDate=getVbankDate();
         }
         System.out.println(expiredDate+" 최종");
+        return expiredDate;
+    }
+    private String getVbankDate() {
+        System.out.println("getVbankDate");
+        String expiredDate=LocalDateTime.now().plusDays(period).toString();
+        expiredDate=expiredDate.replace("T", " ");
         return expiredDate;
     }
 }
