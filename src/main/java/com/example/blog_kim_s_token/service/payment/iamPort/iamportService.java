@@ -99,30 +99,31 @@ public class iamportService {
                 nomalPayment nomalPayment=new nomalPayment();
                 selectPayCompany(buyInfor,nomalPayment);
                 nomalPayment.setPaymentid(paymentId);
-                nomalPayment.setPaymentid("paymentid");
+                nomalPayment.setKind(kind);
                 paymentService.insertPayment(nomalPayment, userDto, totalPrice);
                 paymentabstract=nomalPayment;
             }else if(status.equals("ready")){
                 System.out.println("가상계좌 요청 상품");
                 String bankName=(String)buyInfor.get("vbank_name");
                 String exprireDate=unixtimeToString(Long.parseLong(buyInfor.get("vbank_date").toString()));
+                String vbankCode=(String) buyInfor.get("vbank_code");
                 vbankPayment vbankPayment=new vbankPayment();
                 vbankPayment.setBank(bankName);
                 vbankPayment.setVbankNum((String)buyInfor.get("vbank_num"));
                 vbankPayment.setPaymentid(paymentId);
-                vbankPayment.setPayMethod("pay_method");
+                vbankPayment.setPayMethod((String)buyInfor.get("pay_method"));
                 vbankPayment.setStatus("ready");
                 vbankPayment.setKind(kind);
                 vbankPayment.setEndDate(exprireDate);
                 vbankPayment.setUsedKind(bankName);
-                vbankPayment.setBankCode((String)buyInfor.get("vbank_code"));
-                paymentService.insertPayment(vbankPayment, userDto, totalPrice);
+                vbankPayment.setBankCode(vbankCode);
                 HttpSession httpSession=request.getSession();
                 httpSession.setAttribute("merchantUid",buyInfor.get("merchant_uid"));
                 httpSession.setAttribute("vbankDue",buyInfor.get("vbank_date"));
-                httpSession.setAttribute("bankCode",buyInfor.get("vbank_code"));
+                httpSession.setAttribute("bankCode",vbankCode);
                 httpSession.setAttribute("vbankHolder",buyInfor.get("vbank_holder"));
                 httpSession.setAttribute("amount",buyInfor.get("amount"));
+                paymentService.insertPayment(vbankPayment, userDto, totalPrice);
                 paymentabstract=vbankPayment;
             }
             paymentabstract.setEmail(userDto.getEmail());
