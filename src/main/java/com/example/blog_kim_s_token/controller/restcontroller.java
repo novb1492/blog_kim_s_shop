@@ -8,6 +8,7 @@ import java.util.List;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 import com.auth0.jwt.exceptions.JWTDecodeException;
@@ -161,9 +162,9 @@ public class restcontroller {
         return resevationService.getTimeByDate(getTimeDto);
     }
     @PostMapping("/api/insertReservation")
-    public JSONObject insertReservation(@Valid @RequestBody reservationInsertDto reservationInsertDto,HttpServletResponse response){
+    public JSONObject insertReservation(@Valid @RequestBody reservationInsertDto reservationInsertDto,HttpServletRequest request,HttpServletResponse response){
         System.out.println("insertReservation");
-       return resevationService.confrimContents(reservationInsertDto);
+       return resevationService.confrimContents(reservationInsertDto,request);
     }
     @PostMapping("/api/getPrice")
     public JSONObject getPrice(@Valid@RequestBody getPriceDto getPriceDto,HttpServletResponse response) {

@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import com.example.blog_kim_s_token.customException.failBuyException;
 import com.example.blog_kim_s_token.enums.reservationEnums;
 import com.example.blog_kim_s_token.model.payment.vBankDto;
@@ -145,13 +147,13 @@ public class resevationService {
         return reservationDao.findByTime(timestamp,seat);
     }
     @Transactional(rollbackFor = Exception.class)
-    public JSONObject confrimContents(reservationInsertDto reservationInsertDto) {
+    public JSONObject confrimContents(reservationInsertDto reservationInsertDto,HttpServletRequest request) {
         System.out.println("confrimContents");
         try {
             Collections.sort(reservationInsertDto.getTimes());
             List<Integer>times=reservationInsertDto.getTimes();
             int totalPrice=priceService.getTotalPrice(reservationInsertDto.getSeat(),times.size());
-            paymentabstract paymentabstract=iamportService.confrimPayment(reservationInsertDto.getPaymentId(), totalPrice,kind);
+            paymentabstract paymentabstract=iamportService.confrimPayment(reservationInsertDto.getPaymentId(), totalPrice,kind,request);
             reservationInsertDto.setStatus(paymentabstract.getStatus());
             reservationInsertDto.setUsedKind(paymentabstract.getUsedKind());
             reservationInsertDto.setEmail(paymentabstract.getEmail());
@@ -163,7 +165,7 @@ public class resevationService {
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("confrimContents error");
-            throw new failBuyException(e.getMessage(), reservationInsertDto.getPaymentId());
+            throw new failBuyException(e.getMessage(), reservationInsertDto.getPaymentId(),null);
         }
        
     }
@@ -185,6 +187,7 @@ public class resevationService {
                                         .usedPayKind(reservationInsertDto.getUsedKind())
                                         .build();
                                         reservationDao.save(dto);
+                                        throw new Exception("test");
             }
         } catch (Exception e) {
            e.printStackTrace();

@@ -38,26 +38,4 @@ public class vbankConfig {
           .build();
     }
 
-    /*@Bean
-    protected Step processLines() {
-        return stepBuilderFactory
-          .get("processLines")
-          .tasklet(linesProcessor())
-          .build();
-    }
-
-    @Bean
-    protected Step writeLines() {
-        return stepBuilderFactory
-          .get("writeLines")
-          .tasklet(linesWriter())
-          .build();
-    }*/
-   
-    
-   
-
-
-
-
 }

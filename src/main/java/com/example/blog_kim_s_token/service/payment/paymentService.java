@@ -199,7 +199,7 @@ public class paymentService {
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("vbankOk error"+e.getMessage());
-            throw new failBuyException(e.getMessage(),(String) jsonObject.get("imp_uid"));
+            throw new RuntimeException(e.getMessage());
         }
         
     }

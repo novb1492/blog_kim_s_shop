@@ -6,6 +6,7 @@ import java.util.List;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
@@ -88,10 +89,18 @@ public class errorRestController {
         return utillService.makeJson(false, exception.getMessage());
     }
     @ExceptionHandler(failBuyException.class)
-    public JSONObject failBuyException(failBuyException exception) {
+    public JSONObject failBuyException(failBuyException exception,HttpSession httpSession,HttpServletRequest request) {
         System.out.println("failBuyException 환불시작");
         try {
-            iamportService.cancleBuy(exception.getPayMentId(),0);
+            if(iamportService.cancleBuy(exception.getpaymentid(),0)==false){
+                JSONObject jsonObject=new JSONObject();
+                jsonObject.put("merchant_uid", httpSession.getAttribute("merchantUid"));
+                jsonObject.put("vbank_due",  httpSession.getAttribute("vbankDue"));
+                jsonObject.put("vbank_code",  httpSession.getAttribute("bank"));
+                jsonObject.put("vbank_holder",  httpSession.getAttribute("vbankHolder"));
+                jsonObject.put("amount",  httpSession.getAttribute("amount"));
+                iamportService.cancleVbank(exception.getpaymentid(),jsonObject);
+            }
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println(e.getMessage());

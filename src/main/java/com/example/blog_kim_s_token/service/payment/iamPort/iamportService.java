@@ -8,7 +8,11 @@ package com.example.blog_kim_s_token.service.payment.iamPort;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
-import com.example.blog_kim_s_token.customException.failBuyException;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import com.example.blog_kim_s_token.customException.setBuyerExeption;
 import com.example.blog_kim_s_token.model.iamport.buyInforDto;
 import com.example.blog_kim_s_token.model.iamport.impTokenDto;
 import com.example.blog_kim_s_token.model.user.userDto;
@@ -40,9 +44,9 @@ public class iamportService {
     private userService userService;
 
 
-    public paymentabstract confrimPayment(String impId,int totalPrice,String kind) {
+    public paymentabstract confrimPayment(String impId,int totalPrice,String kind,HttpServletRequest request) {
         System.out.println("confrimPayment");
-        return confrimBuy(getBuyInfor(impId),totalPrice,kind);
+        return confrimBuy(getBuyInfor(impId),totalPrice,kind,request);
     }
     private String getToken() {
         System.out.println("getToken");
@@ -63,7 +67,7 @@ public class iamportService {
             body.clear();
         }
     }
-    private JSONObject getBuyInfor(String impId){
+    public JSONObject getBuyInfor(String impId){
         System.out.println("getBuyInfor");
         String token=getToken();
         headers.add("Authorization", token);
@@ -81,9 +85,10 @@ public class iamportService {
             body.clear();
         }
     }
-    private paymentabstract confrimBuy(JSONObject buyInfor,int totalPrice,String kind) {
+    private paymentabstract confrimBuy(JSONObject buyInfor,int totalPrice,String kind,HttpServletRequest request) {
         System.out.println("confrimBuy");
         String status=(String) buyInfor.get("status");
+        String paymentId=(String)buyInfor.get("imp_uid");
         System.out.println(buyInfor.get("amount")+"결제총량"+totalPrice+" 결제되어야 하는 금액"+ status+" 결제상태");
         userDto userDto=userService.sendUserDto();
         if(confrimBuyerinfor(userDto, buyInfor, totalPrice)){
@@ -92,23 +97,30 @@ public class iamportService {
                 System.out.println("결제된 상품");
                 nomalPayment nomalPayment=new nomalPayment();
                 selectPayCompany(buyInfor,nomalPayment);
-                nomalPayment.setPaymentid((String)buyInfor.get("imp_uid"));
+                nomalPayment.setPaymentid(paymentId);
                 nomalPayment.setPaymentid("paymentid");
-                nomalPayment.setKind(kind);
                 paymentService.insertPayment(nomalPayment, userDto, totalPrice);
                 paymentabstract=nomalPayment;
             }else if(status.equals("ready")){
                 System.out.println("가상계좌 요청 상품");
+                String bankName=(String)buyInfor.get("vbank_name");
+                String exprireDate=unixtimeToString(Long.parseLong(buyInfor.get("vbank_date").toString()));
                 vbankPayment vbankPayment=new vbankPayment();
-                vbankPayment.setBank((String)buyInfor.get("vbank_name"));
+                vbankPayment.setBank(bankName);
                 vbankPayment.setVbankNum((String)buyInfor.get("vbank_num"));
-                vbankPayment.setPaymentid((String)buyInfor.get("imp_uid"));
+                vbankPayment.setPaymentid(paymentId);
                 vbankPayment.setPayMethod("pay_method");
                 vbankPayment.setStatus("ready");
                 vbankPayment.setKind(kind);
-                vbankPayment.setEndDate(unixtimeToString(Long.parseLong(buyInfor.get("vbank_date").toString())));
-                vbankPayment.setUsedKind((String)buyInfor.get("vbank_name"));
+                vbankPayment.setEndDate(exprireDate);
+                vbankPayment.setUsedKind(bankName);
                 paymentService.insertPayment(vbankPayment, userDto, totalPrice);
+                HttpSession httpSession=request.getSession();
+                httpSession.setAttribute("merchantUid", (String)buyInfor.get("merchant_uid"));
+                httpSession.setAttribute("vbankDue",buyInfor.get("vbank_date"));
+                httpSession.setAttribute("bank", (String)buyInfor.get("vbank_code"));
+                httpSession.setAttribute("vbankHolder", (String)buyInfor.get("vbank_holder"));
+                httpSession.setAttribute("amount", (int)buyInfor.get("amount"));
                 paymentabstract=vbankPayment;
             }
             paymentabstract.setEmail(userDto.getEmail());
@@ -116,7 +128,7 @@ public class iamportService {
             return paymentabstract;
         }
         System.out.println("결제 검증실패");
-        throw new failBuyException("결제 검증실패",(String)buyInfor.get("imp_uid"));
+        throw new setBuyerExeption("결제검증 실패", buyInfor);
     } 
     private boolean confrimBuyerinfor(userDto userDto,JSONObject buyerInfor,int totalPrice) {
         if(totalPrice!=(int)buyerInfor.get("amount")){
@@ -164,7 +176,10 @@ public class iamportService {
             }
             HttpEntity<JSONObject>entity=new HttpEntity<JSONObject>(body, headers);
             JSONObject respone= restTemplate.postForObject("https://api.iamport.kr/payments/cancel",entity,JSONObject.class);
-            System.out.println("아임포트 환불 성공"+respone);
+            if((int)respone.get("code")==1){
+                System.out.println(respone.get("message")+" 가상계좌 채번취소로 이동합니다");
+                return false;
+            }
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -177,11 +192,27 @@ public class iamportService {
         }
 
     }
-    public void cancleVbank(String paymentId) {
+    public void cancleVbank(String paymentid,JSONObject jsonObject) {
+        System.out.println("cancleVbank");
         try {
-            String token=getToken();  
+            String token=getToken();
+            headers.setContentType(MediaType.APPLICATION_JSON);  
+            headers.add("Authorization", token);
+            body.put("merchant_uid", jsonObject.get("merchant_uid"));
+            body.put("vbank_due", jsonObject.get("vbank_due"));
+            body.put("vbank_code",89);
+            body.put("vbank_holder", jsonObject.get("vbank_holder"));
+            body.put("amount", jsonObject.get("amount"));
+            HttpEntity<JSONObject>entity=new HttpEntity<JSONObject>(body,headers);
+            JSONObject respone= restTemplate.postForObject("https://api.iamport.kr/vbanks/"+paymentid,entity,JSONObject.class);
+            System.out.println(respone);
         } catch (Exception e) {
-            
+            e.printStackTrace();
+            System.out.println("cancleVbank error"+e.getMessage());
+            throw new RuntimeException("가상계좌 채번 취소에 실패했습니다");
+        }finally{
+            headers.clear();
+            body.clear();
         }
     
 
