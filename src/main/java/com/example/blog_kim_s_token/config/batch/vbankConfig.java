@@ -1,5 +1,6 @@
 package com.example.blog_kim_s_token.config.batch;
 
+
 import com.example.blog_kim_s_token.config.batch.tasks.scanVbank;
 import com.example.blog_kim_s_token.model.payment.vbankDao;
 

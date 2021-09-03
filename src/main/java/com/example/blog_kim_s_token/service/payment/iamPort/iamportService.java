@@ -12,7 +12,6 @@ import java.util.TimeZone;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import com.example.blog_kim_s_token.customException.setBuyerExeption;
 import com.example.blog_kim_s_token.model.iamport.buyInforDto;
 import com.example.blog_kim_s_token.model.iamport.impTokenDto;
 import com.example.blog_kim_s_token.model.user.userDto;
@@ -24,7 +23,9 @@ import com.nimbusds.jose.shaded.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -128,7 +129,7 @@ public class iamportService {
             return paymentabstract;
         }
         System.out.println("결제 검증실패");
-        throw new setBuyerExeption("결제검증 실패", buyInfor);
+        throw new RuntimeException("결제검증 실패");
     } 
     private boolean confrimBuyerinfor(userDto userDto,JSONObject buyerInfor,int totalPrice) {
         if(totalPrice!=(int)buyerInfor.get("amount")){
@@ -204,8 +205,9 @@ public class iamportService {
             body.put("vbank_holder", jsonObject.get("vbank_holder"));
             body.put("amount", jsonObject.get("amount"));
             HttpEntity<JSONObject>entity=new HttpEntity<JSONObject>(body,headers);
-            JSONObject respone= restTemplate.postForObject("https://api.iamport.kr/vbanks/"+paymentid,entity,JSONObject.class);
-            System.out.println(respone);
+            ResponseEntity<JSONObject> respone= restTemplate.exchange("https://api.iamport.kr/vbanks/"+paymentid,HttpMethod.DELETE,entity,JSONObject.class);
+            JSONObject jsonObject2=respone.getBody(); 
+            System.out.println(jsonObject2+" 결과");
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("cancleVbank error"+e.getMessage());
