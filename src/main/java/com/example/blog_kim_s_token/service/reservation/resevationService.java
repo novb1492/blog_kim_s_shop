@@ -176,7 +176,6 @@ public class resevationService {
                 mainReservationDto dto=mainReservationDto.builder()
                                         .email(reservationInsertDto.getEmail())
                                         .name(reservationInsertDto.getName())
-                                        .userid(reservationInsertDto.getUserId())
                                         .time(times.get(i))
                                         .seat(reservationInsertDto.getSeat())
                                         .paymentId(reservationInsertDto.getPaymentId())
@@ -186,7 +185,6 @@ public class resevationService {
                                         .usedPayKind(reservationInsertDto.getUsedKind())
                                         .build();
                                         reservationDao.save(dto);
-                                        throw new Exception();
             }
         } catch (Exception e) {
            e.printStackTrace();

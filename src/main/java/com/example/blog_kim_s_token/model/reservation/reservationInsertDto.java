@@ -29,7 +29,6 @@ public class reservationInsertDto {
 
     @NotBlank(message = "결제번호가 없습니다")
     private String paymentId;
-    private int userId;
     private String name;
     private String email;
     private String status;

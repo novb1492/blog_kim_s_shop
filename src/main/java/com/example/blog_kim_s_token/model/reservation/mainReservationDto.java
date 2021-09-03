@@ -31,9 +31,6 @@ public class mainReservationDto {
     @Column(name="seat",nullable = false)
     private String seat;
 
-    @Column(name = "userid",nullable = false)
-    private int userid;
-
     @Column(name = "email",nullable = false)
     private String email;
 
