@@ -115,13 +115,14 @@ public class iamportService {
                 vbankPayment.setKind(kind);
                 vbankPayment.setEndDate(exprireDate);
                 vbankPayment.setUsedKind(bankName);
+                vbankPayment.setBankCode((String)buyInfor.get("vbank_code"));
                 paymentService.insertPayment(vbankPayment, userDto, totalPrice);
                 HttpSession httpSession=request.getSession();
-                httpSession.setAttribute("merchantUid", (String)buyInfor.get("merchant_uid"));
+                httpSession.setAttribute("merchantUid",buyInfor.get("merchant_uid"));
                 httpSession.setAttribute("vbankDue",buyInfor.get("vbank_date"));
-                httpSession.setAttribute("bank", (String)buyInfor.get("vbank_code"));
-                httpSession.setAttribute("vbankHolder", (String)buyInfor.get("vbank_holder"));
-                httpSession.setAttribute("amount", (int)buyInfor.get("amount"));
+                httpSession.setAttribute("bankCode",buyInfor.get("vbank_code"));
+                httpSession.setAttribute("vbankHolder",buyInfor.get("vbank_holder"));
+                httpSession.setAttribute("amount",buyInfor.get("amount"));
                 paymentabstract=vbankPayment;
             }
             paymentabstract.setEmail(userDto.getEmail());
@@ -201,7 +202,7 @@ public class iamportService {
             headers.add("Authorization", token);
             body.put("merchant_uid", jsonObject.get("merchant_uid"));
             body.put("vbank_due", jsonObject.get("vbank_due"));
-            body.put("vbank_code",89);
+            body.put("vbank_code",jsonObject.get("vbank_code"));
             body.put("vbank_holder", jsonObject.get("vbank_holder"));
             body.put("amount", jsonObject.get("amount"));
             HttpEntity<JSONObject>entity=new HttpEntity<JSONObject>(body,headers);
