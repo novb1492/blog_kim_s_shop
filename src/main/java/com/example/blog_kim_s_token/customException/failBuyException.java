@@ -10,18 +10,11 @@ public class failBuyException extends DataAccessException {
 
 
     private String paymentid;
-    private JSONObject buyerInfor;
+
 
     public failBuyException(String msg,String paymentid,JSONObject buyerInfor) {
         super(msg);
         this.paymentid=paymentid;
-        this.buyerInfor=buyerInfor;
-    }
-    public void setBuyerInfor(JSONObject buyerInfor) {
-        this.buyerInfor=buyerInfor;
-    }
-    public JSONObject getBuyerInfor() {
-        return this.buyerInfor;
     }
     public String getpaymentid() {
         return this.paymentid;

@@ -6,7 +6,6 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 
-import com.example.blog_kim_s_token.customException.failBuyException;
 import com.example.blog_kim_s_token.enums.paymentEnums;
 import com.example.blog_kim_s_token.model.payment.getVankDateDto;
 import com.example.blog_kim_s_token.model.payment.paidDao;
