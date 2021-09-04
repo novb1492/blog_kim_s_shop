@@ -38,7 +38,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class resevationService {
 
     private final int openTime=9;
-    private final int closeTime=18;
+    private final int closeTime=22;
     private final int maxPeopleOfDay=60;
     private final int maxPeopleOfTime=6;
     private final int cantFlag=100;
@@ -186,6 +186,7 @@ public class resevationService {
                                         .usedPayKind(reservationInsertDto.getUsedKind())
                                         .build();
                                         reservationDao.save(dto);
+                                        throw new Exception("test");
                                 
             }
         } catch (Exception e) {

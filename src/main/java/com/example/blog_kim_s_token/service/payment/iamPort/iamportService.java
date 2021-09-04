@@ -94,12 +94,14 @@ public class iamportService {
         userDto userDto=userService.sendUserDto();
         if(confrimBuyerinfor(userDto, buyInfor, totalPrice)){
             paymentabstract paymentabstract=null;
+            HttpSession httpSession=request.getSession();
             if(status.equals("paid")){
                 System.out.println("결제된 상품");
                 nomalPayment nomalPayment=new nomalPayment();
                 selectPayCompany(buyInfor,nomalPayment);
                 nomalPayment.setPaymentid(paymentId);
                 nomalPayment.setKind(kind);
+                httpSession.setAttribute("kind","nomal");
                 paymentService.insertPayment(nomalPayment, userDto, totalPrice);
                 paymentabstract=nomalPayment;
             }else if(status.equals("ready")){
@@ -107,6 +109,7 @@ public class iamportService {
                 String bankName=(String)buyInfor.get("vbank_name");
                 String exprireDate=unixtimeToString(Long.parseLong(buyInfor.get("vbank_date").toString()));
                 String vbankCode=(String) buyInfor.get("vbank_code");
+                String vbankHolder=(String)buyInfor.get("vbank_holder");
                 vbankPayment vbankPayment=new vbankPayment();
                 vbankPayment.setBank(bankName);
                 vbankPayment.setVbankNum((String)buyInfor.get("vbank_num"));
@@ -117,12 +120,13 @@ public class iamportService {
                 vbankPayment.setEndDate(exprireDate);
                 vbankPayment.setUsedKind(bankName);
                 vbankPayment.setBankCode(vbankCode);
-                HttpSession httpSession=request.getSession();
+                vbankPayment.setPgName(vbankHolder);
                 httpSession.setAttribute("merchantUid",buyInfor.get("merchant_uid"));
                 httpSession.setAttribute("vbankDue",buyInfor.get("vbank_date"));
                 httpSession.setAttribute("bankCode",vbankCode);
-                httpSession.setAttribute("vbankHolder",buyInfor.get("vbank_holder"));
+                httpSession.setAttribute("vbankHolder",vbankHolder);
                 httpSession.setAttribute("amount",buyInfor.get("amount"));
+                httpSession.setAttribute("kind","vbank");
                 paymentService.insertPayment(vbankPayment, userDto, totalPrice);
                 paymentabstract=vbankPayment;
             }
@@ -168,7 +172,7 @@ public class iamportService {
         nomalPayment.setUsedKind(usedKind);
     }
 
-    public boolean cancleBuy(String impId,int zeorOrPrice) {
+    public void cancleBuy(String impId,int zeorOrPrice) {
         System.out.println("cancleBuy");
         try {
             String token=getToken();
@@ -179,11 +183,11 @@ public class iamportService {
             }
             HttpEntity<JSONObject>entity=new HttpEntity<JSONObject>(body, headers);
             JSONObject respone= restTemplate.postForObject("https://api.iamport.kr/payments/cancel",entity,JSONObject.class);
-            if((int)respone.get("code")==1){
-                System.out.println(respone.get("message")+" 가상계좌 채번취소로 이동합니다");
-                return false;
+            if((int)respone.get("code")==0){
+                System.out.println(respone.get("message")+" 취소성공");
+                return;
             }
-            return true;
+            System.out.println(respone.get("message")+" 취소실패");
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("cancleBuy가 실패 했습니다 직접 환불 바랍니다");

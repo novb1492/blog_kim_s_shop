@@ -15,4 +15,5 @@ public class vbankPayment extends paymentabstract {
     private String endDate; 
     private String payMethod;
     private String bankCode;
+    private String pgName;
 }

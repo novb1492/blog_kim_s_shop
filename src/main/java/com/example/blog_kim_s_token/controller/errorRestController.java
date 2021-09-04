@@ -92,7 +92,7 @@ public class errorRestController {
     public JSONObject failBuyException(failBuyException exception,HttpSession httpSession) {
         System.out.println("failBuyException 환불시작");
         try {
-            if(iamportService.cancleBuy(exception.getpaymentid(),0)==false){
+            if(httpSession.getAttribute("kind").equals("vbank")){
                 JSONObject jsonObject=new JSONObject();
                 jsonObject.put("merchant_uid", httpSession.getAttribute("merchantUid"));
                 jsonObject.put("vbank_due",  httpSession.getAttribute("vbankDue"));
@@ -101,6 +101,8 @@ public class errorRestController {
                 jsonObject.put("amount",  httpSession.getAttribute("amount"));
                 jsonObject.put("vbank_code",  httpSession.getAttribute("vbank_code"));
                 iamportService.cancleVbank(exception.getpaymentid(),jsonObject);
+            }else{
+                iamportService.cancleBuy(exception.getpaymentid(),0);
             }
         } catch (Exception e) {
             e.printStackTrace();

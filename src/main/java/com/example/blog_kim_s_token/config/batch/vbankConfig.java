@@ -4,6 +4,7 @@ package com.example.blog_kim_s_token.config.batch;
 import com.example.blog_kim_s_token.config.batch.tasks.scanVbank;
 import com.example.blog_kim_s_token.model.payment.vbankDao;
 
+
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
@@ -25,6 +26,7 @@ public class vbankConfig {
 
     @Autowired
     private vbankDao vbankDao;
+
     
     @Bean 
     public Job job(){ 

@@ -55,6 +55,9 @@ public class vBankDto {
     @Column(name = "bankNum",nullable = false)
     private String bankNum;
 
+    @Column(name = "pgName",nullable = false)
+    private String pgName;
+
     @Column(name = "endDate",nullable = false)
     private Timestamp endDate; 
 

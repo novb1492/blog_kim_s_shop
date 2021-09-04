@@ -94,6 +94,7 @@ public class paymentService {
                                     .kind(vbankPayment.getKind())
                                     .price(totalPrice)
                                     .bankCode(vbankPayment.getBankCode())
+                                    .pgName(vbankPayment.getPgName())
                                     .build();
                                     
                                     vbankDao.save(dto);
