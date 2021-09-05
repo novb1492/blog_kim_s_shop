@@ -313,7 +313,7 @@ public class resevationService {
     }
     private String[][] makeResponse(JSONObject jsonObject,List<mainReservationDto>dtoArray) {
         System.out.println("makeResponse");
-        String[][] array=new String[dtoArray.size()][8];
+        String[][] array=new String[dtoArray.size()][9];
             int temp=0;
             DateFormat dateFormat=new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
             for(mainReservationDto m:dtoArray){
@@ -321,22 +321,23 @@ public class resevationService {
                 array[temp][1]=m.getSeat();
                 array[temp][2]=dateFormat.format(m.getCreated());
                 array[temp][3]=dateFormat.format(m.getDateAndTime());
-                if(LocalDateTime.now().plusHours(limitedCancleHour).isAfter(m.getDateAndTime().toLocalDateTime())){
-                    System.out.println("현재시간이 사용시간 이후입니다");
-                    array[temp][4]=Integer.toString(cantFlag);
-                }
                 if(m.getStatus().equals("ready")){
                     vBankDto vBankDto=paymentService.selectVbankProduct(m.getPaymentId());
                     array[temp][4]="미입금";
                     array[temp][5]=vBankDto.getBank()+" "+vBankDto.getBankNum();
                     array[temp][6]=vBankDto.getEndDate().toString();
                     array[temp][7]=vBankDto.getPrice()+"";
+                    array[temp][8]=null;
                 }else{
                     paidDto paidDto=paymentService.selectPaidProduct(m.getPaymentId());
                     array[temp][4]="결제완료";
                     array[temp][5]=m.getUsedPayKind();
                     array[temp][6]=m.getCreated().toString();
                     array[temp][7]=paidDto.getTotalPrice()+"";
+                    if(LocalDateTime.now().plusHours(limitedCancleHour).isAfter(m.getDateAndTime().toLocalDateTime())){
+                        System.out.println("현재시간이 사용시간 이후입니다");
+                        array[temp][8]=Integer.toString(cantFlag);
+                    }
                 }
                 temp++;
             }
