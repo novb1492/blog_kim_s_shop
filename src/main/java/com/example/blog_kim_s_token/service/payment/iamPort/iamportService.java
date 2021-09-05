@@ -110,6 +110,8 @@ public class iamportService {
                 String exprireDate=unixtimeToString(Long.parseLong(buyInfor.get("vbank_date").toString()));
                 String vbankCode=(String) buyInfor.get("vbank_code");
                 String vbankHolder=(String)buyInfor.get("vbank_holder");
+                String unixTime=buyInfor.get("vbank_date").toString();
+                String merchantUid=(String)buyInfor.get("merchant_uid");
                 vbankPayment vbankPayment=new vbankPayment();
                 vbankPayment.setBank(bankName);
                 vbankPayment.setVbankNum((String)buyInfor.get("vbank_num"));
@@ -121,8 +123,10 @@ public class iamportService {
                 vbankPayment.setUsedKind(bankName);
                 vbankPayment.setBankCode(vbankCode);
                 vbankPayment.setPgName(vbankHolder);
-                httpSession.setAttribute("merchantUid",buyInfor.get("merchant_uid"));
-                httpSession.setAttribute("vbankDue",buyInfor.get("vbank_date"));
+                vbankPayment.setUnixTime(unixTime);
+                vbankPayment.setMerchantUid(merchantUid);
+                httpSession.setAttribute("merchantUid",merchantUid);
+                httpSession.setAttribute("vbankDue",unixTime);
                 httpSession.setAttribute("bankCode",vbankCode);
                 httpSession.setAttribute("vbankHolder",vbankHolder);
                 httpSession.setAttribute("amount",buyInfor.get("amount"));

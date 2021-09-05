@@ -373,6 +373,7 @@ public class resevationService {
                 }else if(dto.getStatus().equals("ready")){
                     System.out.println("미결제 상품 취소시도");
                     reservationDao.deleteReservationVbankproduct(dto.getId());
+
                 }
             }
           

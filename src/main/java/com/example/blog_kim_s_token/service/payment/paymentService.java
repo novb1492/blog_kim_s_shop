@@ -95,6 +95,8 @@ public class paymentService {
                                     .price(totalPrice)
                                     .bankCode(vbankPayment.getBankCode())
                                     .pgName(vbankPayment.getPgName())
+                                    .endDateUnixTime(vbankPayment.getUnixTime())
+                                    .merchant_uid(vbankPayment.getMerchantUid())
                                     .build();
                                     vbankDao.save(dto);
                                     System.out.println("vbnk테이블 저장 완료");

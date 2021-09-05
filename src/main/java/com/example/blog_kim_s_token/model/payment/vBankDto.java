@@ -58,6 +58,12 @@ public class vBankDto {
     @Column(name = "pgName",nullable = false)
     private String pgName;
 
+    @Column(name = "merchant_uid",nullable = false)
+    private String merchant_uid;
+
+    @Column(name = "endDateUnixTime",nullable = false)
+    private String endDateUnixTime;
+
     @Column(name = "endDate",nullable = false)
     private Timestamp endDate; 
 
