@@ -175,7 +175,28 @@ public class iamportService {
         nomalPayment.setStatus("paid");
         nomalPayment.setUsedKind(usedKind);
     }
+    public void updateVbank(String paymentid,int newAmount,String unixTime) {
+        System.out.println("updateVbank");
+        try {
+            String token=getToken();
+            headers.setContentType(MediaType.APPLICATION_JSON);  
+            headers.add("Authorization",token);
+            body.put("amount", newAmount);
+            body.put("vbank_due",Integer.parseInt(unixTime));
+            HttpEntity<JSONObject>entity=new HttpEntity<JSONObject>(body,headers);
+            ResponseEntity<JSONObject> respone= restTemplate.exchange("https://api.iamport.kr/vbanks/"+paymentid,HttpMethod.PUT,entity,JSONObject.class);
+            JSONObject jsonObject=respone.getBody();
+            System.out.println(jsonObject+" updateVbank");
 
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("updateVbank error"+ e.getMessage());
+            throw new RuntimeException("가상계좌 정보변경에 실패했습니다");
+        }finally{
+            headers.clear();
+            body.clear();
+        }
+    }
     public void cancleBuy(String impId,int zeorOrPrice) {
         System.out.println("cancleBuy");
         try {

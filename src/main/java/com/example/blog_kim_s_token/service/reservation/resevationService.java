@@ -372,8 +372,9 @@ public class resevationService {
                     iamportService.cancleBuy(paymentId, priceService.getTotalPrice(seat,1));
                 }else if(dto.getStatus().equals("ready")){
                     System.out.println("미결제 상품 취소시도");
+                    vBankDto vBankDto=paymentService.selectVbankProduct(paymentId);
                     reservationDao.deleteReservationVbankproduct(dto.getId());
-
+                    iamportService.updateVbank(paymentId, 100, vBankDto.getEndDateUnixTime());
                 }
             }
           
