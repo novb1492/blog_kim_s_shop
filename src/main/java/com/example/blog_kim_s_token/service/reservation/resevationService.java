@@ -11,13 +11,14 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 
 import com.example.blog_kim_s_token.customException.failBuyException;
 import com.example.blog_kim_s_token.enums.reservationEnums;
-import com.example.blog_kim_s_token.model.payment.paidDao;
 import com.example.blog_kim_s_token.model.payment.paidDto;
+import com.example.blog_kim_s_token.model.payment.tryDeleteInter;
 import com.example.blog_kim_s_token.model.payment.vBankDto;
 import com.example.blog_kim_s_token.model.reservation.*;
 import com.example.blog_kim_s_token.model.reservation.getDateDto;
@@ -355,7 +356,11 @@ public class resevationService {
             List<mainReservationDto>dtoArray=new ArrayList<>();
             for(int i=0;i<ridArray.size();i++){
                 System.out.println(ridArray.get(i)+" 취소예약시도 번호");
-                dtoArray.add(reservationDao.findById(Integer.parseInt(ridArray.get(i))).orElseThrow(()->new IllegalArgumentException("존재하지 않는 예약입니다")));
+                Optional<tryDeleteInter> tryDeleteInter=reservationDao.findBySeatJoin(Integer.parseInt(ridArray.get(i)));
+                tryDeleteInter.orElseThrow(()->new IllegalAccessError("존재하지 않는 예약입니다"));
+                tryDeleteInter tryDeleteInter2=tryDeleteInter.get();
+                dtoArray.add(new mainReservationDto().builder().id(tryDeleteInter2.getId()).paymentId(tryDeleteInter2.getPayment_id()).build());
+                System.out.println(tryDeleteInter2.getId()+" "+tryDeleteInter2.getPrice()+" "+tryDeleteInter2.getPayment_id()+" test");
             }
             for(mainReservationDto dto:dtoArray){
                 reservationEnums enums=confrimCancle(dto);
@@ -368,6 +373,8 @@ public class resevationService {
                 System.out.println(dto.toString()+" cancle");
                 if(dto.getStatus().equals("paid")){
                     System.out.println("결제된 상품 취소시도");
+                    paidDto paidDto=paymentService.selectPaidProduct(paymentId);
+
                     reservationDao.deleteReservationPaidproduct(dto.getId());
                     iamportService.cancleBuy(paymentId, priceService.getTotalPrice(seat,1));
                 }else if(dto.getStatus().equals("ready")){

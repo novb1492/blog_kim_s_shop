@@ -2,6 +2,9 @@ package com.example.blog_kim_s_token.model.reservation;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Optional;
+
+import com.example.blog_kim_s_token.model.payment.tryDeleteInter;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -41,6 +44,10 @@ public interface reservationDao extends JpaRepository<mainReservationDto,Integer
     @Transactional
     @Query(value = "delete a,b  from reservation  a inner join vbank  b  on a.payment_id=b.payment_id where a.id=? ",nativeQuery = true)
     void deleteReservationVbankproduct(int id);
+
+
+    @Query(value = "select a.*,b.price  from reservation  a inner join product  b  on a.seat=b.product_name where a.id=? ",nativeQuery = true)
+    Optional<tryDeleteInter> findBySeatJoin(int id);
 
 }
    

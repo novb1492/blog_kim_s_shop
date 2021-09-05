@@ -200,7 +200,12 @@ public class paymentService {
             e.printStackTrace();
             System.out.println("vbankOk error"+e.getMessage());
             throw new RuntimeException(e.getMessage());
-        }
+        } 
+    }
+    public void updatePaidProductForCancle(String paymentid) {
         
+    }
+    public int minusPrice(int totalPrice,int minusPrice) {
+        return totalPrice-minusPrice;
     }
 }
