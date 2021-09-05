@@ -131,6 +131,10 @@ public class iamportService {
                 httpSession.setAttribute("vbankHolder",vbankHolder);
                 httpSession.setAttribute("amount",buyInfor.get("amount"));
                 httpSession.setAttribute("kind","vbank");
+                if(!merchantUid.startsWith("vbank")){
+                    System.out.println("vbank로 시작하지 않고 위조"+merchantUid);
+                    throw new RuntimeException("결제검증 실패");
+                }
                 paymentService.insertPayment(vbankPayment, userDto, totalPrice);
                 paymentabstract=vbankPayment;
             }
