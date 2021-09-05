@@ -183,6 +183,35 @@ public class iamportService {
             }
             HttpEntity<JSONObject>entity=new HttpEntity<JSONObject>(body, headers);
             JSONObject respone= restTemplate.postForObject("https://api.iamport.kr/payments/cancel",entity,JSONObject.class);
+            System.out.println(respone+" canclebuy");
+            if((int)respone.get("code")==0){
+                System.out.println(respone.get("message")+" 취소성공");
+                return;
+            }
+            System.out.println(respone.get("message")+" 취소실패");
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("cancleBuy가 실패 했습니다 직접 환불 바랍니다");
+            throw new RuntimeException("환불에 실패 했습니다 다시시도 바랍니다");
+        }finally{
+            headers.clear();
+            body.clear();
+
+        }
+
+    }
+    public void cancleBuy( ) {
+        System.out.println("cancleBuy");
+        try {
+            String token=getToken();
+            headers.add("Authorization",token);
+            body.put("imp_uid", "imp_219204191044");
+            body.put("refund_holder", "(주）케이지이니시");
+            body.put("refund_account", "109924399414");
+            body.put("refund_bank", 32);
+            HttpEntity<JSONObject>entity=new HttpEntity<JSONObject>(body, headers);
+            JSONObject respone= restTemplate.postForObject("https://api.iamport.kr/payments/cancel",entity,JSONObject.class);
+            System.out.println(respone+" canclebuy");
             if((int)respone.get("code")==0){
                 System.out.println(respone.get("message")+" 취소성공");
                 return;

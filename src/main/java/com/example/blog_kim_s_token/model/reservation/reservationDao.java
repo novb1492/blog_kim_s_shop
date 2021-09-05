@@ -4,7 +4,9 @@ import java.sql.Timestamp;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 
 public interface reservationDao extends JpaRepository<mainReservationDto,Integer> {
     
@@ -29,5 +31,16 @@ public interface reservationDao extends JpaRepository<mainReservationDto,Integer
     int countByEmail(String email);
 
     List<mainReservationDto> findByPaymentId(String paymentId);
+
+    @Modifying
+    @Transactional
+    @Query(value = "delete a,b  from reservation  a inner join paidproduct  b  on a.payment_id=b.payment_id where a.id=? ",nativeQuery = true)
+    void deleteReservationPaidproduct(int id);
+
+    @Modifying
+    @Transactional
+    @Query(value = "delete a,b  from reservation  a inner join vbank  b  on a.payment_id=b.payment_id where a.id=? ",nativeQuery = true)
+    void deleteReservationVbankproduct(int id);
+
 }
    

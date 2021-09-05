@@ -365,9 +365,14 @@ public class resevationService {
                 }
                 String paymentId=dto.getPaymentId();
                 String seat=dto.getSeat();
-                reservationDao.delete(dto);
+                System.out.println(dto.toString()+" cancle");
                 if(dto.getStatus().equals("paid")){
-                    paymentService.cancleBuy(paymentId, priceService.getTotalPrice(seat,1));
+                    System.out.println("결제된 상품 취소시도");
+                    reservationDao.deleteReservationPaidproduct(dto.getId());
+                    iamportService.cancleBuy(paymentId, priceService.getTotalPrice(seat,1));
+                }else if(dto.getStatus().equals("ready")){
+                    System.out.println("미결제 상품 취소시도");
+                    reservationDao.deleteReservationVbankproduct(dto.getId());
                 }
             }
           
@@ -396,7 +401,7 @@ public class resevationService {
         System.out.println("readyTopaid");
         List<mainReservationDto>array=reservationDao.findByPaymentId(paymentId);
         for(mainReservationDto m:array){
-            m.setStatus("piad");
+            m.setStatus("paid");
         }
         System.out.println("예약테이블 paid로 변경완료");
     }
