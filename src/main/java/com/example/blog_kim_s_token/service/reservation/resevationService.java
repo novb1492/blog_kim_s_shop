@@ -65,6 +65,7 @@ public class resevationService {
     @Autowired
     private paymentService paymentService;
 
+
     public JSONObject getDateBySeat(getDateDto getDateDto) {
         System.out.println("getDateBySeat");
         try {
@@ -359,9 +360,9 @@ public class resevationService {
                 Optional<tryDeleteInter> tryDeleteInter=reservationDao.findBySeatJoin(Integer.parseInt(ridArray.get(i)));
                 tryDeleteInter.orElseThrow(()->new IllegalAccessError("존재하지 않는 예약입니다"));
                 tryDeleteInter tryDeleteInter2=tryDeleteInter.get();
-                dtoArray.add(new mainReservationDto().builder().id(tryDeleteInter2.getId()).paymentId(tryDeleteInter2.getPayment_id()).build());
-                System.out.println(tryDeleteInter2.getId()+" "+tryDeleteInter2.getPrice()+" "+tryDeleteInter2.getPayment_id()+" test");
+                dtoArray.add(new mainReservationDto().builder().seat(tryDeleteInter2.getSeat()).status(tryDeleteInter2.getStatus()).id(tryDeleteInter2.getId()).paymentId(tryDeleteInter2.getPayment_id()).dateAndTime(tryDeleteInter2.getDate_and_time()).email(tryDeleteInter2.getEmail()).build());
             }
+            System.out.println(dtoArray.get(0).toString()+" test");
             for(mainReservationDto dto:dtoArray){
                 reservationEnums enums=confrimCancle(dto);
                 if(enums.getBool()==false){
@@ -373,8 +374,6 @@ public class resevationService {
                 System.out.println(dto.toString()+" cancle");
                 if(dto.getStatus().equals("paid")){
                     System.out.println("결제된 상품 취소시도");
-                    paidDto paidDto=paymentService.selectPaidProduct(paymentId);
-
                     reservationDao.deleteReservationPaidproduct(dto.getId());
                     iamportService.cancleBuy(paymentId, priceService.getTotalPrice(seat,1));
                 }else if(dto.getStatus().equals("ready")){
