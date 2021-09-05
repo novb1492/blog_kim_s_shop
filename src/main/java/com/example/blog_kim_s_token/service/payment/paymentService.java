@@ -96,10 +96,8 @@ public class paymentService {
                                     .bankCode(vbankPayment.getBankCode())
                                     .pgName(vbankPayment.getPgName())
                                     .build();
-                                    
                                     vbankDao.save(dto);
                                     System.out.println("vbnk테이블 저장 완료");
-
     }
     public JSONObject  getVbankDate(getVankDateDto getVankDateDto) {
         System.out.println("getVbankDate");
@@ -132,10 +130,9 @@ public class paymentService {
     private String getVbankDate(long diffDays,int shortestTime,String requestDate) {
         System.out.println("getVbankDate");   
         String expiredDate=null;
-        int expiredTime=shortestTime-minusHour;
         if(diffDays<period){
             System.out.println(shortestTime+" 가장작은시간");
-            expiredDate=requestDate+" "+(expiredTime)+":00:00";
+            expiredDate=requestDate+" "+(shortestTime-minusHour)+":00:00";
             System.out.println(expiredDate+" 새로만든 기한");
             String[]temp=expiredDate.split(" ");
             String time=temp[1];

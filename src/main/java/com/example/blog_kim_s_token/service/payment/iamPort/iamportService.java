@@ -205,12 +205,7 @@ public class iamportService {
             String token=getToken();
             headers.setContentType(MediaType.APPLICATION_JSON);  
             headers.add("Authorization", token);
-            body.put("merchant_uid", jsonObject.get("merchant_uid"));
-            body.put("vbank_due", jsonObject.get("vbank_due"));
-            body.put("vbank_code",jsonObject.get("vbank_code"));
-            body.put("vbank_holder", jsonObject.get("vbank_holder"));
-            body.put("amount", jsonObject.get("amount"));
-            HttpEntity<JSONObject>entity=new HttpEntity<JSONObject>(body,headers);
+            HttpEntity<JSONObject>entity=new HttpEntity<JSONObject>(jsonObject,headers);
             ResponseEntity<JSONObject> respone= restTemplate.exchange("https://api.iamport.kr/vbanks/"+paymentid,HttpMethod.DELETE,entity,JSONObject.class);
             JSONObject jsonObject2=respone.getBody(); 
             System.out.println(jsonObject2+" 결과");
