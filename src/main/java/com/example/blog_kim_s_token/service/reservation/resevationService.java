@@ -16,6 +16,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.example.blog_kim_s_token.customException.failBuyException;
 import com.example.blog_kim_s_token.enums.reservationEnums;
+import com.example.blog_kim_s_token.model.payment.paidDao;
+import com.example.blog_kim_s_token.model.payment.paidDto;
 import com.example.blog_kim_s_token.model.payment.vBankDto;
 import com.example.blog_kim_s_token.model.reservation.*;
 import com.example.blog_kim_s_token.model.reservation.getDateDto;
@@ -159,8 +161,12 @@ public class resevationService {
             reservationInsertDto.setName(paymentabstract.getName());
             confrimInsert(reservationInsertDto);
             insertReservation(reservationInsertDto);
-        
-            return utillService.makeJson(true, "예약이 완료되었습니다");
+            
+            String messege="예약이 완료되었습니다";
+            if(reservationInsertDto.getStatus().equals("ready")){
+                messege=messege+" 발급된 가상계좌는 예약내역페이지를 확인해주세요";
+            }
+            return utillService.makeJson(true, messege);
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("confrimContents error");
@@ -307,7 +313,7 @@ public class resevationService {
     }
     private String[][] makeResponse(JSONObject jsonObject,List<mainReservationDto>dtoArray) {
         System.out.println("makeResponse");
-        String[][] array=new String[dtoArray.size()][7];
+        String[][] array=new String[dtoArray.size()][8];
             int temp=0;
             DateFormat dateFormat=new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
             for(mainReservationDto m:dtoArray){
@@ -324,10 +330,13 @@ public class resevationService {
                     array[temp][4]="미입금";
                     array[temp][5]=vBankDto.getBank()+" "+vBankDto.getBankNum();
                     array[temp][6]=vBankDto.getEndDate().toString();
+                    array[temp][7]=vBankDto.getPrice()+"";
                 }else{
+                    paidDto paidDto=paymentService.selectPaidProduct(m.getPaymentId());
                     array[temp][4]="결제완료";
                     array[temp][5]=m.getUsedPayKind();
                     array[temp][6]=m.getCreated().toString();
+                    array[temp][7]=paidDto.getTotalPrice()+"";
                 }
                 temp++;
             }
