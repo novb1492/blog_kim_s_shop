@@ -179,28 +179,6 @@ public class iamportService {
         nomalPayment.setStatus("paid");
         nomalPayment.setUsedKind(usedKind);
     }
-    public void updateVbank(String paymentid,int newAmount,String unixTime) {
-        System.out.println("updateVbank");
-        try {
-            String token=getToken();
-            headers.setContentType(MediaType.APPLICATION_JSON);  
-            headers.add("Authorization",token);
-            body.put("amount", newAmount);
-            body.put("vbank_due",Integer.parseInt(unixTime));
-            HttpEntity<JSONObject>entity=new HttpEntity<JSONObject>(body,headers);
-            ResponseEntity<JSONObject> respone= restTemplate.exchange("https://api.iamport.kr/vbanks/"+paymentid,HttpMethod.PUT,entity,JSONObject.class);
-            JSONObject jsonObject=respone.getBody();
-            System.out.println(jsonObject+" updateVbank");
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("updateVbank error"+ e.getMessage());
-            throw new RuntimeException("가상계좌 정보변경에 실패했습니다");
-        }finally{
-            headers.clear();
-            body.clear();
-        }
-    }
     public void cancleBuy(String impId,int zeorOrPrice) {
         System.out.println("cancleBuy");
         try {
@@ -234,10 +212,10 @@ public class iamportService {
         try {
             String token=getToken();
             headers.add("Authorization",token);
-            body.put("imp_uid", "imp_219204191044");
+            body.put("imp_uid", "imp_903346368256");
             body.put("refund_holder", "(주）케이지이니시");
-            body.put("refund_account", "109924399414");
-            body.put("refund_bank", 32);
+            body.put("refund_account", "70112003880422");
+            body.put("refund_bank", 89);
             HttpEntity<JSONObject>entity=new HttpEntity<JSONObject>(body, headers);
             JSONObject respone= restTemplate.postForObject("https://api.iamport.kr/payments/cancel",entity,JSONObject.class);
             System.out.println(respone+" canclebuy");

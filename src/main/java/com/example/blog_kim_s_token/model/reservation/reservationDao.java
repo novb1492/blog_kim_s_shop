@@ -32,9 +32,11 @@ public interface reservationDao extends JpaRepository<mainReservationDto,Integer
     @Query(value = "select a.*,b.price from reservation a inner join product b on a.seat=b.product_name where a.email=? order by a.id desc limit ?,?",nativeQuery = true)
     List<getClientInter> findByEmailTwoJoinOrderByIdDescNative(String email,int nowPage,int totalPage);
 
-    
-    @Query(value = "select *from reservation where email=? and r_date between ? and ? order by id desc limit ?,?",nativeQuery = true)
-    List<mainReservationDto>findByEmailOrderByIdBetweenDescNative(String email,Timestamp startDate,Timestamp endDate,int nowPage,int totalPage);
+    @Query(value = "select a.*,b.price,c.vbank_total_price,c.bank_num,c.bank,c.end_date from reservation a inner join product b on a.seat=b.product_name inner join vbank c on a.payment_id=c.payment_id where a.email=? and a.r_date between ? and ? order by a.id desc limit ?,?",nativeQuery = true)
+    List<getClientInter>findByEmailThreeJoinOrderByIdBetweenDescNative(String email,Timestamp startDate,Timestamp endDate,int nowPage,int totalPage);
+
+    @Query(value = "select a.*,b.price from reservation a inner join product b on a.seat=b.product_name where a.email=? and a.r_date between ? and ? order by a.id desc limit ?,?",nativeQuery = true)
+    List<getClientInter>findByEmailTwoJoinOrderByIdBetweenDescNative(String email,Timestamp startDate,Timestamp endDate,int nowPage,int totalPage);
 
     @Query(value = "select count(*) from reservation where email=? and r_date between ? and ?",nativeQuery = true)
     int countByEmailNative(String email,Timestamp startDate,Timestamp endDate);
@@ -45,8 +47,8 @@ public interface reservationDao extends JpaRepository<mainReservationDto,Integer
 
     @Modifying
     @Transactional
-    @Query(value = "delete a,b  from reservation  a inner join paidproduct  b  on a.payment_id=b.payment_id where a.id=? ",nativeQuery = true)
-    void deleteReservationPaidproduct(int id);
+    @Query(value = "delete a,b  from reservation  a inner join paidproduct  b  on a.payment_id=b.payment_id where a.payment_id=?",nativeQuery = true)
+    void deleteReservationPaidproduct(String paymentid);
 
     @Modifying
     @Transactional

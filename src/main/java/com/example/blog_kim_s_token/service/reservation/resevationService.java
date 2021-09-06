@@ -312,7 +312,11 @@ public class resevationService {
                 }
             }else{
                 fisrt=utillService.getFirst(nowPage, pagingNum);
-               // dtoArray=reservationDao.findByEmailOrderByIdBetweenDescNative(email,Timestamp.valueOf(startDate+" "+"00:00:00"),Timestamp.valueOf(endDate+" 00:00:00"),fisrt-1,utillService.getEnd(fisrt, pagingNum)-fisrt+1);
+                dtoArray=reservationDao.findByEmailThreeJoinOrderByIdBetweenDescNative(email,Timestamp.valueOf(startDate+" "+"00:00:00"),Timestamp.valueOf(endDate+" 00:00:00"),fisrt-1,utillService.getEnd(fisrt, pagingNum)-fisrt+1);
+                if(dtoArray.isEmpty()){
+                    System.out.println("dto가 비워있습니다");
+                    dtoArray=reservationDao.findByEmailTwoJoinOrderByIdBetweenDescNative(email,Timestamp.valueOf(startDate+" "+"00:00:00"),Timestamp.valueOf(endDate+" 00:00:00"),fisrt-1,utillService.getEnd(fisrt, pagingNum)-fisrt+1);
+                }
             }
         respone.put("totalPage", totalPage);
         return dtoArray;
@@ -385,13 +389,11 @@ public class resevationService {
                 System.out.println(dto.toString()+" cancle");
                 if(dto.getStatus().equals("paid")){
                     System.out.println("결제된 상품 취소시도");
-                    reservationDao.deleteReservationPaidproduct(dto.getId());
-                    iamportService.cancleBuy(paymentId, priceService.getTotalPrice(seat,1));
+                    reservationDao.deleteReservationPaidproduct(paymentId);
+                    //iamportService.cancleBuy(paymentId, priceService.getTotalPrice(seat,1));
                 }else if(dto.getStatus().equals("ready")){
                     System.out.println("미결제 상품 취소시도");
-                    vBankDto vBankDto=paymentService.selectVbankProduct(paymentId);
                     reservationDao.deleteReservationVbankproduct(dto.getId());
-                    iamportService.updateVbank(paymentId, 100, vBankDto.getEndDateUnixTime());
                 }
             }
           

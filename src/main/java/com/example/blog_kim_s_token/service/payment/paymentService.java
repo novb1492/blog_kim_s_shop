@@ -187,7 +187,7 @@ public class paymentService {
             nomalPayment nomalPayment=new nomalPayment();
             nomalPayment.setEmail(vBankDto.getEmail());
             nomalPayment.setName(vBankDto.getName());
-            nomalPayment.setUsedKind(vBankDto.getBank()+" "+vBankDto.getBankNum());
+            nomalPayment.setUsedKind(vBankDto.getBank()+" "+vBankDto.getBankNum()+" "+vBankDto.getPgName()+" "+vBankDto.getBankCode());
             nomalPayment.setPayMethod("vbank");
             nomalPayment.setKind(vBankDto.getKind());
             nomalPayment.setPaymentid(vBankDto.getPaymentId());
