@@ -368,7 +368,7 @@ public class resevationService {
             for(int i=0;i<ridArray.size();i++){
                 System.out.println(ridArray.get(i)+" 취소예약시도 번호");
                 Optional<tryDeleteInter> tryDeleteInter=reservationDao.findBySeatJoin(Integer.parseInt(ridArray.get(i)));
-                tryDeleteInter.orElseThrow(()->new IllegalAccessError("존재하지 않는 예약입니다"));
+                tryDeleteInter.orElseThrow(()->new IllegalAccessError("존재하지 않는 예약이 발갼되었습니다"));
                 tryDeleteInter tryDeleteInter2=tryDeleteInter.get();
                 dtoArray.add(new mainReservationDto().builder().seat(tryDeleteInter2.getSeat()).status(tryDeleteInter2.getStatus()).id(tryDeleteInter2.getId()).paymentId(tryDeleteInter2.getPayment_id()).dateAndTime(tryDeleteInter2.getDate_and_time()).email(tryDeleteInter2.getEmail()).build());
             }

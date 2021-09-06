@@ -10,9 +10,5 @@ public interface getClientInter {
     String getStatus();
     String getPayment_id();
     String getUsed_pay_kind();
-    String getBank();
-    String getBank_num();
-    Timestamp getEnd_date();
-    int getVbank_total_price(); 
     int getPrice(); 
 }
