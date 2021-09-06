@@ -306,6 +306,10 @@ public class resevationService {
             if(startDate.isEmpty()&&endDate.isEmpty()){
                 fisrt=utillService.getFirst(nowPage, pagingNum);
                 dtoArray=reservationDao.findByEmailJoinOrderByIdDescNative(email, fisrt-1,utillService.getEnd(fisrt, pagingNum)-fisrt+1);//reservationDao.findByEmailOrderByIdDescNative(email,fisrt-1,utillService.getEnd(fisrt, pagingNum)-fisrt+1);
+                if(dtoArray.isEmpty()){
+                    System.out.println("dto가 비워있습니다");
+                    dtoArray=reservationDao.findByEmailTwoJoinOrderByIdDescNative(email, fisrt-1, utillService.getEnd(fisrt, pagingNum)-fisrt+1);
+                }
             }else{
                 fisrt=utillService.getFirst(nowPage, pagingNum);
                // dtoArray=reservationDao.findByEmailOrderByIdBetweenDescNative(email,Timestamp.valueOf(startDate+" "+"00:00:00"),Timestamp.valueOf(endDate+" 00:00:00"),fisrt-1,utillService.getEnd(fisrt, pagingNum)-fisrt+1);
@@ -327,6 +331,7 @@ public class resevationService {
             int temp=0;
             DateFormat dateFormat=new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
             for(getClientInter m:dtoArray){
+               
                 array[temp][0]=Integer.toString(m.getId());
                 array[temp][1]=m.getSeat();
                 array[temp][2]=dateFormat.format(m.getCreated());
@@ -335,14 +340,13 @@ public class resevationService {
                     array[temp][4]="미입금";
                     array[temp][5]=m.getBank()+" "+m.getBank_num();
                     array[temp][6]=m.getEnd_date().toString();
-                    array[temp][7]=m.getPrice()+"";
+                    array[temp][7]=m.getVbank_total_price()+"";
                     array[temp][8]=null;
                 }else{
-                    paidDto paidDto=paymentService.selectPaidProduct(m.getPayment_id());
                     array[temp][4]="결제완료";
                     array[temp][5]=m.getUsed_pay_kind();
                     array[temp][6]=m.getCreated().toString();
-                    array[temp][7]=paidDto.getTotalPrice()+"";
+                    array[temp][7]=m.getPrice()+"";
                     if(LocalDateTime.now().plusHours(limitedCancleHour).isAfter(m.getDate_and_time().toLocalDateTime())){
                         System.out.println("현재시간이 사용시간 이후입니다");
                         array[temp][8]=Integer.toString(cantFlag);
