@@ -304,19 +304,13 @@ public class resevationService {
         List<getClientInter>dtoArray=new ArrayList<>();
         int fisrt=0;
             if(startDate.isEmpty()&&endDate.isEmpty()){
+                System.out.println("날짜 미지정 검색");
                 fisrt=utillService.getFirst(nowPage, pagingNum);
-                dtoArray=reservationDao.findByEmailJoinOrderByIdDescNative(email, fisrt-1,utillService.getEnd(fisrt, pagingNum)-fisrt+1);//reservationDao.findByEmailOrderByIdDescNative(email,fisrt-1,utillService.getEnd(fisrt, pagingNum)-fisrt+1);
-                if(dtoArray.isEmpty()){
-                    System.out.println("dto가 비워있습니다");
-                    dtoArray=reservationDao.findByEmailTwoJoinOrderByIdDescNative(email, fisrt-1, utillService.getEnd(fisrt, pagingNum)-fisrt+1);
-                }
+                dtoArray=reservationDao.findByEmailJoinOrderByIdDescNative(email, fisrt-1,utillService.getEnd(fisrt, pagingNum)-fisrt+1);
             }else{
+                System.out.println("날짜 지정 검색");
                 fisrt=utillService.getFirst(nowPage, pagingNum);
-                dtoArray=reservationDao.findByEmailThreeJoinOrderByIdBetweenDescNative(email,Timestamp.valueOf(startDate+" "+"00:00:00"),Timestamp.valueOf(endDate+" 00:00:00"),fisrt-1,utillService.getEnd(fisrt, pagingNum)-fisrt+1);
-                if(dtoArray.isEmpty()){
-                    System.out.println("dto가 비워있습니다");
-                    dtoArray=reservationDao.findByEmailTwoJoinOrderByIdBetweenDescNative(email,Timestamp.valueOf(startDate+" "+"00:00:00"),Timestamp.valueOf(endDate+" 00:00:00"),fisrt-1,utillService.getEnd(fisrt, pagingNum)-fisrt+1);
-                }
+                dtoArray=reservationDao.findByEmailJoinOrderByIdBetweenDescNative(email,Timestamp.valueOf(startDate+" "+"00:00:00"),Timestamp.valueOf(endDate+" 00:00:00"),fisrt-1,utillService.getEnd(fisrt, pagingNum)-fisrt+1);
             }
         respone.put("totalPage", totalPage);
         return dtoArray;
@@ -341,10 +335,11 @@ public class resevationService {
                 array[temp][2]=dateFormat.format(m.getCreated());
                 array[temp][3]=dateFormat.format(m.getDate_and_time());
                 if(m.getStatus().equals("ready")){
+                    vBankDto vBankDto=paymentService.selectVbankProduct(m.getPayment_id());
                     array[temp][4]="미입금";
-                    array[temp][5]=m.getBank()+" "+m.getBank_num();
-                    array[temp][6]=m.getEnd_date().toString();
-                    array[temp][7]=m.getVbank_total_price()+"";
+                    array[temp][5]=vBankDto.getBank()+" "+vBankDto.getBankNum();
+                    array[temp][6]=vBankDto.getEndDate().toString();
+                    array[temp][7]=vBankDto.getVbankTotalPrice()+"";
                     array[temp][8]=null;
                 }else{
                     array[temp][4]="결제완료";
