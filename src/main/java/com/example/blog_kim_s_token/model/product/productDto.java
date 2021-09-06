@@ -45,6 +45,9 @@ public class productDto {
 
     @Column(name = "kind",nullable = false)
     private String kind;
+
+    @Column(name = "bigKind",nullable = false)
+    private String bigKind;
     
     @Column(name="created")
     @CreationTimestamp  

@@ -197,9 +197,9 @@ public class restcontroller {
          return kakaopayService.doKakaoPay(jsonObject,request);
     }
     @RequestMapping("/api/okKakaopay")
-    public void okKakaopay(HttpServletRequest request,HttpSession session,HttpServletResponse response) {
+    public JSONObject okKakaopay(HttpServletRequest request,HttpSession session,HttpServletResponse response) {
         System.out.println("okKakaopay");
-        kakaopayService.insertPaymentForkakao(request.getParameter("pg_token"),session);
+        return kakaopayService.insertPaymentForkakao(request.getParameter("pg_token"),session);
     }
     @PostMapping("/api/cancleReservation")
     public JSONObject cancleReservation(@RequestBody JSONObject jsonObject,HttpServletRequest request,HttpServletResponse response) {
