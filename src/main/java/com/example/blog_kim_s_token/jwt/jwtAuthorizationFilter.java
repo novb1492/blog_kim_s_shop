@@ -49,6 +49,9 @@ public class jwtAuthorizationFilter  extends BasicAuthenticationFilter {
             }
             else if(uri.equals("/auth/payment")){
                 System.out.println("결제 시스템입니다");
+            } else if(uri.equals("/api/okKakaopay")){
+                System.out.println("카카오결제 시스템입니다");
+                goToError("/api/okKakaopay", request, response);
             }
             else{
                 System.out.println("도메인이 없습니다");

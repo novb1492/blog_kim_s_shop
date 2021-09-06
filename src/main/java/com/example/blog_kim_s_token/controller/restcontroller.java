@@ -8,6 +8,7 @@ import java.util.List;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
@@ -17,6 +18,7 @@ import com.example.blog_kim_s_token.model.article.insertArticleDto;
 import com.example.blog_kim_s_token.model.confrim.emailCofrimDto;
 import com.example.blog_kim_s_token.model.confrim.phoneCofrimDto;
 import com.example.blog_kim_s_token.model.payment.getVankDateDto;
+import com.example.blog_kim_s_token.model.payment.kakaoPayDto;
 import com.example.blog_kim_s_token.model.product.getPriceDto;
 import com.example.blog_kim_s_token.model.reservation.getDateDto;
 import com.example.blog_kim_s_token.model.reservation.getTimeDto;
@@ -38,8 +40,10 @@ import com.example.blog_kim_s_token.service.payment.paymentService;
 import com.example.blog_kim_s_token.service.reservation.resevationService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -123,7 +127,7 @@ public class restcontroller {
         jsonObject.put("email", userService.sendUserDto().getEmail());
         return jsonObject;
     }
-    @PostMapping("/auth/jwtex")
+    @RequestMapping("/auth/jwtex")
     public void TokenExpired() {
         System.out.println("auth/jwtex");
         throw new TokenExpiredException(null);
@@ -188,9 +192,14 @@ public class restcontroller {
         paymentService.vbankOk(jsonObject);
     }
     @PostMapping("/api/kakaopay")
-    public JSONObject getKakaoPayLink(@RequestBody JSONObject jsonObject,HttpServletResponse response) {
+    public JSONObject getKakaoPayLink(@RequestBody JSONObject jsonObject,HttpServletRequest request,HttpServletResponse response) {
         System.out.println("getKakaoPayLink");
-         return kakaopayService.getPayLink(jsonObject);
+         return kakaopayService.doKakaoPay(jsonObject,request);
+    }
+    @RequestMapping("/api/okKakaopay")
+    public void okKakaopay(HttpServletRequest request,HttpSession session,HttpServletResponse response) {
+        System.out.println("okKakaopay");
+        kakaopayService.insertPaymentForkakao(request.getParameter("pg_token"),session);
     }
     @PostMapping("/api/cancleReservation")
     public JSONObject cancleReservation(@RequestBody JSONObject jsonObject,HttpServletRequest request,HttpServletResponse response) {
