@@ -92,7 +92,7 @@ public class paymentService {
                                     .paymentId(vbankPayment.getPaymentid())
                                     .status("ready")
                                     .kind(vbankPayment.getKind())
-                                    .price(totalPrice)
+                                    .vbankTotalPrice(totalPrice)
                                     .bankCode(vbankPayment.getBankCode())
                                     .pgName(vbankPayment.getPgName())
                                     .endDateUnixTime(vbankPayment.getUnixTime())
@@ -192,7 +192,7 @@ public class paymentService {
             nomalPayment.setKind(vBankDto.getKind());
             nomalPayment.setPaymentid(vBankDto.getPaymentId());
             nomalPayment.setStatus("paid");
-            insertPayment(nomalPayment, vBankDto.getPrice());
+            insertPayment(nomalPayment, vBankDto.getVbankTotalPrice());
             vbankDao.delete(vBankDto);
             return;
         }

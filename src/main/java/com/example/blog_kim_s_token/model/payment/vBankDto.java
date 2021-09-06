@@ -37,8 +37,8 @@ public class vBankDto {
     @Column(name = "name",nullable = false)
     private String name;
 
-    @Column(name = "price",nullable = false)
-    private int price;
+    @Column(name = "vbankTotalPrice",nullable = false)
+    private int vbankTotalPrice;
 
     @Column(name = "status",nullable = false)
     private String status;
