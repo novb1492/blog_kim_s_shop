@@ -20,7 +20,7 @@ public class jobSchedular {
     @Autowired
     private vbankConfig vbankConfig;
 
-    @Scheduled(fixedDelay = 1000*600) // scheduler 끝나는 시간 기준으로 1000*n 간격으로 실행
+    @Scheduled(fixedDelay = 1000*300) // scheduler 끝나는 시간 기준으로 1000*n 간격으로 실행
     public void deletevbank() {
         System.out.println("deletevbank");
         try {

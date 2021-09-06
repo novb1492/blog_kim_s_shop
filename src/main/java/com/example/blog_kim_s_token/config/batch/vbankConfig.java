@@ -14,9 +14,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
+
+
 @RequiredArgsConstructor
 @Configuration
 public class vbankConfig {
@@ -31,12 +31,12 @@ public class vbankConfig {
     @Bean 
     public Job job(){ 
         System.out.println("job");
-        return jobBuilderFactory.get(batchName).start(readLines()).next(readLines()).build();
+        return jobBuilderFactory.get(batchName).start(doClearNonePaidReservation()).build();
     } 
     @Bean
-    protected Step readLines() {
+    protected Step doClearNonePaidReservation() {
         return stepBuilderFactory
-            .get("readLines")
+            .get("doClearNonePaidReservation")
           .tasklet(new scanVbank(vbankDao))
           .build();
     }

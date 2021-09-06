@@ -27,9 +27,7 @@ public class scanVbank implements Tasklet  {
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
        System.out.println("scanVbank execute");
-
        vbankDao.innerfind(Timestamp.valueOf(LocalDateTime.now()));
-     
         return RepeatStatus.FINISHED;
     }
     
