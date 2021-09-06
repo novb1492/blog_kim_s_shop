@@ -30,6 +30,7 @@ import com.example.blog_kim_s_token.service.boardService;
 import com.example.blog_kim_s_token.service.priceService;
 import com.example.blog_kim_s_token.service.userService;
 import com.example.blog_kim_s_token.service.ApiServies.kakao.kakaoLoginservice;
+import com.example.blog_kim_s_token.service.ApiServies.kakao.kakaopayService;
 import com.example.blog_kim_s_token.service.ApiServies.naver.naverLoginService;
 import com.example.blog_kim_s_token.service.confrim.confrimService;
 import com.example.blog_kim_s_token.service.fileUpload.fileUploadService;
@@ -55,6 +56,8 @@ public class restcontroller {
     private naverLoginService naverLoingService;
     @Autowired
     private kakaoLoginservice kakaoLoginservice;
+    @Autowired
+    private kakaopayService kakaopayService;
     @Autowired
     private resevationService resevationService;
     @Autowired
@@ -183,6 +186,11 @@ public class restcontroller {
     public void bootPay(@RequestBody JSONObject jsonObject,HttpServletResponse response) {
         System.out.println("payment");
         paymentService.vbankOk(jsonObject);
+    }
+    @PostMapping("/api/kakaopay")
+    public void getKakaoPayLink(@RequestBody JSONObject jsonObject,HttpServletResponse response) {
+        System.out.println("getKakaoPayLink");
+         kakaopayService.getPayLink(jsonObject);
     }
     @PostMapping("/api/cancleReservation")
     public JSONObject cancleReservation(@RequestBody JSONObject jsonObject,HttpServletRequest request,HttpServletResponse response) {

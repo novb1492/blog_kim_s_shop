@@ -235,6 +235,34 @@ public class iamportService {
         }
 
     }
+    public void updateBUY( ) {
+        System.out.println("updateBUY");
+        try {
+            String token=getToken();
+            headers.add("Authorization",token);
+            body.put("imp_uid", "imp_817445346784");
+            body.put("amount", 10000);
+            body.put("vbank_due", 1631175647);
+            HttpEntity<JSONObject>entity=new HttpEntity<JSONObject>(body, headers);
+            ResponseEntity<JSONObject> jsonob= restTemplate.exchange("https://api.iamport.kr/vbanks/imp_817445346784",HttpMethod.PUT,entity,JSONObject.class);
+            JSONObject respone=jsonob.getBody();
+            System.out.println(respone+" canclebuy");
+            if((int)respone.get("code")==0){
+                System.out.println(respone.get("message")+" 취소성공");
+                return;
+            }
+            System.out.println(respone.get("message")+" 취소실패");
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("cancleBuy가 실패 했습니다 직접 환불 바랍니다");
+            throw new RuntimeException("환불에 실패 했습니다 다시시도 바랍니다");
+        }finally{
+            headers.clear();
+            body.clear();
+
+        }
+
+    }
     public void cancleVbank(String paymentid,JSONObject jsonObject) {
         System.out.println("cancleVbank");
         try {

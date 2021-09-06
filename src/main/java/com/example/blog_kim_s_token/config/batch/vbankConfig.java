@@ -26,7 +26,7 @@ public class vbankConfig {
 
     @Autowired
     private vbankDao vbankDao;
-
+    
     
     @Bean 
     public Job job(){ 
@@ -40,5 +40,6 @@ public class vbankConfig {
           .tasklet(new scanVbank(vbankDao))
           .build();
     }
+
 
 }
