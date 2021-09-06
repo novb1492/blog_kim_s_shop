@@ -188,9 +188,9 @@ public class restcontroller {
         paymentService.vbankOk(jsonObject);
     }
     @PostMapping("/api/kakaopay")
-    public void getKakaoPayLink(@RequestBody JSONObject jsonObject,HttpServletResponse response) {
+    public JSONObject getKakaoPayLink(@RequestBody JSONObject jsonObject,HttpServletResponse response) {
         System.out.println("getKakaoPayLink");
-         kakaopayService.getPayLink(jsonObject);
+         return kakaopayService.getPayLink(jsonObject);
     }
     @PostMapping("/api/cancleReservation")
     public JSONObject cancleReservation(@RequestBody JSONObject jsonObject,HttpServletRequest request,HttpServletResponse response) {

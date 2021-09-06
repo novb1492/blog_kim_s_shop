@@ -2,6 +2,7 @@ package com.example.blog_kim_s_token.service.ApiServies.kakao;
 
 
 
+import com.example.blog_kim_s_token.service.utillService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -19,7 +20,7 @@ public class kakaopayService {
     private HttpHeaders headers=new HttpHeaders();
     private MultiValueMap<String,Object> body=new LinkedMultiValueMap<>();
     
-    public void getPayLink(JSONObject jsonObject) {
+    public JSONObject getPayLink(JSONObject jsonObject) {
         System.out.println("getPayLink");
         try {
             headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -37,7 +38,7 @@ public class kakaopayService {
             HttpEntity<MultiValueMap<String,Object>>entity=new HttpEntity<>(body,headers);
             JSONObject response=restTemplate.postForObject("https://kapi.kakao.com/v1/payment/ready", entity,JSONObject.class);
             System.out.println(response+" 카카오페이 통신요청 결과");
-            
+            return utillService.makeJson(true,  (String)response.get("next_redirect_pc_url"));
             //return (String)response.get("next_redirect_pc_url");
         } catch (Exception e) {
             e.printStackTrace();
