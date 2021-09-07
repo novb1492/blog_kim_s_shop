@@ -330,7 +330,6 @@ public class resevationService {
         System.out.println("makeResponse");
         String[][] array=new String[dtoArray.size()][9];
             int temp=0;
-
             for(getClientInter m:dtoArray){
                 array[temp][0]=Integer.toString(m.getId());
                 array[temp][1]=m.getSeat();

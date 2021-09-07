@@ -18,10 +18,10 @@ public class tryKakaoPayDto {
     @Min(value = 0,message = "금액이 0원입니다")
     private int totalPrice;
 
-    @NotBlank
+    @NotBlank(message = "kind가 비어 있습니다")
     private String kind;
     
-    @Size(min = 0,message="아이템이 비워있습니다")
+    @Size(min = 0,message="아이템이 비어 있습니다")
     private String[][] itemArray;
     private String[] other;
 }
