@@ -235,16 +235,15 @@ public class iamportService {
         }
 
     }
-    public void updateBUY( ) {
+    public void updateVbank(String paymentid,int newPrice,String unixTime) {
         System.out.println("updateBUY");
         try {
             String token=getToken();
             headers.add("Authorization",token);
-            body.put("imp_uid", "imp_817445346784");
-            body.put("amount", 10000);
-            body.put("vbank_due", 1631175647);
+            body.put("amount", newPrice);
+            body.put("vbank_due", unixTime);
             HttpEntity<JSONObject>entity=new HttpEntity<JSONObject>(body, headers);
-            ResponseEntity<JSONObject> jsonob= restTemplate.exchange("https://api.iamport.kr/vbanks/imp_817445346784",HttpMethod.PUT,entity,JSONObject.class);
+            ResponseEntity<JSONObject> jsonob= restTemplate.exchange("https://api.iamport.kr/vbanks/"+paymentid,HttpMethod.PUT,entity,JSONObject.class);
             JSONObject respone=jsonob.getBody();
             System.out.println(respone+" canclebuy");
             if((int)respone.get("code")==0){

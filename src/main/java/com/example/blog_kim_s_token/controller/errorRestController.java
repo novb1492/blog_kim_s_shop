@@ -96,7 +96,6 @@ public class errorRestController {
                 JSONObject jsonObject=new JSONObject();
                 jsonObject.put("merchant_uid", httpSession.getAttribute("merchantUid"));
                 jsonObject.put("vbank_due",  httpSession.getAttribute("vbankDue"));
-                jsonObject.put("vbank_code",  httpSession.getAttribute("bank"));
                 jsonObject.put("vbank_holder",  httpSession.getAttribute("vbankHolder"));
                 jsonObject.put("amount",  httpSession.getAttribute("amount"));
                 jsonObject.put("vbank_code",  httpSession.getAttribute("vbank_code"));

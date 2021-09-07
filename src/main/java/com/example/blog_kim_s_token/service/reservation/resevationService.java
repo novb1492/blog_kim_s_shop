@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.example.blog_kim_s_token.customException.failBuyException;
 import com.example.blog_kim_s_token.enums.reservationEnums;
-
+import com.example.blog_kim_s_token.model.payment.paidDto;
 import com.example.blog_kim_s_token.model.payment.tryDeleteInter;
 import com.example.blog_kim_s_token.model.payment.vBankDto;
 import com.example.blog_kim_s_token.model.reservation.*;
@@ -369,14 +369,17 @@ public class resevationService {
                 return utillService.makeJson(false, "선택한 예약이 없습니다"); 
             }
             List<mainReservationDto>dtoArray=new ArrayList<>();
+            List<Integer>price=new ArrayList<>();
             for(int i=0;i<ridArray.size();i++){
                 System.out.println(ridArray.get(i)+" 취소예약시도 번호");
                 Optional<tryDeleteInter> tryDeleteInter=reservationDao.findBySeatJoin(Integer.parseInt(ridArray.get(i)));
                 tryDeleteInter.orElseThrow(()->new IllegalAccessError("존재하지 않는 예약이 발갼되었습니다"));
                 tryDeleteInter tryDeleteInter2=tryDeleteInter.get();
                 dtoArray.add(new mainReservationDto().builder().seat(tryDeleteInter2.getSeat()).status(tryDeleteInter2.getStatus()).id(tryDeleteInter2.getId()).paymentId(tryDeleteInter2.getPayment_id()).dateAndTime(tryDeleteInter2.getDate_and_time()).email(tryDeleteInter2.getEmail()).build());
+                price.add(tryDeleteInter2.getPrice());
             }
             System.out.println(dtoArray.get(0).toString()+" test");
+            int temp=0;
             for(mainReservationDto dto:dtoArray){
                 reservationEnums enums=confrimCancle(dto);
                 if(enums.getBool()==false){
@@ -384,17 +387,27 @@ public class resevationService {
                     throw new Exception(enums.getMessege());
                 }
                 String paymentId=dto.getPaymentId();
-                String seat=dto.getSeat();
-                System.out.println(dto.toString()+" cancle");
                 if(dto.getStatus().equals("paid")){
                     System.out.println("결제된 상품 취소시도");
-                    reservationDao.deleteReservationPaidproduct(paymentId);
-                    //iamportService.cancleBuy(paymentId, priceService.getTotalPrice(seat,1));
+                    reservationDao.deleteById(dto.getId());
+                    iamportService.cancleBuy(paymentId, price.get(temp));
                 }else if(dto.getStatus().equals("ready")){
                     System.out.println("미결제 상품 취소시도");
-                    reservationDao.deleteReservationVbankproduct(dto.getId());
-                    iamportService.updateBUY();
+                    vBankDto vBankDto=paymentService.selectVbankProduct(paymentId);
+                    int newPrice=paymentService.minusPrice(vBankDto.getVbankTotalPrice(),price.get(temp));
+                    if(newPrice==0){
+                        System.out.println("가상계좌 금액이 0임 채번취소 ");
+                        jsonObject.put("merchant_uid", vBankDto.getMerchant_uid());
+                        jsonObject.put("vbank_due",  vBankDto.getEndDateUnixTime());
+                        jsonObject.put("vbank_code",  vBankDto.getBankCode());
+                        jsonObject.put("vbank_holder",  vBankDto.getPgName());
+                        jsonObject.put("amount",  vBankDto.getVbankTotalPrice());
+                        iamportService.cancleVbank(paymentId, jsonObject);
+                    }else{
+                        iamportService.updateVbank(paymentId, newPrice, vBankDto.getEndDateUnixTime());
+                    }
                 }
+                temp+=1;
             }
           
             return utillService.makeJson(true, "예약취소 성공");

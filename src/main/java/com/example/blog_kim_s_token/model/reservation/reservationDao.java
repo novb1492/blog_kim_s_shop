@@ -35,15 +35,9 @@ public interface reservationDao extends JpaRepository<mainReservationDto,Integer
 
     List<mainReservationDto> findByPaymentId(String paymentId);
 
-    @Modifying
-    @Transactional
-    @Query(value = "delete a,b  from reservation  a inner join paidproduct  b  on a.payment_id=b.payment_id where a.payment_id=?",nativeQuery = true)
-    void deleteReservationPaidproduct(String paymentid);
+ 
 
-    @Modifying
-    @Transactional
-    @Query(value = "delete a,b  from reservation  a inner join vbank  b  on a.payment_id=b.payment_id where a.id=? ",nativeQuery = true)
-    void deleteReservationVbankproduct(int id);
+  
 
 
     @Query(value = "select a.*,b.price  from reservation  a inner join product  b  on a.seat=b.product_name where a.id=? ",nativeQuery = true)
