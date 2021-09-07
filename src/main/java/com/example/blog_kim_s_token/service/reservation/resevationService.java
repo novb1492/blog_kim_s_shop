@@ -398,7 +398,7 @@ public class resevationService {
                     vBankDto vBankDto=paymentService.selectVbankProduct(paymentId);
                     int newPrice=paymentService.minusPrice(vBankDto.getVbankTotalPrice(),price.get(temp));
                     if(newPrice==0){
-                        System.out.println("가상계좌 금액이 0임 채번취소 ");
+                        System.out.println("가상계좌 금액이 0임 채번취소ㄴ ");
                         jsonObject.put("merchant_uid", vBankDto.getMerchant_uid());
                         jsonObject.put("vbank_due",  vBankDto.getEndDateUnixTime());
                         jsonObject.put("vbank_code",  vBankDto.getBankCode());
