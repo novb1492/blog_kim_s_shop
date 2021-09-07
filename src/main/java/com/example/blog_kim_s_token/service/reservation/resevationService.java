@@ -330,13 +330,12 @@ public class resevationService {
         System.out.println("makeResponse");
         String[][] array=new String[dtoArray.size()][9];
             int temp=0;
-            DateFormat dateFormat=new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+
             for(getClientInter m:dtoArray){
-               
                 array[temp][0]=Integer.toString(m.getId());
                 array[temp][1]=m.getSeat();
-                array[temp][2]=dateFormat.format(m.getCreated());
-                array[temp][3]=dateFormat.format(m.getDate_and_time());
+                array[temp][2]=m.getCreated().toString();
+                array[temp][3]=m.getDate_and_time().toString();
                 if(m.getStatus().equals("ready")){
                     vBankDto vBankDto=paymentService.selectVbankProduct(m.getPayment_id());
                     array[temp][4]="미입금";

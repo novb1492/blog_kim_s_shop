@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import com.example.blog_kim_s_token.customException.failKakaoPay;
+import com.example.blog_kim_s_token.enums.aboutPayEnums;
 import com.example.blog_kim_s_token.model.reservation.reservationInsertDto;
 import com.example.blog_kim_s_token.model.user.userDto;
 import com.example.blog_kim_s_token.service.priceService;
@@ -62,20 +63,31 @@ public class kakaopayService {
         System.out.println(tryKakaoPayDto);
         try {
             String[][] itemArray=tryKakaoPayDto.getItemArray();
+            int itemArraySize=itemArray.length;
             int totalPrice=0;
             String itemName="";
             int count=0;
             String kind=tryKakaoPayDto.getKind();
+            List<Integer>times=new ArrayList<>();
+            HttpSession httpSession=request.getSession();
             if(!kind.equals("reservation")&&!kind.equals("product")){
                 utillService.makeJson(false ,"취급 상품 없음");
             }
-            for(int i=0;i<itemArray.length;i++){
+            for(int i=0;i<itemArraySize;i++){
                 totalPrice+=priceService.getTotalPrice(tryKakaoPayDto.getItemArray()[i][0],Integer.parseInt(tryKakaoPayDto.getItemArray()[i][1]));
                 itemName+=tryKakaoPayDto.getItemArray()[i][0];
-                if(i!=itemArray.length-1){
+                if(i!=itemArraySize-1){
                     itemName+=",";
                 }
                 count+=Integer.parseInt(itemArray[i][1]);
+                if(kind.equals(aboutPayEnums.reservationKind.getString())){
+                    System.out.println("예약 상품 입니다 시간 분리 시작");
+                    times.add(Integer.parseInt(itemArray[i][2]));
+                    if(i==itemArraySize-1){
+                        System.out.println("시간 분리 완료");
+                        httpSession.setAttribute("times", times);
+                    }
+                }
             }
             System.out.println(totalPrice);
             confrimProduct(tryKakaoPayDto.getTotalPrice(), totalPrice, kind);
@@ -97,7 +109,6 @@ public class kakaopayService {
             body.add("fail_url", failUrl);
             JSONObject response=getPayLink(readyUrl);
             System.out.println(response+" 카카오페이 통신요청 결과");
-            HttpSession httpSession=request.getSession();
             httpSession.setAttribute("partner_order_id", partner_order_id);
             httpSession.setAttribute("tid", response.get("tid"));
             httpSession.setAttribute("item", itemName);
@@ -139,6 +150,7 @@ public class kakaopayService {
         int totalPrice=(int)httpSession.getAttribute("totalPrice");
         String kind=(String)httpSession.getAttribute("kind");
         String paymentid=(String)httpSession.getAttribute("tid");
+        List<Integer>times=(List<Integer>)httpSession.getAttribute("times");
         try {
             body.add("cid", cid);
             body.add("tid",paymentid);
@@ -159,19 +171,19 @@ public class kakaopayService {
             paymentService.insertPayment(nomalPayment,totalPrice);
             if(kind.equals("reservation")){
                 System.out.println("예약 상품 결제");
-                doReservation(email,name,paymentid,itemArray,other);
+                doReservation(email,name,paymentid,itemArray,other,times);
             }else if(kind.equals("product")){
                 System.out.println("상품결제");
             }
   
-           return utillService.makeJson(true, "예약이 완료 되었습니다");
+           return utillService.makeJson(true, "완료 되었습니다");
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("insertPaymentForkakao error"+e.getMessage());
             throw new failKakaoPay(e.getMessage(),cid,paymentid,totalPrice);
         }
     }  
-    private void doReservation(String email,String name,String paymentid,String[][]itemArray,String[] other ) {
+    private void doReservation(String email,String name,String paymentid,String[][]itemArray,String[] other,List<Integer>times) {
         System.out.println("doReservation");
         reservationInsertDto reservationInsertDto=new reservationInsertDto();
                 reservationInsertDto.setEmail(email);
@@ -183,10 +195,6 @@ public class kakaopayService {
                 reservationInsertDto.setYear(Integer.parseInt(other[0]));
                 reservationInsertDto.setMonth(Integer.parseInt(other[1]));
                 reservationInsertDto.setDate(Integer.parseInt(other[2]));
-                List<Integer>times=new ArrayList<>();
-                for(int i=0;i<itemArray.length;i++){
-                    times.add(Integer.parseInt(itemArray[i][2]));
-                }
                 reservationInsertDto.setTimes(times);
         resevationService.confrimContents(reservationInsertDto);
     }
