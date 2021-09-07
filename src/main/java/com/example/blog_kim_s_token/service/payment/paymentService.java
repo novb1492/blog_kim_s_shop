@@ -202,8 +202,16 @@ public class paymentService {
             throw new RuntimeException(e.getMessage());
         } 
     }
-    public void updatePaidProductForCancle(String paymentid) {
-        
+    public void updatePaidProductForCancle(String paymentid,int minusPrice) {
+        paidDto paidDto=paidDao.findByPaymentId(paymentid);
+        int price=paidDto.getTotalPrice();
+        int newPrice=price-minusPrice;
+        if(newPrice==0){
+            System.out.println("취소후 전액환불예정");
+            paidDao.delete(paidDto);
+            return;
+        }
+        paidDto.setTotalPrice(newPrice);
     }
     public int minusPrice(int totalPrice,int minusPrice) {
         return totalPrice-minusPrice;

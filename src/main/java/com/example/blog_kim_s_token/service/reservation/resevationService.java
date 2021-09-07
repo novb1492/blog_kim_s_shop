@@ -389,8 +389,10 @@ public class resevationService {
                 String paymentId=dto.getPaymentId();
                 if(dto.getStatus().equals("paid")){
                     System.out.println("결제된 상품 취소시도");
+                    int minusPrice=price.get(temp);
                     reservationDao.deleteById(dto.getId());
-                    iamportService.cancleBuy(paymentId, price.get(temp));
+                    paymentService.updatePaidProductForCancle(paymentId, minusPrice);
+                    iamportService.cancleBuy(paymentId,minusPrice);
                 }else if(dto.getStatus().equals("ready")){
                     System.out.println("미결제 상품 취소시도");
                     vBankDto vBankDto=paymentService.selectVbankProduct(paymentId);
