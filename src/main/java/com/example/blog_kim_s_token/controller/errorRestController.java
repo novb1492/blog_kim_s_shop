@@ -11,14 +11,18 @@ import javax.servlet.http.HttpSession;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.example.blog_kim_s_token.customException.failBuyException;
+import com.example.blog_kim_s_token.customException.failKakaoPay;
 import com.example.blog_kim_s_token.jwt.jwtService;
 import com.example.blog_kim_s_token.model.jwt.jwtDto;
 import com.example.blog_kim_s_token.service.utillService;
+import com.example.blog_kim_s_token.service.ApiServies.kakao.kakaopayService;
 import com.example.blog_kim_s_token.service.cookie.cookieService;
 import com.example.blog_kim_s_token.service.payment.iamPort.iamportService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -31,6 +35,8 @@ public class errorRestController {
     private jwtService jwtService;
     @Autowired
     private iamportService iamportService;
+    @Autowired
+    private kakaopayService kakaopayService;
 
     
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -109,5 +115,15 @@ public class errorRestController {
             utillService.makeJson(false,e.getMessage());
         }
         return utillService.makeJson(true, exception.getMessage());
+    }
+    @ExceptionHandler(failKakaoPay.class)
+    public JSONObject failKakaoPay(failKakaoPay failKakaoPay) {
+        MultiValueMap<String,Object> body=new LinkedMultiValueMap<>();
+        body.add("cid", failKakaoPay.getCid());
+        body.add("tid", failKakaoPay.getTid());
+        body.add("cancel_amount", failKakaoPay.getTotalPrice());
+        body.add("cancel_tax_free_amount",0);
+        kakaopayService.cancleKakaopay(body);
+        return utillService.makeJson(false, failKakaoPay.getMessage());
     }
 }
