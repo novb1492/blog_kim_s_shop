@@ -71,17 +71,16 @@ public class kakaopayService {
             }
             for(int i=0;i<itemArray.length;i++){
                 totalPrice+=priceService.getTotalPrice(tryKakaoPayDto.getItemArray()[i][0],Integer.parseInt(tryKakaoPayDto.getItemArray()[i][1]));
-            }
-            System.out.println(totalPrice);
-            if(tryKakaoPayDto.getTotalPrice()!=totalPrice){
-                return utillService.makeJson(false, "가격이 위조 되었습니다");
-            }
-            for(int i=0;i<itemArray.length;i++){
                 itemName+=tryKakaoPayDto.getItemArray()[i][0];
                 if(i!=itemArray.length-1){
                     itemName+=",";
                 }
                 count+=Integer.parseInt(itemArray[i][1]);
+            }
+            System.out.println(totalPrice);
+            confrimProduct(tryKakaoPayDto.getTotalPrice(), totalPrice, kind);
+            if(tryKakaoPayDto.getTotalPrice()!=totalPrice){
+                return utillService.makeJson(false, "가격이 위조 되었습니다");
             }
             System.out.println(itemName+"/"+count);
             String partner_order_id=utillService.GetRandomNum(10);
@@ -120,11 +119,14 @@ public class kakaopayService {
         }  
     }
     private void confrimProduct(int requestTotalPrice,int totalPrice,String kind) {
+        System.out.println("confrimProduct");
         if(!kind.equals("reservation")&&!kind.equals("product")){
-            utillService.makeJson(false ,"취급 상품 없음");
+            System.out.println("취급하지 않는 상품 조회");
+            throw new RuntimeException("취급하지 않는 상품 조회");
         }
         if(requestTotalPrice!=totalPrice){
-            //return utillService.makeJson(false, "가격이 위조 되었습니다");
+            System.out.println("가격이 변조되었습니다");
+            throw new RuntimeException("가격이 변조되었습니다");
         }
     }
     @Transactional(rollbackFor = Exception.class)
@@ -139,7 +141,7 @@ public class kakaopayService {
         String paymentid=(String)httpSession.getAttribute("tid");
         try {
             body.add("cid", cid);
-            body.add("tid",httpSession.getAttribute("tid"));
+            body.add("tid",paymentid);
             body.add("partner_order_id",httpSession.getAttribute("partner_order_id"));
             body.add("partner_user_id", httpSession.getAttribute("email"));
             body.add("quantity",httpSession.getAttribute("count"));
@@ -156,7 +158,10 @@ public class kakaopayService {
             nomalPayment.setName(name);
             paymentService.insertPayment(nomalPayment,totalPrice);
             if(kind.equals("reservation")){
+                System.out.println("예약 상품 결제");
                 doReservation(email,name,paymentid,itemArray,other);
+            }else if(kind.equals("product")){
+                System.out.println("상품결제");
             }
   
            return utillService.makeJson(true, "예약이 완료 되었습니다");
