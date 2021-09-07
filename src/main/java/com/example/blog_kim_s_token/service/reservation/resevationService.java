@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.example.blog_kim_s_token.customException.failBuyException;
 import com.example.blog_kim_s_token.enums.reservationEnums;
-import com.example.blog_kim_s_token.model.payment.paidDto;
+
 import com.example.blog_kim_s_token.model.payment.tryDeleteInter;
 import com.example.blog_kim_s_token.model.payment.vBankDto;
 import com.example.blog_kim_s_token.model.reservation.*;
@@ -175,6 +175,10 @@ public class resevationService {
             throw new failBuyException(e.getMessage(), reservationInsertDto.getPaymentId(),null);
         }
        
+    }
+    public void confrimContents(reservationInsertDto reservationInsertDto) {
+        confrimInsert(reservationInsertDto);
+        insertReservation(reservationInsertDto);
     }
     private void insertReservation(reservationInsertDto reservationInsertDto) {
         System.out.println("insertReservation");
