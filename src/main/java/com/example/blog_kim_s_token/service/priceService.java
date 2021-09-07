@@ -1,5 +1,7 @@
 package com.example.blog_kim_s_token.service;
 
+import java.util.Optional;
+
 import com.example.blog_kim_s_token.enums.priceEnums;
 import com.example.blog_kim_s_token.model.product.getPriceDto;
 import com.example.blog_kim_s_token.model.product.productDao;
@@ -19,7 +21,9 @@ public class priceService {
     private final int continuePrice=100;
     
     private productDto selectProduct(String productName) {
-        return productDao.findByProductName(productName);
+        Optional<productDto> optional=productDao.findByProductName(productName);
+        optional.orElseThrow(()->new IllegalAccessError("존재하지 않는 상품입니다"));
+        return optional.get();
     }
     public JSONObject responeTotalprice(getPriceDto getPriceDto) {
         System.out.println("responeTotalprice");

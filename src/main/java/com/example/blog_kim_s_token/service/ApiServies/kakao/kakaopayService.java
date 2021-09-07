@@ -55,19 +55,39 @@ public class kakaopayService {
     @Autowired
     private resevationService resevationService;
     
-    public JSONObject doKakaoPay(JSONObject jsonObject,HttpServletRequest request) {
-        List<Integer>count=(List<Integer>)jsonObject.get("count");
-        int countSize=count.size();
-        productDto productDto=productDao.findByProductName((String)jsonObject.get("item"));
-        int totalPrice=priceService.getTotalPrice((String)jsonObject.get("item"), countSize);
-        int partner_order_id=Integer.parseInt(utillService.GetRandomNum(10));
-        if((int)jsonObject.get("totalPrice")==totalPrice){
+    
+    public JSONObject doKakaoPay(tryKakaoPayDto tryKakaoPayDto,HttpServletRequest request) {
+        System.out.println("doKakaoPay");
+        System.out.println(tryKakaoPayDto);
+        try {
+            String[][] itemArray=tryKakaoPayDto.getItemArray();
+            int totalPrice=0;
+            String itemName="";
+            int count=0;
+            String kind=tryKakaoPayDto.getKind();
+
+            for(int i=0;i<itemArray.length;i++){
+                totalPrice+=priceService.getTotalPrice(tryKakaoPayDto.getItemArray()[i][0],Integer.parseInt(tryKakaoPayDto.getItemArray()[i][1]));
+            }
+            System.out.println(totalPrice);
+            if(tryKakaoPayDto.getTotalPrice()!=totalPrice){
+                return utillService.makeJson(false, "가격이 위조 되었습니다");
+            }
+            for(int i=0;i<itemArray.length;i++){
+                itemName+=tryKakaoPayDto.getItemArray()[i][0];
+                if(i!=itemArray.length-1){
+                    itemName+=",";
+                }
+                count+=Integer.parseInt(itemArray[i][1]);
+            }
+            System.out.println(itemName+"/"+count);
+            String partner_order_id=utillService.GetRandomNum(10);
             userDto userDto=userService.sendUserDto();
             body.add("cid", cid);
             body.add("partner_order_id",partner_order_id);
             body.add("partner_user_id", userDto.getEmail());
-            body.add("item_name", jsonObject.get("item"));
-            body.add("quantity", countSize);
+            body.add("item_name", itemName);
+            body.add("quantity", count);
             body.add("total_amount", totalPrice);
             body.add("tax_free_amount", 0);
             body.add("approval_url", sucUrl);
@@ -78,19 +98,33 @@ public class kakaopayService {
             HttpSession httpSession=request.getSession();
             httpSession.setAttribute("partner_order_id", partner_order_id);
             httpSession.setAttribute("tid", response.get("tid"));
-            httpSession.setAttribute("item", jsonObject.get("item"));
-            httpSession.setAttribute("month", jsonObject.get("month"));
-            httpSession.setAttribute("date", jsonObject.get("date"));
-            httpSession.setAttribute("times", jsonObject.get("times"));
-            httpSession.setAttribute("year", jsonObject.get("year"));
+            httpSession.setAttribute("item", itemName);
             httpSession.setAttribute("totalPrice", totalPrice);
-            httpSession.setAttribute("kind", productDto.getBigKind());
+            httpSession.setAttribute("kind", kind);
             httpSession.setAttribute("email",userDto.getEmail());
             httpSession.setAttribute("name", userDto.getName());
             httpSession.setAttribute("count", count);
+            if(kind.equals("reservation")){
+                System.out.println("예약 결제시도");
+                httpSession.setAttribute("year", tryKakaoPayDto.getOther()[0]);
+                httpSession.setAttribute("month",tryKakaoPayDto.getOther()[1]);
+                httpSession.setAttribute("date", tryKakaoPayDto.getOther()[2]);
+                for(int i=0;i<itemArray.length;i++){
+                    if(i!=itemArray.length-1){
+                        itemName+=",";
+                    }
+                    httpSession.setAttribute("times",itemArray[i][2]); 
+                }
+            }
             return utillService.makeJson(true,(String)response.get("next_redirect_pc_url"));
-        }
-        return utillService.makeJson(false, "결제검증 실패");
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("doKakaoPay");
+            throw new RuntimeException(e.getMessage());
+        }finally{
+            headers.clear();
+            body.clear();
+        }  
     }
     private JSONObject getPayLink() {
         System.out.println("getPayLink");

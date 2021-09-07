@@ -32,6 +32,7 @@ import com.example.blog_kim_s_token.service.priceService;
 import com.example.blog_kim_s_token.service.userService;
 import com.example.blog_kim_s_token.service.ApiServies.kakao.kakaoLoginservice;
 import com.example.blog_kim_s_token.service.ApiServies.kakao.kakaopayService;
+import com.example.blog_kim_s_token.service.ApiServies.kakao.tryKakaoPayDto;
 import com.example.blog_kim_s_token.service.ApiServies.naver.naverLoginService;
 import com.example.blog_kim_s_token.service.confrim.confrimService;
 import com.example.blog_kim_s_token.service.fileUpload.fileUploadService;
@@ -190,9 +191,9 @@ public class restcontroller {
         paymentService.vbankOk(jsonObject);
     }
     @PostMapping("/api/kakaopay")
-    public JSONObject getKakaoPayLink(@RequestBody JSONObject jsonObject,HttpServletRequest request,HttpServletResponse response) {
+    public JSONObject getKakaoPayLink(@RequestBody tryKakaoPayDto tryKakaoPayDto,HttpServletRequest request,HttpServletResponse response) {
         System.out.println("getKakaoPayLink");
-         return kakaopayService.doKakaoPay(jsonObject,request);
+         return kakaopayService.doKakaoPay(tryKakaoPayDto,request);
     }
     @RequestMapping("/api/okKakaopay")
     public JSONObject okKakaopay(HttpServletRequest request,HttpSession session,HttpServletResponse response) {
