@@ -220,9 +220,11 @@ public class restcontroller {
         return boardService.getArticle(getArticleDto);
     }
     @PostMapping("/api/getAllArticle")
-    public List<articleDto> getAllArticle(HttpServletRequest request,HttpServletResponse response) {
+    public articleDto getAllArticle(HttpServletRequest request,HttpServletResponse response) {
         System.out.println("getAllArticle"); 
-        return boardService.getArticle();
+        getArticleDto getArticleDto=new getArticleDto();
+        getArticleDto.setArticleId(1);
+        return boardService.getArticle(getArticleDto);
     }
     @PostMapping("/auth/test")
     public JSONObject test(HttpServletRequest request,HttpServletResponse response) {

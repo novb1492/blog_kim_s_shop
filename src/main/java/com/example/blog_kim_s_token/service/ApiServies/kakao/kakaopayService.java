@@ -60,10 +60,11 @@ public class kakaopayService {
         int countSize=count.size();
         productDto productDto=productDao.findByProductName((String)jsonObject.get("item"));
         int totalPrice=priceService.getTotalPrice((String)jsonObject.get("item"), countSize);
+        int partner_order_id=Integer.parseInt(utillService.GetRandomNum(10));
         if((int)jsonObject.get("totalPrice")==totalPrice){
             userDto userDto=userService.sendUserDto();
             body.add("cid", cid);
-            body.add("partner_order_id",1234+"");
+            body.add("partner_order_id",partner_order_id);
             body.add("partner_user_id", userDto.getEmail());
             body.add("item_name", jsonObject.get("item"));
             body.add("quantity", countSize);
@@ -73,7 +74,9 @@ public class kakaopayService {
             body.add("cancel_url", cancleUrl);
             body.add("fail_url", failUrl);
             JSONObject response=getPayLink();
+            System.out.println(response+" 카카오페이 통신요청 결과");
             HttpSession httpSession=request.getSession();
+            httpSession.setAttribute("partner_order_id", partner_order_id);
             httpSession.setAttribute("tid", response.get("tid"));
             httpSession.setAttribute("item", jsonObject.get("item"));
             httpSession.setAttribute("month", jsonObject.get("month"));
@@ -96,9 +99,7 @@ public class kakaopayService {
             headers.add("Authorization","KakaoAK "+adminKey);
            
             HttpEntity<MultiValueMap<String,Object>>entity=new HttpEntity<>(body,headers);
-            JSONObject response=restTemplate.postForObject("https://kapi.kakao.com/v1/payment/ready", entity,JSONObject.class);
-            System.out.println(response+" 카카오페이 통신요청 결과");
-            return restTemplate.postForObject("https://kapi.kakao.com/v1/payment/ready", entity,JSONObject.class);
+            return restTemplate.postForObject("https://kapi.kakao.com/v1/payment/ready",entity,JSONObject.class);
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("getPayLink error "+ e.getMessage());
@@ -115,7 +116,7 @@ public class kakaopayService {
             List<Integer>count=(List<Integer>)httpSession.getAttribute("count");
             body.add("cid", cid);
             body.add("tid",httpSession.getAttribute("tid"));
-            body.add("partner_order_id",1234+"");
+            body.add("partner_order_id",httpSession.getAttribute("partner_order_id"));
             body.add("partner_user_id", httpSession.getAttribute("email"));
             body.add("quantity", count.size());
             body.add("pg_token", pgToken);

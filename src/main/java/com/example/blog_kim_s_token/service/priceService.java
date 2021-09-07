@@ -25,14 +25,14 @@ public class priceService {
         System.out.println("responeTotalprice");
         productDto productDto=selectProduct(getPriceDto.getProductName());
         JSONObject jsonObject=new JSONObject();
-        priceEnums priceEnums=confrimProduct(productDto, getPriceDto.getCount().size());
+        priceEnums priceEnums=confrimProduct(productDto, getPriceDto.getCount());
         
         if(priceEnums.gettotalPrice()==errorPrice){
             jsonObject.put("totalPrice", errorPrice);
             jsonObject.put("messege", priceEnums.getMessege());
         }else{
             jsonObject.put("price",productDto.getPrice());
-            jsonObject.put("totalPrice",getTotalPrice(productDto.getPrice(),getPriceDto.getCount().size()));
+            jsonObject.put("totalPrice",getTotalPrice(productDto.getPrice(),getPriceDto.getCount()));
         }
         return jsonObject;
     }

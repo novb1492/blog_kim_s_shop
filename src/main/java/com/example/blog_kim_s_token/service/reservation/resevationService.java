@@ -17,7 +17,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.example.blog_kim_s_token.customException.failBuyException;
 import com.example.blog_kim_s_token.enums.reservationEnums;
-import com.example.blog_kim_s_token.model.payment.paidDto;
 import com.example.blog_kim_s_token.model.payment.tryDeleteInter;
 import com.example.blog_kim_s_token.model.payment.vBankDto;
 import com.example.blog_kim_s_token.model.reservation.*;
@@ -362,6 +361,7 @@ public class resevationService {
     @Transactional(rollbackFor = Exception.class)
     public JSONObject deleteReservation(JSONObject jsonObject) {
         System.out.println("deleteReservation");
+        //테스트계정 한계로인해 일반결제만 제대로 다룰 수 있다 
         try {
             List<String>ridArray=(List<String>)jsonObject.get("rid");
             if(ridArray.size()<=0){
@@ -398,7 +398,7 @@ public class resevationService {
                     vBankDto vBankDto=paymentService.selectVbankProduct(paymentId);
                     int newPrice=paymentService.minusPrice(vBankDto.getVbankTotalPrice(),price.get(temp));
                     if(newPrice==0){
-                        System.out.println("가상계좌 금액이 0임 채번취소ㄴ ");
+                        System.out.println("가상계좌 금액이 0임 채번취소 ");
                         jsonObject.put("merchant_uid", vBankDto.getMerchant_uid());
                         jsonObject.put("vbank_due",  vBankDto.getEndDateUnixTime());
                         jsonObject.put("vbank_code",  vBankDto.getBankCode());

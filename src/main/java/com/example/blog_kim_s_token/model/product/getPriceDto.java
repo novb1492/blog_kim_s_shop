@@ -2,6 +2,7 @@ package com.example.blog_kim_s_token.model.product;
 
 import java.util.List;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 
 import lombok.AllArgsConstructor;
@@ -16,5 +17,6 @@ public class getPriceDto {
     
     @NotBlank
     private String productName;
-    private List<Integer>count;
+    @Min(value = 0,message = "수량이 0보다 작습니다")
+    private int count;
 }
