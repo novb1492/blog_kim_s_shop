@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -22,5 +23,8 @@ public class getVankDateDto {
     @Max(value = 31,message = "월이 31보다 큽니다")
     private int date;
     private List<Integer>times;
+
+    @NotBlank(message = "종류가 공백입니다")
+    private String kind;
 
 }

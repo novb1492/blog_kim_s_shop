@@ -18,7 +18,6 @@ import com.example.blog_kim_s_token.model.reservation.*;
 import com.example.blog_kim_s_token.model.reservation.getDateDto;
 import com.example.blog_kim_s_token.model.reservation.getTimeDto;
 import com.example.blog_kim_s_token.model.reservation.reservationInsertDto;
-import com.example.blog_kim_s_token.service.priceService;
 import com.example.blog_kim_s_token.service.utillService;
 import com.example.blog_kim_s_token.service.payment.paymentService;
 import com.example.blog_kim_s_token.service.payment.iamPort.iamportService;
@@ -48,7 +47,6 @@ public class resevationService {
     @Autowired
     private iamportService iamportService;
   
-
     @Autowired
     private reservationDao reservationDao;
     @Autowired
@@ -185,13 +183,12 @@ public class resevationService {
     private void confrimInsert(reservationInsertDto reservationInsertDto){
         System.out.println("confrimInsert");
             List<mainReservationDto>array=reservationDao.findByEmailNative(reservationInsertDto.getEmail(),reservationInsertDto.getSeat());
+            List<Integer>times=reservationInsertDto.getTimes();
             System.out.println(array.toString()+" 내역들");
             if(reservationInsertDto.getTimes().size()<=0){
                 System.out.println("몇시간 쓸지 선택 되지 않음");
                 throw new RuntimeException("시간을 선택하지 않았습니다");
-            }
-            if(array!=null){
-                List<Integer>times=reservationInsertDto.getTimes();
+            }else if(array!=null){
                 System.out.println("show");
                 for(mainReservationDto m:array){
                     for(int i:times){
@@ -212,14 +209,7 @@ public class resevationService {
                 }
             }
             if(reservationInsertDto.getStatus().equals(aboutPayEnums.statusReady.getString())){
-                System.out.println("가상계좌 시간 검증");
-                if(utillService.compareDate(Timestamp.valueOf(reservationInsertDto.getYear()+"-"+reservationInsertDto.getMonth()+"-"+reservationInsertDto.getDate()+" "+reservationInsertDto.getTimes().get(0)+":00:00"), LocalDateTime.now())==false){
-                    LocalDateTime shortestTime=Timestamp.valueOf(reservationInsertDto.getYear()+"-"+reservationInsertDto.getMonth()+"-"+reservationInsertDto.getDate()+" "+reservationInsertDto.getTimes().get(0)+":00:00").toLocalDateTime();
-                    if(LocalDateTime.now().plusHours(minusHour).isAfter(shortestTime)){
-                        System.out.println("가상 계좌 제한시간은 최대 "+minusHour+"시간입니다");
-                        throw new RuntimeException("가상 계좌 제한시간은 최대 "+minusHour+"시간입니다");
-                    }
-                }
+                paymentService.checkTime(reservationInsertDto.getYear(),reservationInsertDto.getMonth(),reservationInsertDto.getDate(),times.get(0));
             }
     }
     public JSONObject getClientReservation(JSONObject JSONObject) {

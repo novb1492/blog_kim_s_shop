@@ -116,31 +116,33 @@ public class paymentService {
     }
     public JSONObject  getVbankDate(getVankDateDto getVankDateDto) {
         System.out.println("getVbankDate");
-        try { 
-            Calendar getToday = Calendar.getInstance();
-            getToday.setTime(new Date()); 
-            String requestDate=getVankDateDto.getYear()+"-"+getVankDateDto.getMonth()+"-"+getVankDateDto.getDate();
-            long diffDays = utillService.getDateGap(getToday, requestDate);
-            Collections.sort(getVankDateDto.getTimes());
-            int shortestTime=getVankDateDto.getTimes().get(0);
-            paymentEnums enums=checkTime(getVankDateDto);
-            if(enums.getBool()==false){
-                return utillService.makeJson(enums.getBool(), enums.getperiod());
+        try {
+            if(getVankDateDto.getKind().equals(aboutPayEnums.reservation.getString())){
+                Calendar getToday = Calendar.getInstance();
+                getToday.setTime(new Date()); 
+                String requestDate=getVankDateDto.getYear()+"-"+getVankDateDto.getMonth()+"-"+getVankDateDto.getDate();
+                long diffDays = utillService.getDateGap(getToday, requestDate);
+                Collections.sort(getVankDateDto.getTimes());
+                int shortestTime=getVankDateDto.getTimes().get(0);
+                checkTime(getVankDateDto.getYear(),getVankDateDto.getMonth(),getVankDateDto.getDate(),shortestTime);
+                return utillService.makeJson(true,getVbankDate(diffDays, shortestTime, requestDate));
+            }else{
+                return utillService.makeJson(true,getVbankDate());
             }
-            return utillService.makeJson(true,getVbankDate(diffDays, shortestTime, requestDate));
+            
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("getVbankDate error "+e.getMessage());
-            throw new RuntimeException("가상계좌 일짜 계산 실패");
+            throw new RuntimeException(e.getMessage());
         }
     }
-    private paymentEnums checkTime(getVankDateDto getVankDateDto) {
-        System.out.println("checkTime");
-        if(Timestamp.valueOf(getVankDateDto.getYear()+"-"+getVankDateDto.getMonth()+"-"+getVankDateDto.getDate()+" "+(getVankDateDto.getTimes().get(0)-minusHour)+":00:00").toLocalDateTime().isBefore(LocalDateTime.now())){
-            paymentEnums.failCheck.setperiod("가상계좌는 최소 "+minusHour+"전에 가능합니다");
-            return paymentEnums.failCheck;
+    public void checkTime(int year,int month,int date,int time) {
+        System.out.println("가상계좌 시간 검증" +time);
+        LocalDateTime shortestTime=Timestamp.valueOf(year+"-"+month+"-"+date+" "+time+":00:00").toLocalDateTime();
+        if(LocalDateTime.now().plusHours(minusHour).isAfter(shortestTime)){
+            System.out.println("가상 계좌 제한시간은 최대 "+minusHour+"시간입니다");
+            throw new RuntimeException("가상 계좌 제한시간은 최대 "+minusHour+"시간입니다");
         }
-        return paymentEnums.sucCheck;
     }
     private String getVbankDate(long diffDays,int shortestTime,String requestDate) {
         System.out.println("getVbankDate");   
@@ -279,7 +281,7 @@ public class paymentService {
            }else{
                System.out.println("confrimProduct 통과");
                if(i==splitNameSize-1){
-                System.out.println("confrimProduct 통과");
+                System.out.println("confrimProduct 완전 통과");
                 return;
                }
            }
