@@ -4,15 +4,15 @@ package com.example.blog_kim_s_token.service.ApiServies.kakao;
 
 
 
-import java.util.ArrayList;
+
 import java.util.List;
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import com.example.blog_kim_s_token.customException.failKakaoPay;
 import com.example.blog_kim_s_token.enums.aboutPayEnums;
-import com.example.blog_kim_s_token.model.reservation.reservationInsertDto;
 import com.example.blog_kim_s_token.model.user.userDto;
-import com.example.blog_kim_s_token.service.priceService;
 import com.example.blog_kim_s_token.service.userService;
 import com.example.blog_kim_s_token.service.utillService;
 import com.example.blog_kim_s_token.service.payment.paymentService;
@@ -48,8 +48,6 @@ public class kakaopayService {
     @Autowired
     private paymentService paymentService;
     @Autowired
-    private priceService priceService;
-    @Autowired
     private userService userService;
     @Autowired
     private resevationService resevationService;
@@ -60,30 +58,13 @@ public class kakaopayService {
         System.out.println(tryKakaoPayDto);
         try {
             String[][] itemArray=tryKakaoPayDto.getItemArray();
-            int itemArraySize=itemArray.length;
-            int totalPrice=0;
-            String itemName="";
-            int count=0;
             String kind=aboutPayEnums.valueOf(tryKakaoPayDto.getKind()).getString();
-            List<Integer>times=new ArrayList<>();
-            HttpSession httpSession=request.getSession();
-            for(int i=0;i<itemArraySize;i++){
-                totalPrice+=priceService.getTotalPrice(tryKakaoPayDto.getItemArray()[i][0],Integer.parseInt(tryKakaoPayDto.getItemArray()[i][1]));
-                itemName+=tryKakaoPayDto.getItemArray()[i][0];
-                if(i!=itemArraySize-1){
-                    itemName+=",";
-                }
-                count+=Integer.parseInt(itemArray[i][1]);
-                if(kind.equals(aboutPayEnums.reservation.getString())){
-                    System.out.println("예약 상품 입니다 시간 분리 시작");
-                    times.add(Integer.parseInt(itemArray[i][2]));
-                    if(i==itemArraySize-1){
-                        System.out.println("시간 분리 완료");
-                        httpSession.setAttribute("times", times);
-                    }
-                }
-            }
-            System.out.println(totalPrice);
+            Map<String,Object>result=paymentService.getTotalPageAndOther(itemArray, kind);
+            System.out.println(result+" 상품정보 가공");
+            int totalPrice=(int)result.get("totalPrice");
+            String itemName=(String)result.get("itemName");
+            int count=(int)result.get("count");
+            List<Integer>times=(List<Integer>)result.get("times");
             confrimProduct(tryKakaoPayDto.getTotalPrice(), totalPrice);
             if(tryKakaoPayDto.getTotalPrice()!=totalPrice){
                 return utillService.makeJson(false, "가격이 위조 되었습니다");
@@ -103,6 +84,7 @@ public class kakaopayService {
             body.add("fail_url", failUrl);
             JSONObject response=getPayLink(readyUrl);
             System.out.println(response+" 카카오페이 통신요청 결과");
+            HttpSession httpSession=request.getSession();
             httpSession.setAttribute("partner_order_id", partner_order_id);
             httpSession.setAttribute("tid", response.get("tid"));
             httpSession.setAttribute("item", itemName);
@@ -113,6 +95,7 @@ public class kakaopayService {
             httpSession.setAttribute("count", count);
             httpSession.setAttribute("itemArray", itemArray);
             httpSession.setAttribute("other", tryKakaoPayDto.getOther());
+            httpSession.setAttribute("times", times);
             return utillService.makeJson(true,(String)response.get("next_redirect_pc_url"));
         }catch(IllegalArgumentException e){
             e.printStackTrace();

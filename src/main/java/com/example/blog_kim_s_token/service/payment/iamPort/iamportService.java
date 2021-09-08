@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
 
 import javax.servlet.http.HttpServletRequest;
@@ -55,8 +56,6 @@ public class iamportService {
     @Autowired
     private userService userService;
     @Autowired
-    private priceService priceService;
-    @Autowired
     private resevationService resevationService;
 
 
@@ -67,31 +66,13 @@ public class iamportService {
         String impid=tryImpPayDto.getImpid();
         try {
             String[][] itemArray=tryImpPayDto.getItemArray();
-            String[] other=tryImpPayDto.getOther();
-            int itemArraySize=itemArray.length;
-            int totalPrice=0;
-            String itemName="";
-            int count=0;
             String kind=aboutPayEnums.valueOf(tryImpPayDto.getKind()).getString();
-            List<Integer>times=new ArrayList<>();
-            HttpSession httpSession=request.getSession();
-            for(int i=0;i<itemArraySize;i++){
-                totalPrice+=priceService.getTotalPrice(tryImpPayDto.getItemArray()[i][0],Integer.parseInt(tryImpPayDto.getItemArray()[i][1]));
-                itemName+=tryImpPayDto.getItemArray()[i][0];
-                if(i!=itemArraySize-1){
-                    itemName+=",";
-                }
-                count+=Integer.parseInt(itemArray[i][1]);
-                if(kind.equals(aboutPayEnums.reservation.getString())){
-                    System.out.println("예약 상품 입니다 시간 분리 시작");
-                    times.add(Integer.parseInt(itemArray[i][2]));
-                    if(i==itemArraySize-1){
-                        System.out.println("시간 분리 완료");
-                        httpSession.setAttribute("times", times);
-                    }
-                }
-            }
-            System.out.println(totalPrice);
+            Map<String,Object>result=paymentService.getTotalPageAndOther(itemArray, kind);
+            System.out.println(result+" 상품정보 가공");
+            int totalPrice=(int)result.get("totalPrice");
+            String itemName=(String)result.get("itemName");
+            int count=(int)result.get("count");
+            List<Integer>times=(List<Integer>)result.get("times");
             paymentabstract paymentabstract=confrimBuy(getBuyInfor(impid),totalPrice,kind,request); 
             if(kind.equals(aboutPayEnums.reservation.getString())){
                 System.out.println("예약 상품 결제");
@@ -99,7 +80,7 @@ public class iamportService {
                 if(status.equals(aboutPayEnums.statusReady.getString())){
                     Collections.sort(times);
                 }
-                resevationService.doReservation(paymentabstract.getEmail(),paymentabstract.getName(), impid, itemArray, other, times,status,paymentabstract.getUsedKind());
+                resevationService. doReservation(paymentabstract.getEmail(),paymentabstract.getName(), impid, itemArray,tryImpPayDto.getOther(), times,status,paymentabstract.getUsedKind());
             }else if(kind.equals(aboutPayEnums.product.getString())){
                 System.out.println("일반 상품 결제");
             }

@@ -2,10 +2,15 @@ package com.example.blog_kim_s_token.service.payment;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
+import com.example.blog_kim_s_token.enums.aboutPayEnums;
 import com.example.blog_kim_s_token.enums.paymentEnums;
 import com.example.blog_kim_s_token.model.payment.getVankDateDto;
 import com.example.blog_kim_s_token.model.payment.paidDao;
@@ -13,6 +18,7 @@ import com.example.blog_kim_s_token.model.payment.paidDto;
 import com.example.blog_kim_s_token.model.payment.vBankDto;
 import com.example.blog_kim_s_token.model.payment.vbankDao;
 import com.example.blog_kim_s_token.model.user.userDto;
+import com.example.blog_kim_s_token.service.priceService;
 import com.example.blog_kim_s_token.service.utillService;
 import com.example.blog_kim_s_token.service.payment.iamPort.iamportService;
 import com.example.blog_kim_s_token.service.payment.iamPort.nomalPayment;
@@ -36,6 +42,8 @@ public class paymentService {
     private iamportService iamportService;
     @Autowired
     private resevationService resevationService;
+    @Autowired
+    private priceService priceService;
     @Value("${payment.period}")
     private  int period;
     @Value("${payment.minusHour}")
@@ -216,10 +224,17 @@ public class paymentService {
     public int minusPrice(int totalPrice,int minusPrice) {
         return totalPrice-minusPrice;
     }
-    /*public void getTotalPageAndOther(int itemArraySize) {
+    public Map<String,Object> getTotalPageAndOther(String[][] itemArray,String kind) {
+        System.out.println("getTotalPageAndOther");
+        int itemArraySize=itemArray.length;
+        int totalPrice=0;
+        String itemName="";
+        int count=0;
+        List<Integer>times=new ArrayList<>();
+        Map<String,Object>result=new HashMap<>();
         for(int i=0;i<itemArraySize;i++){
-            totalPrice+=priceService.getTotalPrice(tryKakaoPayDto.getItemArray()[i][0],Integer.parseInt(tryKakaoPayDto.getItemArray()[i][1]));
-            itemName+=tryKakaoPayDto.getItemArray()[i][0];
+            totalPrice+=priceService.getTotalPrice(itemArray[i][0],Integer.parseInt(itemArray[i][1]));
+            itemName+=itemArray[i][0];
             if(i!=itemArraySize-1){
                 itemName+=",";
             }
@@ -229,9 +244,14 @@ public class paymentService {
                 times.add(Integer.parseInt(itemArray[i][2]));
                 if(i==itemArraySize-1){
                     System.out.println("시간 분리 완료");
-                    httpSession.setAttribute("times", times);
+                    result.put("times", times);
                 }
             }
         }
-    }*/
+        result.put("totalPrice", totalPrice);
+        result.put("itemName", itemName);
+        result.put("count", count);
+        return result;
+    }
+
 }
