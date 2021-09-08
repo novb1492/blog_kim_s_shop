@@ -72,15 +72,16 @@ public class iamportService {
             int totalPrice=(int)result.get("totalPrice");
             String itemName=(String)result.get("itemName");
             int count=(int)result.get("count");
-            List<Integer>times=(List<Integer>)result.get("times");
+            List<Integer>timeOrsize=(List<Integer>)result.get("times");
+            paymentService.confrimProduct(tryImpPayDto.getTotalPrice(),totalPrice,count,itemName);
             paymentabstract paymentabstract=confrimBuy(getBuyInfor(impid),totalPrice,kind,request); 
             if(kind.equals(aboutPayEnums.reservation.getString())){
                 System.out.println("예약 상품 결제");
                 String status=paymentabstract.getStatus();
                 if(status.equals(aboutPayEnums.statusReady.getString())){
-                    Collections.sort(times);
+                    Collections.sort(timeOrsize);
                 }
-                resevationService. doReservation(paymentabstract.getEmail(),paymentabstract.getName(), impid, itemArray,tryImpPayDto.getOther(), times,status,paymentabstract.getUsedKind());
+                resevationService.doReservation(paymentabstract.getEmail(),paymentabstract.getName(), impid, itemArray,tryImpPayDto.getOther(), timeOrsize,status,paymentabstract.getUsedKind());
             }else if(kind.equals(aboutPayEnums.product.getString())){
                 System.out.println("일반 상품 결제");
             }

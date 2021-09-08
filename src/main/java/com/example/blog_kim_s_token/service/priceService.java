@@ -20,7 +20,7 @@ public class priceService {
     private final int errorPrice=0;
     private final int continuePrice=100;
     
-    private productDto selectProduct(String productName) {
+    public productDto selectProduct(String productName) {
         Optional<productDto> optional=productDao.findByProductName(productName);
         optional.orElseThrow(()->new IllegalAccessError("존재하지 않는 상품입니다"));
         return optional.get();

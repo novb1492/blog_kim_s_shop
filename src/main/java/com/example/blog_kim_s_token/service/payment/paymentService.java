@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.management.RuntimeErrorException;
+
 import com.example.blog_kim_s_token.enums.aboutPayEnums;
 import com.example.blog_kim_s_token.enums.paymentEnums;
 import com.example.blog_kim_s_token.model.payment.getVankDateDto;
@@ -17,6 +19,8 @@ import com.example.blog_kim_s_token.model.payment.paidDao;
 import com.example.blog_kim_s_token.model.payment.paidDto;
 import com.example.blog_kim_s_token.model.payment.vBankDto;
 import com.example.blog_kim_s_token.model.payment.vbankDao;
+import com.example.blog_kim_s_token.model.product.productDao;
+import com.example.blog_kim_s_token.model.product.productDto;
 import com.example.blog_kim_s_token.model.user.userDto;
 import com.example.blog_kim_s_token.service.priceService;
 import com.example.blog_kim_s_token.service.utillService;
@@ -26,6 +30,7 @@ import com.example.blog_kim_s_token.service.payment.iamPort.vbankPayment;
 import com.example.blog_kim_s_token.service.reservation.resevationService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
+import org.hibernate.validator.constraints.Length;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -37,7 +42,7 @@ public class paymentService {
     @Autowired
     private paidDao paidDao;
     @Autowired
-    private vbankDao vbankDao;
+    private vbankDao vbankDao; 
     @Autowired
     private iamportService iamportService;
     @Autowired
@@ -230,7 +235,7 @@ public class paymentService {
         int totalPrice=0;
         String itemName="";
         int count=0;
-        List<Integer>times=new ArrayList<>();
+        List<Integer>timesOrSize=new ArrayList<>();
         Map<String,Object>result=new HashMap<>();
         for(int i=0;i<itemArraySize;i++){
             totalPrice+=priceService.getTotalPrice(itemArray[i][0],Integer.parseInt(itemArray[i][1]));
@@ -241,17 +246,46 @@ public class paymentService {
             count+=Integer.parseInt(itemArray[i][1]);
             if(kind.equals(aboutPayEnums.reservation.getString())){
                 System.out.println("예약 상품 입니다 시간 분리 시작");
-                times.add(Integer.parseInt(itemArray[i][2]));
+                timesOrSize.add(Integer.parseInt(itemArray[i][2]));
                 if(i==itemArraySize-1){
                     System.out.println("시간 분리 완료");
-                    result.put("times", times);
+                    result.put("times", timesOrSize);
                 }
+            }else if(kind.equals(aboutPayEnums.product.getString())){
+                System.out.println("일반 상품입니다 사이즈 분리시작");
             }
         }
         result.put("totalPrice", totalPrice);
         result.put("itemName", itemName);
         result.put("count", count);
         return result;
+    }
+    public void confrimProduct(int requestTotalPrice,int totalPrice,int count,String productName) {
+        System.out.println("confrimProduct");
+        String[] splitName=productName.split(",");
+        int splitNameSize=splitName.length;
+        String messege="검증실패";
+        for(int i=0;i<splitNameSize;i++){
+           productDto productDto=priceService.selectProduct(splitName[i]);
+           int remainCount=productDto.getCount();
+           if(requestTotalPrice!=totalPrice){
+               System.out.println("가격이 변조되었습니다");
+               messege="가격이 변조되었습니다";
+               break;
+           }else if(remainCount<=0||remainCount-count<=0){
+               System.out.println("재고 부족");
+               messege="재고가 없거나 요청수량 보다 적습니다"+splitName[i];
+               break;
+           }else{
+               System.out.println("confrimProduct 통과");
+               if(i==splitNameSize-1){
+                System.out.println("confrimProduct 통과");
+                return;
+               }
+           }
+        }
+        throw new RuntimeException(messege);
+       
     }
 
 }

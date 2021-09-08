@@ -65,10 +65,7 @@ public class kakaopayService {
             String itemName=(String)result.get("itemName");
             int count=(int)result.get("count");
             List<Integer>times=(List<Integer>)result.get("times");
-            confrimProduct(tryKakaoPayDto.getTotalPrice(), totalPrice);
-            if(tryKakaoPayDto.getTotalPrice()!=totalPrice){
-                return utillService.makeJson(false, "가격이 위조 되었습니다");
-            }
+            paymentService.confrimProduct(tryKakaoPayDto.getTotalPrice(),totalPrice,count,itemName);
             System.out.println(itemName+"/"+count);
             String partner_order_id=utillService.GetRandomNum(10);
             userDto userDto=userService.sendUserDto();
@@ -109,13 +106,6 @@ public class kakaopayService {
             headers.clear();
             body.clear();
         }  
-    }
-    private void confrimProduct(int requestTotalPrice,int totalPrice) {
-        System.out.println("confrimProduct");
-        if(requestTotalPrice!=totalPrice){
-            System.out.println("가격이 변조되었습니다");
-            throw new RuntimeException("가격이 변조되었습니다");
-        }
     }
     @Transactional(rollbackFor = Exception.class)
     public JSONObject insertPaymentForkakao(String pgToken,HttpSession httpSession) {
