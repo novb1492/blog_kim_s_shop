@@ -114,7 +114,7 @@ public class errorRestController {
             System.out.println(e.getMessage());
             utillService.makeJson(false,e.getMessage());
         }
-        return utillService.makeJson(true, exception.getMessage());
+        return utillService.makeJson(false, exception.getMessage());
     }
     @ExceptionHandler(failKakaoPay.class)
     public JSONObject failKakaoPay(failKakaoPay failKakaoPay) {
