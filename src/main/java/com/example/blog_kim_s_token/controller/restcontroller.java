@@ -3,7 +3,6 @@ package com.example.blog_kim_s_token.controller;
 
 
 
-import java.util.List;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -21,7 +20,6 @@ import com.example.blog_kim_s_token.model.payment.getVankDateDto;
 import com.example.blog_kim_s_token.model.product.getPriceDto;
 import com.example.blog_kim_s_token.model.reservation.getDateDto;
 import com.example.blog_kim_s_token.model.reservation.getTimeDto;
-import com.example.blog_kim_s_token.model.reservation.reservationInsertDto;
 import com.example.blog_kim_s_token.model.user.addressDto;
 import com.example.blog_kim_s_token.model.user.phoneDto;
 import com.example.blog_kim_s_token.model.user.pwdDto;
@@ -37,6 +35,8 @@ import com.example.blog_kim_s_token.service.ApiServies.naver.naverLoginService;
 import com.example.blog_kim_s_token.service.confrim.confrimService;
 import com.example.blog_kim_s_token.service.fileUpload.fileUploadService;
 import com.example.blog_kim_s_token.service.payment.paymentService;
+import com.example.blog_kim_s_token.service.payment.iamPort.iamportService;
+import com.example.blog_kim_s_token.service.payment.iamPort.tryImpPayDto;
 import com.example.blog_kim_s_token.service.reservation.resevationService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,6 +71,8 @@ public class restcontroller {
     private paymentService paymentService;
     @Autowired
     private boardService boardService;
+    @Autowired
+    private iamportService iamportService;
 
     @PostMapping("/auth/confrimEmail")
     public boolean confrimEmail(HttpServletRequest request,HttpServletResponse response) {
@@ -165,10 +167,11 @@ public class restcontroller {
         System.out.println("getTimeByDate");
         return resevationService.getTimeByDate(getTimeDto);
     }
-    @PostMapping("/api/insertReservation")
-    public JSONObject insertReservation(@Valid @RequestBody reservationInsertDto reservationInsertDto,HttpServletRequest request,HttpServletResponse response){
-        System.out.println("insertReservation");
-       return resevationService.confrimContents(reservationInsertDto,request);
+    @PostMapping("/api/buyImp")
+    public JSONObject buyImp(@Valid @RequestBody tryImpPayDto tryImpPayDto,HttpServletRequest request,HttpServletResponse response){
+        System.out.println("buyImp");
+        return iamportService.confrimPayment(tryImpPayDto,request);
+       
     }
     @PostMapping("/api/getPrice")
     public JSONObject getPrice(@Valid@RequestBody getPriceDto getPriceDto,HttpServletResponse response) {
@@ -191,7 +194,7 @@ public class restcontroller {
         paymentService.vbankOk(jsonObject);
     }
     @PostMapping("/api/kakaopay")
-    public JSONObject getKakaoPayLink(@RequestBody tryKakaoPayDto tryKakaoPayDto,HttpServletRequest request,HttpServletResponse response) {
+    public JSONObject getKakaoPayLink(@Valid @RequestBody tryKakaoPayDto tryKakaoPayDto,HttpServletRequest request,HttpServletResponse response) {
         System.out.println("getKakaoPayLink");
          return kakaopayService.doKakaoPay(tryKakaoPayDto,request);
     }

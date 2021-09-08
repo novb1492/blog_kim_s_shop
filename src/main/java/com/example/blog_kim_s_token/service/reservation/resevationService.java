@@ -1,21 +1,16 @@
 package com.example.blog_kim_s_token.service.reservation;
 
 import java.sql.Timestamp;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import javax.servlet.http.HttpServletRequest;
-
-import com.example.blog_kim_s_token.customException.failBuyException;
+import com.example.blog_kim_s_token.enums.aboutPayEnums;
 import com.example.blog_kim_s_token.enums.reservationEnums;
 import com.example.blog_kim_s_token.model.payment.tryDeleteInter;
 import com.example.blog_kim_s_token.model.payment.vBankDto;
@@ -26,10 +21,8 @@ import com.example.blog_kim_s_token.model.reservation.reservationInsertDto;
 import com.example.blog_kim_s_token.service.priceService;
 import com.example.blog_kim_s_token.service.utillService;
 import com.example.blog_kim_s_token.service.payment.paymentService;
-import com.example.blog_kim_s_token.service.payment.paymentabstract;
 import com.example.blog_kim_s_token.service.payment.iamPort.iamportService;
 import com.nimbusds.jose.shaded.json.JSONObject;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -44,7 +37,6 @@ public class resevationService {
     private final int maxPeopleOfDay=60;
     private final int maxPeopleOfTime=6;
     private final int cantFlag=100;
-    private final String kind="reservation";
     private final int pagingNum=3;
 
     @Value("${payment.minusHour}")
@@ -59,8 +51,6 @@ public class resevationService {
 
     @Autowired
     private reservationDao reservationDao;
-    @Autowired
-    private priceService priceService;
     @Autowired
     private paymentService paymentService;
 
@@ -148,33 +138,6 @@ public class resevationService {
         System.out.println(timestamp);
         return reservationDao.findByTime(timestamp,seat);
     }
-    @Transactional(rollbackFor = Exception.class)
-    public JSONObject confrimContents(reservationInsertDto reservationInsertDto,HttpServletRequest request) {
-        System.out.println("confrimContents");
-        try {
-            Collections.sort(reservationInsertDto.getTimes());
-            List<Integer>times=reservationInsertDto.getTimes();
-            int totalPrice=priceService.getTotalPrice(reservationInsertDto.getSeat(),times.size());
-            paymentabstract paymentabstract=iamportService.confrimPayment(reservationInsertDto.getPaymentId(), totalPrice,kind,request);
-            reservationInsertDto.setStatus(paymentabstract.getStatus());
-            reservationInsertDto.setUsedKind(paymentabstract.getUsedKind());
-            reservationInsertDto.setEmail(paymentabstract.getEmail());
-            reservationInsertDto.setName(paymentabstract.getName());
-            confrimInsert(reservationInsertDto);
-            insertReservation(reservationInsertDto);
-            
-            String messege="예약이 완료되었습니다";
-            if(reservationInsertDto.getStatus().equals("ready")){
-                messege=messege+" 발급된 가상계좌는 예약내역페이지를 확인해주세요";
-            }
-            return utillService.makeJson(true, messege);
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("confrimContents error");
-            throw new failBuyException(e.getMessage(), reservationInsertDto.getPaymentId(),null);
-        }
-       
-    }
     public void confrimContents(reservationInsertDto reservationInsertDto) {
         confrimInsert(reservationInsertDto);
         insertReservation(reservationInsertDto);
@@ -233,7 +196,7 @@ public class resevationService {
                     }
                 }
             }
-            if(reservationInsertDto.getStatus().equals("ready")){
+            if(reservationInsertDto.getStatus().equals(aboutPayEnums.statusReady.getString())){
                 System.out.println("가상계좌 시간 검증");
                 if(utillService.compareDate(Timestamp.valueOf(reservationInsertDto.getYear()+"-"+reservationInsertDto.getMonth()+"-"+reservationInsertDto.getDate()+" "+reservationInsertDto.getTimes().get(0)+":00:00"), LocalDateTime.now())==false){
                     LocalDateTime shortestTime=Timestamp.valueOf(reservationInsertDto.getYear()+"-"+reservationInsertDto.getMonth()+"-"+reservationInsertDto.getDate()+" "+reservationInsertDto.getTimes().get(0)+":00:00").toLocalDateTime();

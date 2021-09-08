@@ -1,10 +1,9 @@
 package com.example.blog_kim_s_token.model.product;
 
-import java.util.List;
+
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

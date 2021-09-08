@@ -216,4 +216,22 @@ public class paymentService {
     public int minusPrice(int totalPrice,int minusPrice) {
         return totalPrice-minusPrice;
     }
+    /*public void getTotalPageAndOther(int itemArraySize) {
+        for(int i=0;i<itemArraySize;i++){
+            totalPrice+=priceService.getTotalPrice(tryKakaoPayDto.getItemArray()[i][0],Integer.parseInt(tryKakaoPayDto.getItemArray()[i][1]));
+            itemName+=tryKakaoPayDto.getItemArray()[i][0];
+            if(i!=itemArraySize-1){
+                itemName+=",";
+            }
+            count+=Integer.parseInt(itemArray[i][1]);
+            if(kind.equals(aboutPayEnums.reservation.getString())){
+                System.out.println("예약 상품 입니다 시간 분리 시작");
+                times.add(Integer.parseInt(itemArray[i][2]));
+                if(i==itemArraySize-1){
+                    System.out.println("시간 분리 완료");
+                    httpSession.setAttribute("times", times);
+                }
+            }
+        }
+    }*/
 }

@@ -4,8 +4,9 @@ public enum aboutPayEnums {
     
     statusPaid("paid"),
     statusReady("ready"),
-    reservationKind("reservation"),
-    productKind("product");
+    reservation("reservation"),
+    product("product"),
+    vbank("vbank");
 
     private String messege;
 

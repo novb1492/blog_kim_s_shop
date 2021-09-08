@@ -6,11 +6,8 @@ package com.example.blog_kim_s_token.service.ApiServies.kakao;
 
 import java.util.ArrayList;
 import java.util.List;
-
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-
 import com.example.blog_kim_s_token.customException.failKakaoPay;
 import com.example.blog_kim_s_token.enums.aboutPayEnums;
 import com.example.blog_kim_s_token.model.reservation.reservationInsertDto;
@@ -67,12 +64,9 @@ public class kakaopayService {
             int totalPrice=0;
             String itemName="";
             int count=0;
-            String kind=tryKakaoPayDto.getKind();
+            String kind=aboutPayEnums.valueOf(tryKakaoPayDto.getKind()).getString();
             List<Integer>times=new ArrayList<>();
             HttpSession httpSession=request.getSession();
-            if(!kind.equals("reservation")&&!kind.equals("product")){
-                utillService.makeJson(false ,"취급 상품 없음");
-            }
             for(int i=0;i<itemArraySize;i++){
                 totalPrice+=priceService.getTotalPrice(tryKakaoPayDto.getItemArray()[i][0],Integer.parseInt(tryKakaoPayDto.getItemArray()[i][1]));
                 itemName+=tryKakaoPayDto.getItemArray()[i][0];
@@ -80,7 +74,7 @@ public class kakaopayService {
                     itemName+=",";
                 }
                 count+=Integer.parseInt(itemArray[i][1]);
-                if(kind.equals(aboutPayEnums.reservationKind.getString())){
+                if(kind.equals(aboutPayEnums.reservation.getString())){
                     System.out.println("예약 상품 입니다 시간 분리 시작");
                     times.add(Integer.parseInt(itemArray[i][2]));
                     if(i==itemArraySize-1){
@@ -90,7 +84,7 @@ public class kakaopayService {
                 }
             }
             System.out.println(totalPrice);
-            confrimProduct(tryKakaoPayDto.getTotalPrice(), totalPrice, kind);
+            confrimProduct(tryKakaoPayDto.getTotalPrice(), totalPrice);
             if(tryKakaoPayDto.getTotalPrice()!=totalPrice){
                 return utillService.makeJson(false, "가격이 위조 되었습니다");
             }
@@ -120,7 +114,11 @@ public class kakaopayService {
             httpSession.setAttribute("itemArray", itemArray);
             httpSession.setAttribute("other", tryKakaoPayDto.getOther());
             return utillService.makeJson(true,(String)response.get("next_redirect_pc_url"));
-        } catch (Exception e) {
+        }catch(IllegalArgumentException e){
+            e.printStackTrace();
+            System.out.println("doKakaoPay");
+            throw new RuntimeException("조건에 맞지 않는 상품선택입니다");
+        }catch (Exception e) {
             e.printStackTrace();
             System.out.println("doKakaoPay");
             throw new RuntimeException(e.getMessage());
@@ -129,12 +127,8 @@ public class kakaopayService {
             body.clear();
         }  
     }
-    private void confrimProduct(int requestTotalPrice,int totalPrice,String kind) {
+    private void confrimProduct(int requestTotalPrice,int totalPrice) {
         System.out.println("confrimProduct");
-        if(!kind.equals("reservation")&&!kind.equals("product")){
-            System.out.println("취급하지 않는 상품 조회");
-            throw new RuntimeException("취급하지 않는 상품 조회");
-        }
         if(requestTotalPrice!=totalPrice){
             System.out.println("가격이 변조되었습니다");
             throw new RuntimeException("가격이 변조되었습니다");
@@ -203,7 +197,6 @@ public class kakaopayService {
         try {
             headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
             headers.add("Authorization","KakaoAK "+adminKey);
-           
             HttpEntity<MultiValueMap<String,Object>>entity=new HttpEntity<>(body,headers);
             return restTemplate.postForObject(url,entity,JSONObject.class);
         } catch (Exception e) {
