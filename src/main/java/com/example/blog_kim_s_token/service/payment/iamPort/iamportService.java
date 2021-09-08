@@ -99,8 +99,8 @@ public class iamportService {
                 if(status.equals(aboutPayEnums.statusReady.getString())){
                     Collections.sort(times);
                 }
-                doReservation(paymentabstract.getEmail(), paymentabstract.getName(), impid, itemArray, other, times,status,paymentabstract.getUsedKind());
-            }else{
+                resevationService.doReservation(paymentabstract.getEmail(),paymentabstract.getName(), impid, itemArray, other, times,status,paymentabstract.getUsedKind());
+            }else if(kind.equals(aboutPayEnums.product.getString())){
                 System.out.println("일반 상품 결제");
             }
             return utillService.makeJson(true, "완료되었습니다");
@@ -129,21 +129,6 @@ public class iamportService {
             headers.clear();
             body.clear();
         }
-    }
-    private void doReservation(String email,String name,String paymentid,String[][]itemArray,String[] other,List<Integer>times,String status,String usedKind) {
-        System.out.println("doReservation");
-        reservationInsertDto reservationInsertDto=new reservationInsertDto();
-                reservationInsertDto.setEmail(email);
-                reservationInsertDto.setName(name);
-                reservationInsertDto.setPaymentId(paymentid);
-                reservationInsertDto.setSeat(itemArray[0][0]);
-                reservationInsertDto.setStatus(status);
-                reservationInsertDto.setUsedKind(usedKind);
-                reservationInsertDto.setYear(Integer.parseInt(other[0]));
-                reservationInsertDto.setMonth(Integer.parseInt(other[1]));
-                reservationInsertDto.setDate(Integer.parseInt(other[2]));
-                reservationInsertDto.setTimes(times);
-        resevationService.confrimContents(reservationInsertDto);
     }
     public JSONObject getBuyInfor(String impId){
         System.out.println("getBuyInfor");

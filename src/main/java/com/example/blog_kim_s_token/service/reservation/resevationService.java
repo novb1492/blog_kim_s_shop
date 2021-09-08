@@ -138,7 +138,22 @@ public class resevationService {
         System.out.println(timestamp);
         return reservationDao.findByTime(timestamp,seat);
     }
-    public void confrimContents(reservationInsertDto reservationInsertDto) {
+    public void doReservation(String email,String name,String paymentid,String[][]itemArray,String[] other,List<Integer>times,String status,String usedKind) {
+        System.out.println("doReservation");
+        reservationInsertDto reservationInsertDto=new reservationInsertDto();
+                reservationInsertDto.setEmail(email);
+                reservationInsertDto.setName(name);
+                reservationInsertDto.setPaymentId(paymentid);
+                reservationInsertDto.setSeat(itemArray[0][0]);
+                reservationInsertDto.setStatus(status);
+                reservationInsertDto.setUsedKind(usedKind);
+                reservationInsertDto.setYear(Integer.parseInt(other[0]));
+                reservationInsertDto.setMonth(Integer.parseInt(other[1]));
+                reservationInsertDto.setDate(Integer.parseInt(other[2]));
+                reservationInsertDto.setTimes(times);
+       confrimContents(reservationInsertDto);
+    }
+    private void confrimContents(reservationInsertDto reservationInsertDto) {
         confrimInsert(reservationInsertDto);
         insertReservation(reservationInsertDto);
     }

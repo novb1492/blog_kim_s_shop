@@ -6,6 +6,7 @@ public enum aboutPayEnums {
     statusReady("ready"),
     reservation("reservation"),
     product("product"),
+    kakaoPay("kakaoPay"),
     vbank("vbank");
 
     private String messege;

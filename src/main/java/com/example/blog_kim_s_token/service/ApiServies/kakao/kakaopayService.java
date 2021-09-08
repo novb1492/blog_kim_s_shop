@@ -154,18 +154,20 @@ public class kakaopayService {
             body.add("pg_token", pgToken);
             JSONObject response=getPayLink(approveUrl);
             System.out.println(response+" 카카오페이 결제완료");
+            String usedKind=aboutPayEnums.kakaoPay.getString();
             nomalPayment nomalPayment=new nomalPayment();
             nomalPayment.setKind(kind);
             nomalPayment.setEmail(email);
-            nomalPayment.setPayMethod("kakaoPay");
+            nomalPayment.setPayMethod(usedKind);
             nomalPayment.setPaymentid(paymentid);
             nomalPayment.setStatus(status);
-            nomalPayment.setUsedKind("kakaoPay");
+            nomalPayment.setUsedKind(usedKind);
             nomalPayment.setName(name);
             paymentService.insertPayment(nomalPayment,totalPrice);
             if(kind.equals("reservation")){
                 System.out.println("예약 상품 결제");
-                doReservation(email,name,paymentid,itemArray,other,times);
+                resevationService.doReservation(email,name, paymentid, itemArray, other, times,status,usedKind);
+      
             }else if(kind.equals("product")){
                 System.out.println("상품결제");
             }
@@ -177,21 +179,6 @@ public class kakaopayService {
             throw new failKakaoPay(e.getMessage(),cid,paymentid,totalPrice);
         }
     }  
-    private void doReservation(String email,String name,String paymentid,String[][]itemArray,String[] other,List<Integer>times) {
-        System.out.println("doReservation");
-        reservationInsertDto reservationInsertDto=new reservationInsertDto();
-                reservationInsertDto.setEmail(email);
-                reservationInsertDto.setName(name);
-                reservationInsertDto.setPaymentId(paymentid);
-                reservationInsertDto.setSeat(itemArray[0][0]);
-                reservationInsertDto.setStatus(status);
-                reservationInsertDto.setUsedKind("kakaoPay");
-                reservationInsertDto.setYear(Integer.parseInt(other[0]));
-                reservationInsertDto.setMonth(Integer.parseInt(other[1]));
-                reservationInsertDto.setDate(Integer.parseInt(other[2]));
-                reservationInsertDto.setTimes(times);
-        resevationService.confrimContents(reservationInsertDto);
-    }
     private JSONObject getPayLink(String url) {
         System.out.println("getPayLink");
         try {
