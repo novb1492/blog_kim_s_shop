@@ -59,7 +59,7 @@ public class kakaopayService {
         try {
             String[][] itemArray=tryKakaoPayDto.getItemArray();
             String kind=aboutPayEnums.valueOf(tryKakaoPayDto.getKind()).getString();
-            Map<String,Object>result=paymentService.getTotalPageAndOther(itemArray, kind);
+            Map<String,Object>result=paymentService.getTotalPriceAndOther(itemArray, kind);
             System.out.println(result+" 상품정보 가공");
             int totalPrice=(int)result.get("totalPrice");
             String itemName=(String)result.get("itemName");

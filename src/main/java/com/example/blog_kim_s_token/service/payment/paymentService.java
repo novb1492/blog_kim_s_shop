@@ -227,8 +227,8 @@ public class paymentService {
     public int minusPrice(int totalPrice,int minusPrice) {
         return totalPrice-minusPrice;
     }
-    public Map<String,Object> getTotalPageAndOther(String[][] itemArray,String kind) {
-        System.out.println("getTotalPageAndOther");
+    public Map<String,Object> getTotalPriceAndOther(String[][] itemArray,String kind) {
+        System.out.println("getTotalPriceAndOther");
         int itemArraySize=itemArray.length;
         int totalPrice=0;
         String itemName="";
