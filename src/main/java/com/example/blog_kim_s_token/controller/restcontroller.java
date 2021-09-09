@@ -17,6 +17,7 @@ import com.example.blog_kim_s_token.model.article.insertArticleDto;
 import com.example.blog_kim_s_token.model.confrim.emailCofrimDto;
 import com.example.blog_kim_s_token.model.confrim.phoneCofrimDto;
 import com.example.blog_kim_s_token.model.payment.getVankDateDto;
+import com.example.blog_kim_s_token.model.payment.tryCanclePayDto;
 import com.example.blog_kim_s_token.model.product.getPriceDto;
 import com.example.blog_kim_s_token.model.reservation.getDateDto;
 import com.example.blog_kim_s_token.model.reservation.getTimeDto;
@@ -35,7 +36,6 @@ import com.example.blog_kim_s_token.service.ApiServies.naver.naverLoginService;
 import com.example.blog_kim_s_token.service.confrim.confrimService;
 import com.example.blog_kim_s_token.service.fileUpload.fileUploadService;
 import com.example.blog_kim_s_token.service.payment.paymentService;
-import com.example.blog_kim_s_token.service.payment.iamPort.iamportService;
 import com.example.blog_kim_s_token.service.payment.iamPort.tryImpPayDto;
 import com.example.blog_kim_s_token.service.reservation.resevationService;
 import com.nimbusds.jose.shaded.json.JSONObject;
@@ -71,8 +71,7 @@ public class restcontroller {
     private paymentService paymentService;
     @Autowired
     private boardService boardService;
-    @Autowired
-    private iamportService iamportService;
+
 
     @PostMapping("/auth/confrimEmail")
     public boolean confrimEmail(HttpServletRequest request,HttpServletResponse response) {
@@ -170,7 +169,7 @@ public class restcontroller {
     @PostMapping("/api/buyImp")
     public JSONObject buyImp(@Valid @RequestBody tryImpPayDto tryImpPayDto,HttpServletRequest request,HttpServletResponse response){
         System.out.println("buyImp");
-        return iamportService.confrimPayment(tryImpPayDto,request);
+        return paymentService.confrimPayment(tryImpPayDto,request);
        
     }
     @PostMapping("/api/getPrice")
@@ -203,10 +202,10 @@ public class restcontroller {
         System.out.println("okKakaopay");
         return kakaopayService.insertPaymentForkakao(request.getParameter("pg_token"),session);
     }
-    @PostMapping("/api/cancleReservation")
-    public JSONObject cancleReservation(@RequestBody JSONObject jsonObject,HttpServletRequest request,HttpServletResponse response) {
-        System.out.println("cancleReservation"); 
-        return resevationService.deleteReservation(jsonObject);
+    @PostMapping("/api/canclePay")
+    public void canclePay(@Valid @RequestBody tryCanclePayDto tryCanclePayDto,HttpServletRequest request,HttpServletResponse response) {
+        System.out.println("canclePay"); 
+         paymentService.canclePay(tryCanclePayDto);
     }
     @PostMapping("/api/imageUpload")
     public JSONObject imageUpload(@RequestParam("file")MultipartFile multipartFile,HttpServletRequest request,HttpServletResponse response) {

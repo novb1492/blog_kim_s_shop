@@ -64,7 +64,7 @@ public class kakaopayService {
             int totalPrice=(int)result.get("totalPrice");
             String itemName=(String)result.get("itemName");
             int count=(int)result.get("count");
-            List<Integer>times=(List<Integer>)result.get("times");
+            List<Integer>timesOrSize=(List<Integer>)result.get("timesOrSize");
             paymentService.confrimProduct(tryKakaoPayDto.getTotalPrice(),totalPrice,count,itemName);
             System.out.println(itemName+"/"+count);
             String partner_order_id=utillService.GetRandomNum(10);
@@ -92,7 +92,7 @@ public class kakaopayService {
             httpSession.setAttribute("count", count);
             httpSession.setAttribute("itemArray", itemArray);
             httpSession.setAttribute("other", tryKakaoPayDto.getOther());
-            httpSession.setAttribute("times", times);
+            httpSession.setAttribute("timesOrSize", timesOrSize);
             return utillService.makeJson(true,(String)response.get("next_redirect_pc_url"));
         }catch(IllegalArgumentException e){
             e.printStackTrace();
@@ -117,7 +117,7 @@ public class kakaopayService {
         int totalPrice=(int)httpSession.getAttribute("totalPrice");
         String kind=(String)httpSession.getAttribute("kind");
         String paymentid=(String)httpSession.getAttribute("tid");
-        List<Integer>times=(List<Integer>)httpSession.getAttribute("times");
+        List<Integer>timesOrSize=(List<Integer>)httpSession.getAttribute("timesOrSize");
         try {
             body.add("cid", cid);
             body.add("tid",paymentid);
@@ -139,7 +139,7 @@ public class kakaopayService {
             paymentService.insertPayment(nomalPayment,totalPrice);
             if(kind.equals("reservation")){
                 System.out.println("예약 상품 결제");
-                resevationService.doReservation(email,name, paymentid, itemArray, other, times,status,usedKind);
+                resevationService.doReservation(email,name, paymentid, itemArray, other,timesOrSize,status,usedKind);
       
             }else if(kind.equals("product")){
                 System.out.println("상품결제");

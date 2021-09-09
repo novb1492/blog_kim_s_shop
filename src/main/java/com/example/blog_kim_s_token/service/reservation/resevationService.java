@@ -324,80 +324,23 @@ public class resevationService {
             }
         return array;
     }
-    @Transactional(rollbackFor = Exception.class)
-    public JSONObject deleteReservation(JSONObject jsonObject) {
+    public void deleteReservation(String paymentid) {
         System.out.println("deleteReservation");
         //테스트계정 한계로인해 일반결제만 제대로 다룰 수 있다 
-        try {
-            List<String>ridArray=(List<String>)jsonObject.get("rid");
-            if(ridArray.size()<=0){
-                System.out.println("선택한 예약이없습니다");
-                return utillService.makeJson(false, "선택한 예약이 없습니다"); 
-            }
-            List<mainReservationDto>dtoArray=new ArrayList<>();
-            List<Integer>price=new ArrayList<>();
-            for(int i=0;i<ridArray.size();i++){
-                System.out.println(ridArray.get(i)+" 취소예약시도 번호");
-                Optional<tryDeleteInter> tryDeleteInter=reservationDao.findBySeatJoin(Integer.parseInt(ridArray.get(i)));
-                tryDeleteInter.orElseThrow(()->new IllegalAccessError("존재하지 않는 예약이 발갼되었습니다"));
-                tryDeleteInter tryDeleteInter2=tryDeleteInter.get();
-                dtoArray.add(new mainReservationDto().builder().seat(tryDeleteInter2.getSeat()).status(tryDeleteInter2.getStatus()).id(tryDeleteInter2.getId()).paymentId(tryDeleteInter2.getPayment_id()).dateAndTime(tryDeleteInter2.getDate_and_time()).email(tryDeleteInter2.getEmail()).build());
-                price.add(tryDeleteInter2.getPrice());
-            }
-            System.out.println(dtoArray.get(0).toString()+" test");
-            int temp=0;
-            for(mainReservationDto dto:dtoArray){
-                reservationEnums enums=confrimCancle(dto);
-                if(enums.getBool()==false){
-                    System.out.println("예약환불 중 조건에 맞지 않는 예약발견");
-                    throw new Exception(enums.getMessege());
-                }
-                String paymentId=dto.getPaymentId();
-                if(dto.getStatus().equals("paid")){
-                    System.out.println("결제된 상품 취소시도");
-                    int minusPrice=price.get(temp);
-                    reservationDao.deleteById(dto.getId());
-                    paymentService.updatePaidProductForCancle(paymentId, minusPrice);
-                    iamportService.cancleBuy(paymentId,minusPrice);
-                }else if(dto.getStatus().equals("ready")){
-                    System.out.println("미결제 상품 취소시도");
-                    vBankDto vBankDto=paymentService.selectVbankProduct(paymentId);
-                    int newPrice=paymentService.minusPrice(vBankDto.getVbankTotalPrice(),price.get(temp));
-                    if(newPrice==0){
-                        System.out.println("가상계좌 금액이 0임 채번취소 ");
-                        jsonObject.put("merchant_uid", vBankDto.getMerchant_uid());
-                        jsonObject.put("vbank_due",  vBankDto.getEndDateUnixTime());
-                        jsonObject.put("vbank_code",  vBankDto.getBankCode());
-                        jsonObject.put("vbank_holder",  vBankDto.getPgName());
-                        jsonObject.put("amount",  vBankDto.getVbankTotalPrice());
-                        iamportService.cancleVbank(paymentId, jsonObject);
-                    }else{
-                        iamportService.updateVbank(paymentId, newPrice, vBankDto.getEndDateUnixTime());
-                    }
-                }
-                temp+=1;
-            }
-          
-            return utillService.makeJson(true, "예약취소 성공");
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println(e.getMessage());
-            throw new RuntimeException(e.getMessage());
-        }
+  
     }
-    private reservationEnums confrimCancle(mainReservationDto mainReservationDto) {
+    private void confrimCancle(mainReservationDto mainReservationDto) {
         String messege=null;
-        String enumValue="fail";
         String email=SecurityContextHolder.getContext().getAuthentication().getName();
         if(LocalDateTime.now().plusHours(limitedCancleHour).isAfter(mainReservationDto.getDateAndTime().toLocalDateTime())){
             messege="예약시간 한시간 전까지 취소가능합니다";
         }else if(!email.equals(mainReservationDto.getEmail())){
             messege="예약과 예약자 이메일이 다릅니다";
         }else{
-            enumValue="can";
+            System.out.println("예약 취소 가능");
+            return;
         }
-        reservationEnums.valueOf(enumValue).setMessete(messege);
-        return reservationEnums.valueOf(enumValue);
+       throw new RuntimeException(messege);
     }
     public void readyTopaid(String paymentId) {
         System.out.println("readyTopaid");

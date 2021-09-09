@@ -6,31 +6,18 @@ package com.example.blog_kim_s_token.service.payment.iamPort;
 
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
-import java.util.List;
-import java.util.Map;
 import java.util.TimeZone;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-
-import com.example.blog_kim_s_token.customException.failBuyException;
 import com.example.blog_kim_s_token.enums.aboutPayEnums;
-import com.example.blog_kim_s_token.enums.paymentEnums;
 import com.example.blog_kim_s_token.model.iamport.buyInforDto;
 import com.example.blog_kim_s_token.model.iamport.impTokenDto;
-import com.example.blog_kim_s_token.model.reservation.reservationInsertDto;
 import com.example.blog_kim_s_token.model.user.userDto;
-import com.example.blog_kim_s_token.service.priceService;
 import com.example.blog_kim_s_token.service.userService;
-import com.example.blog_kim_s_token.service.utillService;
 import com.example.blog_kim_s_token.service.payment.paymentService;
 import com.example.blog_kim_s_token.service.payment.paymentabstract;
-import com.example.blog_kim_s_token.service.reservation.resevationService;
 import com.nimbusds.jose.shaded.json.JSONObject;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -38,7 +25,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 @Service
@@ -55,44 +41,7 @@ public class iamportService {
     private paymentService paymentService;
     @Autowired
     private userService userService;
-    @Autowired
-    private resevationService resevationService;
 
-
-    @Transactional(rollbackFor = Exception.class)
-    public JSONObject confrimPayment(tryImpPayDto tryImpPayDto,HttpServletRequest request) {
-        System.out.println("confrimPayment");
-        System.out.println(tryImpPayDto);
-        String impid=tryImpPayDto.getImpid();
-        try {
-            String[][] itemArray=tryImpPayDto.getItemArray();
-            String kind=aboutPayEnums.valueOf(tryImpPayDto.getKind()).getString();
-            Map<String,Object>result=paymentService.getTotalPriceAndOther(itemArray, kind);
-            System.out.println(result+" 상품정보 가공");
-            int totalPrice=(int)result.get("totalPrice");
-            String itemName=(String)result.get("itemName");
-            int count=(int)result.get("count");
-            List<Integer>timeOrsize=(List<Integer>)result.get("times");
-            paymentService.confrimProduct(tryImpPayDto.getTotalPrice(),totalPrice,count,itemName);
-            paymentabstract paymentabstract=confrimBuy(getBuyInfor(impid),totalPrice,kind,request); 
-            if(kind.equals(aboutPayEnums.reservation.getString())){
-                System.out.println("예약 상품 결제");
-                String status=paymentabstract.getStatus();
-                if(status.equals(aboutPayEnums.statusReady.getString())){
-                    Collections.sort(timeOrsize);
-                }
-                resevationService.doReservation(paymentabstract.getEmail(),paymentabstract.getName(), impid, itemArray,tryImpPayDto.getOther(), timeOrsize,status,paymentabstract.getUsedKind());
-            }else if(kind.equals(aboutPayEnums.product.getString())){
-                System.out.println("일반 상품 결제");
-            }
-            return utillService.makeJson(true, "완료되었습니다");
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("confrimPayment error");
-            throw new failBuyException(e.getMessage(),impid);
-        }
-    }
-    
     private String getToken() {
         System.out.println("getToken");
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -130,7 +79,7 @@ public class iamportService {
             body.clear();
         }
     }
-    private paymentabstract confrimBuy(JSONObject buyInfor,int totalPrice,String kind,HttpServletRequest request) {
+    public paymentabstract confrimBuy(JSONObject buyInfor,int totalPrice,String kind,HttpServletRequest request) {
         System.out.println("confrimBuy");
         String status=(String) buyInfor.get("status");
         String paymentId=(String)buyInfor.get("imp_uid");

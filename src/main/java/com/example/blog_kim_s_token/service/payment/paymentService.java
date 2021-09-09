@@ -10,12 +10,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 
-
+import com.example.blog_kim_s_token.customException.failBuyException;
 import com.example.blog_kim_s_token.enums.aboutPayEnums;
 import com.example.blog_kim_s_token.model.payment.getVankDateDto;
 import com.example.blog_kim_s_token.model.payment.paidDao;
 import com.example.blog_kim_s_token.model.payment.paidDto;
+import com.example.blog_kim_s_token.model.payment.tryCanclePayDto;
 import com.example.blog_kim_s_token.model.payment.vBankDto;
 import com.example.blog_kim_s_token.model.payment.vbankDao;
 import com.example.blog_kim_s_token.model.product.productDto;
@@ -24,6 +26,7 @@ import com.example.blog_kim_s_token.service.priceService;
 import com.example.blog_kim_s_token.service.utillService;
 import com.example.blog_kim_s_token.service.payment.iamPort.iamportService;
 import com.example.blog_kim_s_token.service.payment.iamPort.nomalPayment;
+import com.example.blog_kim_s_token.service.payment.iamPort.tryImpPayDto;
 import com.example.blog_kim_s_token.service.payment.iamPort.vbankPayment;
 import com.example.blog_kim_s_token.service.reservation.resevationService;
 import com.nimbusds.jose.shaded.json.JSONObject;
@@ -50,11 +53,6 @@ public class paymentService {
     @Value("${payment.minusHour}")
     private  int minusHour;
     
-    
-    public void cancleBuy(String paymentId,int price) {
-        System.out.println("cancleBuy");
-        iamportService.cancleBuy(paymentId, price);
-    }
     public vBankDto selectVbankProduct(String paymentId) {
         return vbankDao.findByPaymentId(paymentId);
     }
@@ -247,7 +245,7 @@ public class paymentService {
                 timesOrSize.add(Integer.parseInt(itemArray[i][2]));
                 if(i==itemArraySize-1){
                     System.out.println("시간 분리 완료");
-                    result.put("times", timesOrSize);
+                    result.put("timesOrSize", timesOrSize);
                 }
             }else if(kind.equals(aboutPayEnums.product.getString())){
                 System.out.println("일반 상품입니다 사이즈 분리시작");
@@ -283,7 +281,58 @@ public class paymentService {
            }
         }
         throw new RuntimeException(messege);
-       
+    }
+    @Transactional(rollbackFor = Exception.class)
+    public JSONObject confrimPayment(tryImpPayDto tryImpPayDto,HttpServletRequest request) {
+        System.out.println("confrimPayment");
+        System.out.println(tryImpPayDto);
+        String impid=tryImpPayDto.getImpid();
+        try {
+            String[][] itemArray=tryImpPayDto.getItemArray();
+            String kind=aboutPayEnums.valueOf(tryImpPayDto.getKind()).getString();
+            Map<String,Object>result=getTotalPriceAndOther(itemArray, kind);
+            System.out.println(result+" 상품정보 가공");
+            int totalPrice=(int)result.get("totalPrice");
+            String itemName=(String)result.get("itemName");
+            int count=(int)result.get("count");
+            List<Integer>timeOrsize=(List<Integer>)result.get("timesOrSize");
+            confrimProduct(tryImpPayDto.getTotalPrice(),totalPrice,count,itemName);
+            paymentabstract paymentabstract=iamportService.confrimBuy(iamportService.getBuyInfor(impid),totalPrice,kind,request); 
+            if(kind.equals(aboutPayEnums.reservation.getString())){
+                System.out.println("예약 상품 결제");
+                String status=paymentabstract.getStatus();
+                if(status.equals(aboutPayEnums.statusReady.getString())){
+                    Collections.sort(timeOrsize);
+                }
+                resevationService.doReservation(paymentabstract.getEmail(),paymentabstract.getName(), impid, itemArray,tryImpPayDto.getOther(), timeOrsize,status,paymentabstract.getUsedKind());
+            }else if(kind.equals(aboutPayEnums.product.getString())){
+                System.out.println("일반 상품 결제");
+            }
+            return utillService.makeJson(true, "완료되었습니다");
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("confrimPayment error");
+            throw new failBuyException(e.getMessage(),impid);
+        }
+    }
+    @Transactional(rollbackFor = Exception.class)
+    public JSONObject canclePay(tryCanclePayDto tryCanclePayDto ) {
+        System.out.println("canclePay");
+        try {
+            String kind=aboutPayEnums.valueOf(tryCanclePayDto.getKind()).getString();
+            String paymentid=tryCanclePayDto.getPaymentid();
+            if(kind.equals(aboutPayEnums.reservation.getString())){
+                System.out.println("예약 상품 취소 시도");
+                resevationService.deleteReservation(paymentid);
+            }else if(kind.equals(aboutPayEnums.product.getString())){
+                System.out.println("일반 상품 취소 시도");
+            }
+            return null;
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("canclePay error"+ e.getMessage());
+            throw new RuntimeException(e.getMessage());
+        }
     }
 
 }
