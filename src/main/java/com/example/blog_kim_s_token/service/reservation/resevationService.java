@@ -13,6 +13,7 @@ import java.util.Optional;
 import com.amazonaws.services.managedblockchain.model.IllegalActionException;
 import com.example.blog_kim_s_token.enums.aboutPayEnums;
 import com.example.blog_kim_s_token.enums.reservationEnums;
+import com.example.blog_kim_s_token.model.payment.paidDto;
 import com.example.blog_kim_s_token.model.payment.tryDeleteInter;
 import com.example.blog_kim_s_token.model.payment.vBankDto;
 import com.example.blog_kim_s_token.model.payment.vbankDao;
@@ -329,9 +330,6 @@ public class resevationService {
             System.out.println(i+"deleteReservation");
             reservationAndPriceInters.add(reservationDao.findByPaymentidJoinPriceNative(i).orElseThrow(()->new RuntimeException("품목 조회 실패")));
         }
-        for(int i=0;i<reservationAndPriceInters.size();i++){
-            System.out.println(reservationAndPriceInters.get(0).getDate_and_time().toString());
-        }
         for(reservationAndPriceInter r:reservationAndPriceInters){
             confrimCancle(r.getDate_and_time(), r.getEmail());
             String status=r.getStatus();
@@ -346,7 +344,11 @@ public class resevationService {
                 paymentService.requestUpdateVbankBeforePaid(paymentid, newPrice,vBankDto.getEndDateUnixTime());
             }else if(status.equals(aboutPayEnums.statusPaid.getString())){
                 System.out.println("입금후 환불시도");
-                
+                paidDto paidDto=paymentService.selectPaidProduct(paymentid);
+                if(paidDto.getUsedKind().equals(aboutPayEnums.kakaoPay.getString())){
+                    System.out.println("카카오페이 환불 시도");
+                    paymentService.requestCancleToKakaoPay(paidDto.getPaymentId(),price);
+                }
             }
         }
         

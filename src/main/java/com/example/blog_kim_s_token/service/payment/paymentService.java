@@ -9,7 +9,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -25,6 +25,7 @@ import com.example.blog_kim_s_token.model.product.productDto;
 import com.example.blog_kim_s_token.model.user.userDto;
 import com.example.blog_kim_s_token.service.priceService;
 import com.example.blog_kim_s_token.service.utillService;
+import com.example.blog_kim_s_token.service.ApiServies.kakao.kakaopayService;
 import com.example.blog_kim_s_token.service.payment.iamPort.iamportService;
 import com.example.blog_kim_s_token.service.payment.iamPort.nomalPayment;
 import com.example.blog_kim_s_token.service.payment.iamPort.tryImpPayDto;
@@ -35,6 +36,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 @Service
 public class paymentService {
@@ -53,6 +56,11 @@ public class paymentService {
     private  int period;
     @Value("${payment.minusHour}")
     private  int minusHour;
+    @Value("${kakao.kakaoPay.cid}")
+    private String kakaoPayCid;
+    @Autowired
+    private kakaopayService kakaopayService;
+
     
     public vBankDto selectVbankProduct(String paymentId) {
         return  vbankDao.findByPaymentId(paymentId).orElseThrow(()->new RuntimeException("입금대기를 찾을 수없습니다"+paymentId));
@@ -344,7 +352,7 @@ public class paymentService {
             }else if(kind.equals(aboutPayEnums.product.getString())){
                 System.out.println("일반 상품 취소 시도");
             }
-            return null;
+            return utillService.makeJson(true, "완료되었습니다");
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("canclePay error"+ e.getMessage());
@@ -354,6 +362,15 @@ public class paymentService {
     public void requestUpdateVbankBeforePaid(String paymentid,int newPrice,String unixTime) {
         System.out.println("requestUpdateVbankBeforePaid");
         iamportService.requestUpdateVbank(paymentid, newPrice, unixTime);
+    }
+    public void requestCancleToKakaoPay(String tid,int price) {
+        System.out.println("requestCancleToKakaoPay");
+        MultiValueMap<String,Object> body=new LinkedMultiValueMap<>();
+        body.add("cid", kakaoPayCid);
+        body.add("tid", tid);
+        body.add("cancel_amount", price);
+        body.add("cancel_tax_free_amount",0);
+        kakaopayService.cancleKakaopay(body);
     }
 
 
