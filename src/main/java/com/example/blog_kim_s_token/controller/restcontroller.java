@@ -203,7 +203,7 @@ public class restcontroller {
         return kakaopayService.insertPaymentForkakao(request.getParameter("pg_token"),session);
     }
     @PostMapping("/api/canclePay")
-    public void canclePay(@Valid @RequestBody tryCanclePayDto tryCanclePayDto,HttpServletRequest request,HttpServletResponse response) {
+    public void canclePay( @RequestBody tryCanclePayDto tryCanclePayDto,HttpServletRequest request,HttpServletResponse response) {
         System.out.println("canclePay"); 
          paymentService.canclePay(tryCanclePayDto);
     }

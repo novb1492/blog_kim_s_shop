@@ -228,8 +228,8 @@ public class iamportService {
         }
 
     }
-    public void updateVbank(String paymentid,int newPrice,String unixTime) {
-        System.out.println("updateBUY");
+    public void requestUpdateVbank(String paymentid,int newPrice,String unixTime) {
+        System.out.println("requestUpdateVbank");
         try {
             String token=getToken();
             headers.add("Authorization",token);

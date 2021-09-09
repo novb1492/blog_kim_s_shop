@@ -10,14 +10,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import com.amazonaws.services.managedblockchain.model.IllegalActionException;
 import com.example.blog_kim_s_token.enums.aboutPayEnums;
 import com.example.blog_kim_s_token.enums.reservationEnums;
 import com.example.blog_kim_s_token.model.payment.tryDeleteInter;
 import com.example.blog_kim_s_token.model.payment.vBankDto;
+import com.example.blog_kim_s_token.model.payment.vbankDao;
 import com.example.blog_kim_s_token.model.reservation.*;
-import com.example.blog_kim_s_token.model.reservation.getDateDto;
-import com.example.blog_kim_s_token.model.reservation.getTimeDto;
-import com.example.blog_kim_s_token.model.reservation.reservationInsertDto;
 import com.example.blog_kim_s_token.service.utillService;
 import com.example.blog_kim_s_token.service.payment.paymentService;
 import com.example.blog_kim_s_token.service.payment.iamPort.iamportService;
@@ -43,14 +42,12 @@ public class resevationService {
    
     @Value("${payment.limitedCancleHour}")
     private  int limitedCancleHour;
-
-    @Autowired
-    private iamportService iamportService;
-  
     @Autowired
     private reservationDao reservationDao;
     @Autowired
     private paymentService paymentService;
+    @Autowired
+    private vbankDao vbankDao;
 
 
     public JSONObject getDateBySeat(getDateDto getDateDto) {
@@ -324,17 +321,44 @@ public class resevationService {
             }
         return array;
     }
-    public void deleteReservation(String paymentid) {
+    public void deleteReservation(List<Integer> idArray) {
         System.out.println("deleteReservation");
         //테스트계정 한계로인해 일반결제만 제대로 다룰 수 있다 
+        List<reservationAndPriceInter>reservationAndPriceInters=new ArrayList<>();
+        for(int i: idArray){
+            System.out.println(i+"deleteReservation");
+            reservationAndPriceInters.add(reservationDao.findByPaymentidJoinPriceNative(i).orElseThrow(()->new RuntimeException("품목 조회 실패")));
+        }
+        for(int i=0;i<reservationAndPriceInters.size();i++){
+            System.out.println(reservationAndPriceInters.get(0).getDate_and_time().toString());
+        }
+        for(reservationAndPriceInter r:reservationAndPriceInters){
+            confrimCancle(r.getDate_and_time(), r.getEmail());
+            String status=r.getStatus();
+            String paymentid=r.getPayment_id();
+            int price=r.getPrice();
+            int rid=r.getId();
+            if(status.equals(aboutPayEnums.statusReady.getString())){
+                System.out.println("가상계좌 입금전 환불 시도");
+                vBankDto vBankDto=paymentService.selectVbankProduct(paymentid);
+                int newPrice=paymentService.updateVbank(paymentid,price);
+                reservationDao.deleteById(rid);
+                paymentService.requestUpdateVbankBeforePaid(paymentid, newPrice,vBankDto.getEndDateUnixTime());
+            }else if(status.equals(aboutPayEnums.statusPaid.getString())){
+                System.out.println("입금후 환불시도");
+                
+            }
+        }
+        
   
     }
-    private void confrimCancle(mainReservationDto mainReservationDto) {
+    private void confrimCancle(Timestamp dateAndTime,String remail) {
+        System.out.println("confrimCancle");
         String messege=null;
         String email=SecurityContextHolder.getContext().getAuthentication().getName();
-        if(LocalDateTime.now().plusHours(limitedCancleHour).isAfter(mainReservationDto.getDateAndTime().toLocalDateTime())){
+        if(LocalDateTime.now().plusHours(limitedCancleHour).isAfter(dateAndTime.toLocalDateTime())){
             messege="예약시간 한시간 전까지 취소가능합니다";
-        }else if(!email.equals(mainReservationDto.getEmail())){
+        }else if(!email.equals(remail)){
             messege="예약과 예약자 이메일이 다릅니다";
         }else{
             System.out.println("예약 취소 가능");

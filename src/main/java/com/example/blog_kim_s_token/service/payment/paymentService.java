@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -54,10 +55,10 @@ public class paymentService {
     private  int minusHour;
     
     public vBankDto selectVbankProduct(String paymentId) {
-        return vbankDao.findByPaymentId(paymentId);
+        return  vbankDao.findByPaymentId(paymentId).orElseThrow(()->new RuntimeException("입금대기를 찾을 수없습니다"+paymentId));
     }
     public paidDto selectPaidProduct(String paymentId) {
-        return paidDao.findByPaymentId(paymentId);
+        return paidDao.findByPaymentId(paymentId).orElseThrow(()->new RuntimeException("입금확인을 찾을 수없습니다"+paymentId));
     }
     public void insertPayment(nomalPayment nomalPayment,userDto userDto,int totalPrice) {
         System.out.println("insertPayment");
@@ -186,7 +187,7 @@ public class paymentService {
         if(status.equals("paid")&&merchantUid.startsWith("vbank")){
             System.out.println("가상계좌가 입금 확인됨");
             String paymentId=(String) jsonObject.get("imp_uid");
-            vBankDto vBankDto=vbankDao.findByPaymentId(paymentId);
+            vBankDto vBankDto=selectVbankProduct(paymentId);
             if(vBankDto.getKind().equals("reservation")){
                 System.out.println("예약시도 가상계좌였습니다");
                 resevationService.readyTopaid(paymentId);
@@ -212,7 +213,7 @@ public class paymentService {
         } 
     }
     public void updatePaidProductForCancle(String paymentid,int minusPrice) {
-        paidDto paidDto=paidDao.findByPaymentId(paymentid);
+        paidDto paidDto=selectPaidProduct(paymentid);
         int price=paidDto.getTotalPrice();
         int newPrice=price-minusPrice;
         if(newPrice==0){
@@ -222,8 +223,24 @@ public class paymentService {
         }
         paidDto.setTotalPrice(newPrice);
     }
+    public int updateVbank(String paymentid,int minusPrice) {
+        vBankDto vBankDto=selectVbankProduct(paymentid);
+        int newPrice=minusPrice(vBankDto.getVbankTotalPrice(),minusPrice);
+        if(newPrice==0){
+            vbankDao.delete(vBankDto);
+            System.out.println("잔액 0 채번 취소");
+            
+        }else{
+            vBankDto.setVbankTotalPrice(newPrice);
+        }
+         return newPrice;
+    }
     public int minusPrice(int totalPrice,int minusPrice) {
-        return totalPrice-minusPrice;
+        int newPrice=totalPrice-minusPrice;
+        if(newPrice==0||newPrice>0){
+            return newPrice;
+        }
+        throw new RuntimeException("환불 잔액이 총액보다 큽니다");
     }
     public Map<String,Object> getTotalPriceAndOther(String[][] itemArray,String kind) {
         System.out.println("getTotalPriceAndOther");
@@ -320,10 +337,10 @@ public class paymentService {
         System.out.println("canclePay");
         try {
             String kind=aboutPayEnums.valueOf(tryCanclePayDto.getKind()).getString();
-            String paymentid=tryCanclePayDto.getPaymentid();
+            List<Integer> idArray=tryCanclePayDto.getId();
             if(kind.equals(aboutPayEnums.reservation.getString())){
                 System.out.println("예약 상품 취소 시도");
-                resevationService.deleteReservation(paymentid);
+                resevationService.deleteReservation(idArray);
             }else if(kind.equals(aboutPayEnums.product.getString())){
                 System.out.println("일반 상품 취소 시도");
             }
@@ -334,5 +351,10 @@ public class paymentService {
             throw new RuntimeException(e.getMessage());
         }
     }
+    public void requestUpdateVbankBeforePaid(String paymentid,int newPrice,String unixTime) {
+        System.out.println("requestUpdateVbankBeforePaid");
+        iamportService.requestUpdateVbank(paymentid, newPrice, unixTime);
+    }
+
 
 }

@@ -22,7 +22,7 @@ import lombok.RequiredArgsConstructor;
 public class vbankConfig {
     private final JobBuilderFactory jobBuilderFactory;
     private final StepBuilderFactory stepBuilderFactory;
-    private final String batchName="chekNonePaidVbank";
+    private final String batchName="checkNonePaidVbank";
 
     @Autowired
     private vbankDao vbankDao;

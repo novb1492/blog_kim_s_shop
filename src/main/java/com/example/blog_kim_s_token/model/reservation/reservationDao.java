@@ -33,6 +33,9 @@ public interface reservationDao extends JpaRepository<mainReservationDto,Integer
 
     List<mainReservationDto> findByPaymentId(String paymentId);
 
+   @Query(value = "select a.*,b.price from reservation a inner join product b on a.seat=b.product_name where a.id=?",nativeQuery = true)
+    Optional<reservationAndPriceInter> findByPaymentidJoinPriceNative(int id);
+
  
 
   
