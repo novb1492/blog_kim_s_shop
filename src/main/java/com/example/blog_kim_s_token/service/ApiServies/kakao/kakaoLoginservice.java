@@ -69,12 +69,12 @@ public class kakaoLoginservice {
     public String kakaoGetCode() {
         return "https://kauth.kakao.com/oauth/authorize?response_type=code&client_id="+apikey+"&redirect_uri="+callBackUrl+"";
     }
-    public kakaoTokenDto kakaoGetToken(String code) {
+    public kakaoTokenDto kakaoGetToken(String code,String callbackUrl) {
         System.out.println(code+" kakaocode");
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         body.add("grant_type", "authorization_code");
         body.add("client_id", apikey);
-        body.add("redirect_uri", callBackUrl);
+        body.add("redirect_uri", callbackUrl);
         body.add("code", code);
         body.add("scope","talk_message");
         try {
@@ -156,24 +156,22 @@ public class kakaoLoginservice {
             headers.clear();
         }
     }
-    public void sendKakaoMessage(HttpSession httpSession,HttpServletRequest request) {
-        System.out.println("sendKakaoMessage"+request.getParameter("code"));
+    public void sendKakaoMessage(HttpSession httpSession,String code) {
+        System.out.println("sendKakaoMessage"+code);
         try {
-            kakaoTokenDto kakaoTokenDto=kakaoGetToken(request.getParameter("code"));
+            kakaoTokenDto kakaoTokenDto=kakaoGetToken(code,callBackUrl2);
             String accessToken=kakaoTokenDto.getAccess_token();
             headers.add("Authorization", "Bearer "+accessToken);
-            String str = "{\"web_url\",:\"http:localhost:3030/index.html\"}";
             JSONObject jsonObject=new JSONObject();
             JSONObject jsonObject2=new JSONObject();
-           
-      
+           jsonObject2.put("web_url","http:localhost:3030/index.html");
+
             jsonObject.put("object_type", "text");
-            jsonObject.put("link",str);
+            jsonObject.put("link",jsonObject2);
             jsonObject.put("text", "value");
-            jsonObject.put("button_title", "value");
-            body.add("template_object","jsonObject");
-  
-            System.out.println("Bearer "+accessToken);
+            System.out.println(jsonObject.toString());
+            body.add("template_object",jsonObject);
+
             HttpEntity<MultiValueMap<String,Object>>entity=new HttpEntity<>(body,headers);
             System.out.println(entity.getBody().toString());
             JSONObject response=restTemplate.postForObject("https://kapi.kakao.com/v2/api/talk/memo/default/send",entity,JSONObject.class);
