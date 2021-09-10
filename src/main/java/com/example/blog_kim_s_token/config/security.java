@@ -72,5 +72,6 @@ public class security extends WebSecurityConfigurerAdapter {
         .anyRequest()///그외 다른 요청운
         .authenticated();//인증이있어야한다(로그인) 
 
+
     }
 }

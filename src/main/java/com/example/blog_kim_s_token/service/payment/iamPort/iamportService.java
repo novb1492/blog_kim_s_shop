@@ -203,34 +203,6 @@ public class iamportService {
         }
 
     }
-    public void cancleBuy( ) {
-        System.out.println("cancleBuy");
-        try {
-            String token=getToken();
-            headers.add("Authorization",token);
-            body.put("imp_uid", "imp_903346368256");
-            body.put("refund_holder", "(주）케이지이니시");
-            body.put("refund_account", "70112003880422");
-            body.put("refund_bank", 89);
-            HttpEntity<JSONObject>entity=new HttpEntity<JSONObject>(body, headers);
-            JSONObject respone= restTemplate.postForObject("https://api.iamport.kr/payments/cancel",entity,JSONObject.class);
-            System.out.println(respone+" canclebuy");
-            if((int)respone.get("code")==0){
-                System.out.println(respone.get("message")+" 취소성공");
-                return;
-            }
-            System.out.println(respone.get("message")+" 취소실패");
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("cancleBuy가 실패 했습니다 직접 환불 바랍니다");
-            throw new RuntimeException("환불에 실패 했습니다 다시시도 바랍니다");
-        }finally{
-            headers.clear();
-            body.clear();
-
-        }
-
-    }
     public void requestUpdateVbank(String paymentid,int newPrice,String unixTime) {
         System.out.println("requestUpdateVbank");
         try {
@@ -267,7 +239,7 @@ public class iamportService {
             HttpEntity<JSONObject>entity=new HttpEntity<JSONObject>(jsonObject,headers);
             ResponseEntity<JSONObject> respone= restTemplate.exchange("https://api.iamport.kr/vbanks/"+paymentid,HttpMethod.DELETE,entity,JSONObject.class);
             JSONObject jsonObject2=respone.getBody(); 
-            System.out.println(jsonObject2+" 결과");
+            System.out.println(jsonObject2+" 결과"+"세틀뱅크는 테스트 채번취소 미지원 ");
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("cancleVbank error"+e.getMessage());
