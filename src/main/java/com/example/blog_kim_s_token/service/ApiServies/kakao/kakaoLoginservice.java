@@ -14,6 +14,7 @@ import com.example.blog_kim_s_token.model.user.userDto;
 import com.example.blog_kim_s_token.service.csrfTokenService;
 import com.example.blog_kim_s_token.service.cookie.cookieService;
 import com.nimbusds.jose.shaded.json.JSONObject;
+import com.nimbusds.jose.shaded.json.parser.JSONParser;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,6 +29,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+
+import java.net.URLEncoder;
 import java.util.LinkedHashMap;
 import java.util.Optional;
 
@@ -161,16 +164,20 @@ public class kakaoLoginservice {
         try {
             kakaoTokenDto kakaoTokenDto=kakaoGetToken(code,callBackUrl2);
             String accessToken=kakaoTokenDto.getAccess_token();
+            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
             headers.add("Authorization", "Bearer "+accessToken);
             JSONObject jsonObject=new JSONObject();
             JSONObject jsonObject2=new JSONObject();
            jsonObject2.put("web_url","http:localhost:3030/index.html");
 
+
             jsonObject.put("object_type", "text");
             jsonObject.put("link",jsonObject2);
+            System.out.println(jsonObject2.toString());
             jsonObject.put("text", "value");
             System.out.println(jsonObject.toString());
             body.add("template_object",jsonObject);
+            
 
             HttpEntity<MultiValueMap<String,Object>>entity=new HttpEntity<>(body,headers);
             System.out.println(entity.getBody().toString());
