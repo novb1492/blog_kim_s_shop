@@ -8,26 +8,25 @@ import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 
-import com.amazonaws.services.managedblockchain.model.IllegalActionException;
 import com.example.blog_kim_s_token.enums.aboutPayEnums;
 import com.example.blog_kim_s_token.enums.reservationEnums;
-import com.example.blog_kim_s_token.model.payment.paidDao;
+
 import com.example.blog_kim_s_token.model.payment.paidDto;
-import com.example.blog_kim_s_token.model.payment.tryDeleteInter;
+
 import com.example.blog_kim_s_token.model.payment.vBankDto;
-import com.example.blog_kim_s_token.model.payment.vbankDao;
+
 import com.example.blog_kim_s_token.model.reservation.*;
 import com.example.blog_kim_s_token.service.utillService;
 import com.example.blog_kim_s_token.service.payment.paymentService;
-import com.example.blog_kim_s_token.service.payment.iamPort.iamportService;
+
 import com.nimbusds.jose.shaded.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+
 
 @Service
 public class resevationService {
@@ -48,10 +47,7 @@ public class resevationService {
     private reservationDao reservationDao;
     @Autowired
     private paymentService paymentService;
-    @Autowired
-    private vbankDao vbankDao;
-    @Autowired
-    private paidDao paidDao;
+
 
 
     public JSONObject getDateBySeat(getDateDto getDateDto) {
@@ -347,11 +343,26 @@ public class resevationService {
             }else if(status.equals(aboutPayEnums.statusPaid.getString())){
                 System.out.println("입금후 환불시도");
                 paidDto paidDto=paymentService.selectPaidProduct(paymentid);
+                paymentService.updatePaidProductForCancle(paymentid,price);
                 if(paidDto.getUsedKind().equals(aboutPayEnums.kakaoPay.getString())){
                     System.out.println("카카오페이 환불 시도");
-                    paymentService.updatePaidProductForCancle(paymentid,price);
                     paymentService.requestCancleToKakaoPay(paidDto.getPaymentId(),price);
+                    return;
+                }else{
+                    System.out.println("아임포트 환불");
+                    JSONObject body=new JSONObject();
+                    if(paidDto.getPayMethod().equals("vbank")){
+                        Map<String,Object>vbankMap=paymentService.getVankInforInDb(paidDto);
+                        body.put("refund_holder", vbankMap.get("refund_holder"));
+                        body.put("refund_bank", vbankMap.get("refund_bank"));
+                        body.put("refund_account", vbankMap.get("refund_account"));
+                    }
+                    body.put("amount", price);
+                    body.put("imp_uid", paymentid);
+                    body.put("checksum", paidDto.getTotalPrice()+price);
+                    paymentService.canclePay(body);
                 }
+            
             }
         }
         

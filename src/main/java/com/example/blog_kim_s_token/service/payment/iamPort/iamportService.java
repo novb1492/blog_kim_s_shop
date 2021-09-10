@@ -172,23 +172,26 @@ public class iamportService {
         nomalPayment.setStatus("paid");
         nomalPayment.setUsedKind(usedKind);
     }
-    public void cancleBuy(String impId,int zeorOrPrice) {
+    public void cancleBuy(JSONObject body) {
         System.out.println("cancleBuy");
         try {
             String token=getToken();
             headers.add("Authorization",token);
-            body.put("imp_uid", impId);
-            if(zeorOrPrice!=0){
-                body.put("amount", zeorOrPrice);
-            }
             HttpEntity<JSONObject>entity=new HttpEntity<JSONObject>(body, headers);
             JSONObject respone= restTemplate.postForObject("https://api.iamport.kr/payments/cancel",entity,JSONObject.class);
             System.out.println(respone+" canclebuy");
-            if((int)respone.get("code")==0){
-                System.out.println(respone.get("message")+" 취소성공");
+            int code=(int)respone.get("code");
+            String message=(String) respone.get("message");
+            System.out.println(code+" "+message);
+            if(code==0){
+                System.out.println(message+" 취소성공");
+                return;
+            }else if(code==-1&&message.startsWith("환불")){
+                System.out.println(message+"테스트 모드는 여기까지 가능 취소성공");
                 return;
             }
-            System.out.println(respone.get("message")+" 취소실패");
+            System.out.println(message+" 취소실패");
+            throw new Exception();
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("cancleBuy가 실패 했습니다 직접 환불 바랍니다");

@@ -97,9 +97,9 @@ public class errorRestController {
     @ExceptionHandler(failBuyException.class)
     public JSONObject failBuyException(failBuyException exception,HttpSession httpSession) {
         System.out.println("failBuyException 환불시작");
+        JSONObject jsonObject=new JSONObject();
         try {
             if(httpSession.getAttribute("kind").equals("vbank")){
-                JSONObject jsonObject=new JSONObject();
                 jsonObject.put("merchant_uid", httpSession.getAttribute("merchantUid"));
                 jsonObject.put("vbank_due",  httpSession.getAttribute("vbankDue"));
                 jsonObject.put("vbank_holder",  httpSession.getAttribute("vbankHolder"));
@@ -107,7 +107,8 @@ public class errorRestController {
                 jsonObject.put("vbank_code",  httpSession.getAttribute("vbank_code"));
                 iamportService.cancleVbank(exception.getpaymentid(),jsonObject);
             }else{
-                iamportService.cancleBuy(exception.getpaymentid(),0);
+                jsonObject.put("imp_uid", exception.getpaymentid());
+                iamportService.cancleBuy(jsonObject);
             }
         } catch (Exception e) {
             e.printStackTrace();

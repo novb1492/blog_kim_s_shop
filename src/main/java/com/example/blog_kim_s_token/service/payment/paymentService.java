@@ -372,6 +372,24 @@ public class paymentService {
         body.add("cancel_tax_free_amount",0);
         kakaopayService.cancleKakaopay(body);
     }
+    public void canclePay(JSONObject body) {
+        iamportService.cancleBuy(body);
+    }
+    public Map<String,Object> getVankInforInDb(paidDto paidDto) {
+        System.out.println("getVankInforInDb");
+        try {
+            String[] splitVankInfor=paidDto.getUsedKind().split(" ");
+            Map<String,Object>map=new HashMap<>();
+            map.put("refund_holder",splitVankInfor[2]);
+            map.put("refund_bank",splitVankInfor[1] );
+            map.put("refund_account",splitVankInfor[3] );
+            return map;
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("getVankInforInDb errpr"+e.getMessage());
+            throw new RuntimeException("가상계좌 정보 추출에 실패했습니다");
+        }
+    }
 
 
 }
