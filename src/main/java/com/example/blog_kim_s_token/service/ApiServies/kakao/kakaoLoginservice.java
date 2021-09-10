@@ -12,6 +12,7 @@ import com.example.blog_kim_s_token.model.oauth.kakao.kakaoTokenDto;
 import com.example.blog_kim_s_token.model.user.userDao;
 import com.example.blog_kim_s_token.model.user.userDto;
 import com.example.blog_kim_s_token.service.csrfTokenService;
+import com.example.blog_kim_s_token.service.utillService;
 import com.example.blog_kim_s_token.service.cookie.cookieService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 import com.nimbusds.jose.shaded.json.parser.JSONParser;
@@ -159,8 +160,8 @@ public class kakaoLoginservice {
             headers.clear();
         }
     }
-    public void sendKakaoMessage(HttpSession httpSession,String code) {
-        System.out.println("sendKakaoMessage"+code);
+    public JSONObject sendKakaoMessage(HttpSession httpSession,String code) {
+        System.out.println("sendKakaoMessage");
         try {
             kakaoTokenDto kakaoTokenDto=kakaoGetToken(code,callBackUrl2);
             String accessToken=kakaoTokenDto.getAccess_token();
@@ -183,10 +184,11 @@ public class kakaoLoginservice {
             System.out.println(entity.getBody().toString());
             JSONObject response=restTemplate.postForObject("https://kapi.kakao.com/v2/api/talk/memo/default/send",entity,JSONObject.class);
             System.out.println(response.toString());
-
+            return utillService.makeJson(true, "예약내역이 전송되었습니다");
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("sendKakaoMessage error"+e.getMessage());
+            throw new RuntimeException("내역 보내기 실패 ");
         }
     }
     public String getNewToken(HttpSession httpSession) {

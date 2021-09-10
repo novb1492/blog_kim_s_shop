@@ -237,13 +237,12 @@ public class restcontroller {
     
     }
     @RequestMapping("/auth/kakaocallback2")
-    public void kakaocallback2(HttpSession httpSession,HttpServletRequest request,HttpServletResponse response) {
+    public JSONObject kakaocallback2(HttpSession httpSession,HttpServletRequest request,HttpServletResponse response) {
         System.out.println("kakaocallback2"+request.getHeader("REFERER"));
         String url=request.getHeader("REFERER");
         String[] code=url.split("code=");
         System.out.println(code[1]);
-        kakaoLoginservice.sendKakaoMessage(httpSession,code[1]);
-    
+        return kakaoLoginservice.sendKakaoMessage(httpSession,code[1]);
     }
     @PostMapping("/auth/test")
     public JSONObject test(HttpServletRequest request,HttpServletResponse response) {
