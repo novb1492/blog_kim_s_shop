@@ -29,6 +29,7 @@ import com.example.blog_kim_s_token.model.user.userDto;
 import com.example.blog_kim_s_token.service.boardService;
 import com.example.blog_kim_s_token.service.priceService;
 import com.example.blog_kim_s_token.service.userService;
+import com.example.blog_kim_s_token.service.utillService;
 import com.example.blog_kim_s_token.service.ApiServies.kakao.kakaoLoginservice;
 import com.example.blog_kim_s_token.service.ApiServies.kakao.kakaopayService;
 import com.example.blog_kim_s_token.service.ApiServies.kakao.tryKakaoPayDto;
@@ -228,6 +229,18 @@ public class restcontroller {
         getArticleDto getArticleDto=new getArticleDto();
         getArticleDto.setArticleId(1);
         return boardService.getArticle(getArticleDto);
+    }
+    @PostMapping("/api/kakaoMore")
+    public JSONObject kakaoMore(HttpServletRequest request,HttpServletResponse response) {
+        System.out.println("kakaoMore");
+        return utillService.makeJson(true, kakaoLoginservice.getMoreOk(request)); 
+    
+    }
+    @RequestMapping("/auth/kakaocallback2")
+    public void kakaocallback2(HttpSession httpSession,HttpServletRequest request,HttpServletResponse response) {
+        System.out.println("kakaocallback2");
+        kakaoLoginservice.sendKakaoMessage(httpSession,request);
+    
     }
     @PostMapping("/auth/test")
     public JSONObject test(HttpServletRequest request,HttpServletResponse response) {

@@ -90,10 +90,11 @@ public class userService {
     public JSONObject doLogin() {
         try {
             String email=SecurityContextHolder.getContext().getAuthentication().getName();
-            System.out.println("시큐리티 확인"+email);
-            return utillService.makeJson(userEnums.sucLogin.getBool(),email);
+            return utillService.makeJson(true,email);
         } catch (Exception e) {
-            return utillService.makeJson(userEnums.failLogin.getBool(),userEnums.failLogin.getMessege());
+            e.printStackTrace();
+            System.out.println("doLogin error"+ e.getMessage());
+            throw new RuntimeException("아이디 혹은 비밀번호가 일치 하지 않습니다");
         }
     }
     public JSONObject findLostEmail(String phoneNum) {
@@ -130,7 +131,7 @@ public class userService {
         } catch (Exception e) {
             System.out.println("updateAddress 에러발생");
             e.printStackTrace();
-            throw new RuntimeException("updateAddress 에러발생");
+            throw new RuntimeException("주소변경 실패");
         }  
     }
     @Transactional

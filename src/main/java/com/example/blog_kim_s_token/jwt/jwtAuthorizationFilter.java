@@ -39,6 +39,7 @@ public class jwtAuthorizationFilter  extends BasicAuthenticationFilter {
         System.out.println(request.getRequestURL()+" url");
         System.out.println(request.getHeader("REFERER")+" 도메인");
         String uri=request.getRequestURI();
+        System.out.println(request.getParameter("code")+" code");
         if(request.getHeader("REFERER")==null){
             System.out.println("도메인이 없습니다"+uri);
             if(uri.equals("/auth/navercallback")){
@@ -46,8 +47,9 @@ public class jwtAuthorizationFilter  extends BasicAuthenticationFilter {
             }
             else if(uri.equals("/auth/kakaocallback")){
                 System.out.println("카카오 로그인 시도입니다");
-            }
-            else if(uri.equals("/auth/payment")){
+            }else if(uri.equals("/auth/kakaocallback2")){
+                System.out.println("카카오 추가 권한받기");
+            }else if(uri.equals("/auth/payment")){
                 System.out.println("결제 시스템입니다");
             } else if(uri.equals("/api/okKakaopay")){
                 System.out.println("카카오결제 시스템입니다");
@@ -57,9 +59,13 @@ public class jwtAuthorizationFilter  extends BasicAuthenticationFilter {
                 System.out.println("도메인이 없습니다");
                 return;
             }
+        }else if(request.getHeader("REFERER").startsWith("http://localhost:8080/auth/kakaocallback2")){
+            System.out.println("콜백요청");
+            goToError("/auth/kakaocallback2", request, response);
+            return;
         }
-        else if(!request.getHeader("REFERER").equals("http://localhost:3030/")){
-            System.out.println("도에민이 다릅니다"+request.getRequestURI()+request.getRequestURL());
+        else if(!request.getHeader("REFERER").startsWith("http://localhost:3030/")){
+            System.out.println("도에민이 다릅니다"+request.getRequestURL());
             return;
         }
         String token=null;

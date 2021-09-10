@@ -79,7 +79,7 @@ public class kakaopayService {
             body.add("approval_url", sucUrl);
             body.add("cancel_url", cancleUrl);
             body.add("fail_url", failUrl);
-            JSONObject response=getPayLink(readyUrl);
+            JSONObject response=requestToKakaoPay(readyUrl);
             System.out.println(response+" 카카오페이 통신요청 결과");
             HttpSession httpSession=request.getSession();
             httpSession.setAttribute("partner_order_id", partner_order_id);
@@ -125,7 +125,7 @@ public class kakaopayService {
             body.add("partner_user_id", httpSession.getAttribute("email"));
             body.add("quantity",httpSession.getAttribute("count"));
             body.add("pg_token", pgToken);
-            JSONObject response=getPayLink(approveUrl);
+            JSONObject response=requestToKakaoPay(approveUrl);
             System.out.println(response+" 카카오페이 결제완료");
             String usedKind=aboutPayEnums.kakaoPay.getString();
             nomalPayment nomalPayment=new nomalPayment();
@@ -152,7 +152,7 @@ public class kakaopayService {
             throw new failKakaoPay(e.getMessage(),cid,paymentid,totalPrice);
         }
     }  
-    private JSONObject getPayLink(String url) {
+    private JSONObject requestToKakaoPay(String url) {
         System.out.println("getPayLink");
         try {
             headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -168,22 +168,9 @@ public class kakaopayService {
             body.clear();
         }
     }
-    public void  cancleKakaopay(MultiValueMap<String,Object> body) {
+    public void  cancleKakaopay(MultiValueMap<String,Object> body2) {
         System.out.println("cancleKakaopay");
-        try {
-            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-            headers.add("Authorization","KakaoAK "+adminKey);
-           
-            HttpEntity<MultiValueMap<String,Object>>entity=new HttpEntity<>(body,headers);
-            JSONObject response=restTemplate.postForObject(realCancleUrl,entity,JSONObject.class);
-            System.out.println(response+" 카카오페이 취소완료");
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("cancleKakaopay error");
-        }finally{
-            headers.clear();
-            body.clear();
-        }
-      
+        body=body2;
+        requestToKakaoPay(realCancleUrl);
     }
 }

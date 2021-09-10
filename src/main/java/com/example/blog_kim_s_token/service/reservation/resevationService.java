@@ -352,7 +352,7 @@ public class resevationService {
                 }else{
                     System.out.println("아임포트 환불");
                     JSONObject body=new JSONObject();
-                    if(paidDto.getPayMethod().equals("vbank")){
+                    if(paidDto.getPayMethod().equals(aboutPayEnums.vbank.getString())){
                         Map<String,Object>vbankMap=paymentService.getVankInforInDb(paidDto);
                         body.put("refund_holder", vbankMap.get("refund_holder"));
                         body.put("refund_bank", vbankMap.get("refund_bank"));
