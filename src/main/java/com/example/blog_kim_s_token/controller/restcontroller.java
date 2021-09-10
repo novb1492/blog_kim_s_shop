@@ -203,9 +203,9 @@ public class restcontroller {
         return kakaopayService.insertPaymentForkakao(request.getParameter("pg_token"),session);
     }
     @PostMapping("/api/canclePay")
-    public void canclePay( @RequestBody tryCanclePayDto tryCanclePayDto,HttpServletRequest request,HttpServletResponse response) {
+    public JSONObject canclePay( @RequestBody tryCanclePayDto tryCanclePayDto,HttpServletRequest request,HttpServletResponse response) {
         System.out.println("canclePay"); 
-         paymentService.canclePay(tryCanclePayDto);
+        return  paymentService.canclePay(tryCanclePayDto);
     }
     @PostMapping("/api/imageUpload")
     public JSONObject imageUpload(@RequestParam("file")MultipartFile multipartFile,HttpServletRequest request,HttpServletResponse response) {

@@ -343,6 +343,7 @@ public class resevationService {
             }else if(status.equals(aboutPayEnums.statusPaid.getString())){
                 System.out.println("입금후 환불시도");
                 paidDto paidDto=paymentService.selectPaidProduct(paymentid);
+                int originalPaidPrice=paidDto.getTotalPrice();
                 paymentService.updatePaidProductForCancle(paymentid,price);
                 if(paidDto.getUsedKind().equals(aboutPayEnums.kakaoPay.getString())){
                     System.out.println("카카오페이 환불 시도");
@@ -359,10 +360,9 @@ public class resevationService {
                     }
                     body.put("amount", price);
                     body.put("imp_uid", paymentid);
-                    body.put("checksum", paidDto.getTotalPrice()+price);
+                    body.put("checksum",originalPaidPrice);
                     paymentService.canclePay(body);
                 }
-            
             }
         }
         
