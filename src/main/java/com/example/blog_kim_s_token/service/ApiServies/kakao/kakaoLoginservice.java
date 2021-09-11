@@ -94,20 +94,11 @@ public class kakaoLoginservice {
             body.clear();
         }
     }
-    public void kakaoLogin(kakaoTokenDto kakaoTokenDto,HttpServletResponse response) {
-        headers.add("Authorization", "Bearer "+kakaoTokenDto.getAccess_token());
-        String accessToken=kakaoTokenDto.getAccess_token();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        try {
-            HttpEntity<MultiValueMap<String,String>>entity=new HttpEntity<>(headers);
-            kakaoLoginDto kakaoLoginDto =restTemplate.postForObject("https://kapi.kakao.com/v2/user/me",entity,kakaoLoginDto.class);
-            System.out.println(kakaoLoginDto+"카카오 로그인정보");
-
-
-            kakaoAccountDto kakaoAccountDto =new kakaoAccountDto((boolean)kakaoLoginDto.getKakao_account().get("email_needs_agreement"),(boolean)kakaoLoginDto.getKakao_account().get("profile_nickname_needs_agreement"),(LinkedHashMap<String,String>)kakaoLoginDto.getKakao_account().get("profile"),(boolean)kakaoLoginDto.getKakao_account().get("is_email_valid"),(boolean)kakaoLoginDto.getKakao_account().get("is_email_verified"),(boolean)kakaoLoginDto.getKakao_account().get("has_email"),(String)kakaoLoginDto.getKakao_account().get("email"));
+    public userDto kakaoLogin(LinkedHashMap<String,Object> profile) {
+        System.out.println("kakaoLogin");
+            kakaoAccountDto kakaoAccountDto =new kakaoAccountDto((boolean)profile.get("email_needs_agreement"),(boolean)profile.get("profile_nickname_needs_agreement"),(LinkedHashMap<String,String>)profile.get("profile"),(boolean)profile.get("is_email_valid"),(boolean)profile.get("is_email_verified"),(boolean)profile.get("has_email"),(String)profile.get("email"));
             String email=kakaoAccountDto.getEmail();
             System.out.println(email);
-
             userDto dto=userDao.findByEmail(email);
             if(dto==null){
                     dto=userDto.builder().email(email)
@@ -124,41 +115,31 @@ public class kakaoLoginservice {
                                         .provider(kakao).build(); 
                                         userDao.save(dto);
             }
-            Authentication authentication=jwtService.confrimAuthenticate(dto);
-            jwtService.setSecuritySession(authentication);
+            return dto;
+    }
+    public void makeCookie(userDto dto,HttpServletResponse response) {
+        System.out.println("makeCookie");
+        Authentication authentication=jwtService.confrimAuthenticate(dto);
+        jwtService.setSecuritySession(authentication);
 
-            String jwtToken=jwtService.getJwtToken(dto.getId());
-            jwtDto jwtDto=jwtService.getRefreshToken(dto.getId());
-            String refreshToken=jwtService.getRefreshToken(jwtDto,dto.getId());
-    
-            String csrfToken=csrfTokenService.getCsrfToken();
-            csrfService.insertCsrfToken(dto.getId(),csrfToken,dto.getEmail());
-            
-            String[][] cookiesNamesAndValues=new String[3][3];
-            cookiesNamesAndValues[0][0]=AuthorizationTokenName;
-            cookiesNamesAndValues[0][1]=jwtToken;
-            cookiesNamesAndValues[0][2]="httponly";
-            cookiesNamesAndValues[1][0]=refreshTokenName;
-            cookiesNamesAndValues[1][1]=refreshToken;
-            cookiesNamesAndValues[1][2]="httponly";
-            cookiesNamesAndValues[2][0]="csrfToken";
-            cookiesNamesAndValues[2][1]=csrfToken;
-            cookiesNamesAndValues[2][2]="httponly";
-            cookieService.cookieFactory(response, cookiesNamesAndValues);
-            Optional<insertKakaoTokenDto> optional=kakaoTokenDao.findByEmail(email);
-            insertKakaoTokenDto dto2=optional.get();
-           if(dto2==null){
-                 dto2=insertKakaoTokenDto.builder()
-                .accessToken(accessToken)
-                .refreshToken(kakaoTokenDto
-                .getRefresh_token()).email(email).build();
-                kakaoTokenDao.save(dto2);
-            }
-        } catch (Exception e) {
-           e.printStackTrace();
-        }finally{
-            headers.clear();
-        }
+        String jwtToken=jwtService.getJwtToken(dto.getId());
+        jwtDto jwtDto=jwtService.getRefreshToken(dto.getId());
+        String refreshToken=jwtService.getRefreshToken(jwtDto,dto.getId());
+
+        String csrfToken=csrfTokenService.getCsrfToken();
+        csrfService.insertCsrfToken(dto.getId(),csrfToken,dto.getEmail());
+        
+        String[][] cookiesNamesAndValues=new String[3][3];
+        cookiesNamesAndValues[0][0]=AuthorizationTokenName;
+        cookiesNamesAndValues[0][1]=jwtToken;
+        cookiesNamesAndValues[0][2]="httponly";
+        cookiesNamesAndValues[1][0]=refreshTokenName;
+        cookiesNamesAndValues[1][1]=refreshToken;
+        cookiesNamesAndValues[1][2]="httponly";
+        cookiesNamesAndValues[2][0]="csrfToken";
+        cookiesNamesAndValues[2][1]=csrfToken;
+        cookiesNamesAndValues[2][2]="httponly";
+        cookieService.cookieFactory(response, cookiesNamesAndValues);
     }
     public JSONObject sendKakaoMessage(HttpSession httpSession,String code) {
         System.out.println("sendKakaoMessage");
