@@ -5,6 +5,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.example.blog_kim_s_token.service.ApiServies.kakao.kakaoLoginservice;
+import com.example.blog_kim_s_token.service.ApiServies.kakao.kakaoService;
 import com.example.blog_kim_s_token.service.ApiServies.naver.naverLoginService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,8 @@ public class controller {
     private naverLoginService naverLoingService;
     @Autowired
     private kakaoLoginservice kakaoLoginservice;
+    @Autowired
+    private kakaoService kakaoService;
     
     @RequestMapping("/auth/navercallback")
     public String naverRollback(HttpServletRequest request,HttpServletResponse response) {
@@ -28,7 +31,7 @@ public class controller {
     @RequestMapping("/auth/kakaocallback")
     public String kakaoRollback(HttpServletRequest request,HttpServletResponse response) {
         System.out.println("kakaologin요청");   
-      kakaoLoginservice.kakaoLogin(kakaoLoginservice.kakaoGetToken(request.getParameter("code"),"http://localhost:8080/auth/kakaocallback"),response);
+        kakaoService.kakaoLogin(request.getParameter("code"),response);
        return "redirect:http://localhost:3030/index.html";
 
     }

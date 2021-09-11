@@ -31,6 +31,7 @@ import com.example.blog_kim_s_token.service.priceService;
 import com.example.blog_kim_s_token.service.userService;
 import com.example.blog_kim_s_token.service.utillService;
 import com.example.blog_kim_s_token.service.ApiServies.kakao.kakaoLoginservice;
+import com.example.blog_kim_s_token.service.ApiServies.kakao.kakaoService;
 import com.example.blog_kim_s_token.service.ApiServies.kakao.kakaopayService;
 import com.example.blog_kim_s_token.service.ApiServies.kakao.tryKakaoPayDto;
 import com.example.blog_kim_s_token.service.ApiServies.naver.naverLoginService;
@@ -62,6 +63,8 @@ public class restcontroller {
     private kakaoLoginservice kakaoLoginservice;
     @Autowired
     private kakaopayService kakaopayService;
+    @Autowired
+    private kakaoService kakaoService;
     @Autowired
     private resevationService resevationService;
     @Autowired
@@ -116,7 +119,7 @@ public class restcontroller {
     }
     @PostMapping("/auth/kakao")
     public String kakaoLogin(HttpServletRequest request,HttpServletResponse response) {
-        return kakaoLoginservice.kakaoGetCode();
+        return kakaoService.kakaoGetLoginCode();
     }
     @PostMapping("/api/userInfor")
     public userDto getUserInfor(HttpServletRequest request,HttpServletResponse response) {
