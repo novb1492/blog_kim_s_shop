@@ -1,31 +1,19 @@
 package com.example.blog_kim_s_token.service.ApiServies.kakao;
 
 import java.util.LinkedHashMap;
-import java.util.Optional;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
-import com.example.blog_kim_s_token.config.security;
-import com.example.blog_kim_s_token.enums.confrimTrue;
-import com.example.blog_kim_s_token.enums.role;
-import com.example.blog_kim_s_token.jwt.jwtService;
-import com.example.blog_kim_s_token.model.jwt.jwtDto;
-import com.example.blog_kim_s_token.model.oauth.kakao.kakaoAccountDto;
-import com.example.blog_kim_s_token.model.oauth.kakao.kakaoLoginDto;
-import com.example.blog_kim_s_token.model.oauth.kakao.kakaoTokenDto;
-import com.example.blog_kim_s_token.model.user.userDao;
 import com.example.blog_kim_s_token.model.user.userDto;
-import com.example.blog_kim_s_token.service.csrfTokenService;
-import com.example.blog_kim_s_token.service.utillService;
-import com.example.blog_kim_s_token.service.cookie.cookieService;
 import com.nimbusds.jose.shaded.json.JSONObject;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -63,6 +51,8 @@ public class kakaoService {
     private String refreshTokenName;
 
     @Autowired
+    private kakaoTokenDao kakaoTokenDao;
+    @Autowired
     private kakaoLoginservice kakaoLoginservice;
     @Autowired
     private kakaoMessageService kakaoMessageService;
@@ -71,8 +61,11 @@ public class kakaoService {
         System.out.println("kakaoGetLoginCode");
         return "https://kauth.kakao.com/oauth/authorize?response_type=code&client_id="+apikey+"&redirect_uri="+LoginCallBckUrl+"";
     }
-    public String getMoreOk() {
+    public String getMoreOk(HttpServletRequest request) {
         System.out.println("getMoreOk 추후 scope변수화 예정" );
+        HttpSession httpSession=request.getSession();
+        insertKakaoTokenDto dto=kakaoTokenDao.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).orElse(null);
+        httpSession.setAttribute("token",dto.getAccessToken());
         return "https://kauth.kakao.com/oauth/authorize?client_id="+apikey+"&redirect_uri="+requestMessageCallBackUrl+"&response_type=code&scope=talk_message";
     }
     private JSONObject requestToKakao(String url) {
@@ -100,26 +93,27 @@ public class kakaoService {
         JSONObject getProfile =requestToKakao(requestLoginUrl);
         System.out.println(getProfile+" 카카오통신응답");
         LinkedHashMap<String,Object> profile=(LinkedHashMap<String,Object>)getProfile.get("kakao_account");
-        userDto dto=kakaoLoginservice.kakaoLogin(profile);   
+        userDto dto=kakaoLoginservice.kakaoLogin(profile,getToken);   
         kakaoLoginservice.makeCookie(dto, response);
      }
-     public void sendMessege(String code) {
-        System.out.println("kakaoLogin");
+     public void sendMessege(String code,HttpServletRequest request) {
+        System.out.println("sendMessege");
+        HttpSession httpSession=request.getSession();
         makeBodyAndHeader(code,requestMessageCallBackUrl);
-        JSONObject getToken=requestToKakao(getTokenUrl);
+        String getToken=(String) httpSession.getAttribute("token");//requestToKakao(getTokenUrl);
         System.out.println(getToken+" 카카오통신응답");
-        headers.add("Authorization","Bearer "+(String)getToken.get("access_token"));
+        headers.add("Authorization","Bearer "+getToken);
         JSONObject jsonObject=new JSONObject();
-            JSONObject jsonObject2=new JSONObject();
-            jsonObject2.put("web_url","http:localhost:3030/index.html");
+        JSONObject jsonObject2=new JSONObject();
+        jsonObject2.put("web_url","http:localhost:3030/index.html");
 
 
-            jsonObject.put("object_type", "text");
-            jsonObject.put("link",jsonObject2);
-            System.out.println(jsonObject2.toString());
-            jsonObject.put("text", "value");
-            System.out.println(jsonObject.toString());
-            body.add("template_object",jsonObject);
+        jsonObject.put("object_type", "text");
+        jsonObject.put("link",jsonObject2);
+        System.out.println(jsonObject2.toString());
+        jsonObject.put("text", "value");
+        System.out.println(jsonObject.toString());
+        body.add("template_object",jsonObject);
         JSONObject response =requestToKakao(requestMessageUrl);
         System.out.println(response+" 카카오통신응답");
 
@@ -130,6 +124,9 @@ public class kakaoService {
         body.add("client_id", apikey);
         body.add("redirect_uri", callBackUrl);
         body.add("code", code);
+     }
+     public insertKakaoTokenDto selectByEmail(String email) {
+       return  kakaoTokenDao.findByEmail(email).orElse(new insertKakaoTokenDto());
      }
 
     
