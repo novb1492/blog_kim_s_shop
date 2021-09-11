@@ -141,7 +141,7 @@ public class kakaoLoginservice {
         cookiesNamesAndValues[2][2]="httponly";
         cookieService.cookieFactory(response, cookiesNamesAndValues);
     }
-    public JSONObject sendKakaoMessage(HttpSession httpSession,String code) {
+    public JSONObject sendKakaoMessage(String code) {
         System.out.println("sendKakaoMessage");
         try {
             kakaoTokenDto kakaoTokenDto=kakaoGetToken(code,callBackUrl2);
@@ -150,7 +150,7 @@ public class kakaoLoginservice {
             headers.add("Authorization", "Bearer "+accessToken);
             JSONObject jsonObject=new JSONObject();
             JSONObject jsonObject2=new JSONObject();
-           jsonObject2.put("web_url","http:localhost:3030/index.html");
+            jsonObject2.put("web_url","http:localhost:3030/index.html");
 
 
             jsonObject.put("object_type", "text");

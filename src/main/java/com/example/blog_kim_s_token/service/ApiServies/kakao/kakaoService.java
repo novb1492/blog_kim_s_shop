@@ -63,15 +63,9 @@ public class kakaoService {
     private String refreshTokenName;
 
     @Autowired
-    private userDao userDao;
-    @Autowired
-    private security security;
-    @Autowired
-    private jwtService jwtService;
-    @Autowired
-    private csrfTokenService csrfService;
-    @Autowired
     private kakaoLoginservice kakaoLoginservice;
+    @Autowired
+    private kakaoMessageService kakaoMessageService;
     
     public String kakaoGetLoginCode() {
         System.out.println("kakaoGetLoginCode");
@@ -101,13 +95,34 @@ public class kakaoService {
         System.out.println("kakaoLogin");
         makeBodyAndHeader(code,LoginCallBckUrl);
         JSONObject getToken=requestToKakao(getTokenUrl);
-        System.out.println(response+" 카카오통신응답");
+        System.out.println(getToken+" 카카오통신응답");
         headers.add("Authorization","Bearer "+(String)getToken.get("access_token"));
         JSONObject getProfile =requestToKakao(requestLoginUrl);
         System.out.println(getProfile+" 카카오통신응답");
         LinkedHashMap<String,Object> profile=(LinkedHashMap<String,Object>)getProfile.get("kakao_account");
         userDto dto=kakaoLoginservice.kakaoLogin(profile);   
         kakaoLoginservice.makeCookie(dto, response);
+     }
+     public void sendMessege(String code) {
+        System.out.println("kakaoLogin");
+        makeBodyAndHeader(code,requestMessageCallBackUrl);
+        JSONObject getToken=requestToKakao(getTokenUrl);
+        System.out.println(getToken+" 카카오통신응답");
+        headers.add("Authorization","Bearer "+(String)getToken.get("access_token"));
+        JSONObject jsonObject=new JSONObject();
+            JSONObject jsonObject2=new JSONObject();
+            jsonObject2.put("web_url","http:localhost:3030/index.html");
+
+
+            jsonObject.put("object_type", "text");
+            jsonObject.put("link",jsonObject2);
+            System.out.println(jsonObject2.toString());
+            jsonObject.put("text", "value");
+            System.out.println(jsonObject.toString());
+            body.add("template_object",jsonObject);
+        JSONObject response =requestToKakao(requestMessageUrl);
+        System.out.println(response+" 카카오통신응답");
+
      }
      private void makeBodyAndHeader(String code,String callBackUrl) {
         System.out.println("makeBodyAndHeader");
@@ -116,6 +131,7 @@ public class kakaoService {
         body.add("redirect_uri", callBackUrl);
         body.add("code", code);
      }
+
     
 
 }
