@@ -3,10 +3,20 @@ package com.example.blog_kim_s_token.service.ApiServies.kakao;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import com.example.blog_kim_s_token.enums.aboutPayEnums;
+import com.example.blog_kim_s_token.jwt.jwtService;
 import com.example.blog_kim_s_token.model.user.userDto;
+import com.example.blog_kim_s_token.service.userService;
+import com.example.blog_kim_s_token.service.utillService;
+import com.example.blog_kim_s_token.service.payment.paymentService;
+import com.example.blog_kim_s_token.service.payment.iamPort.nomalPayment;
 import com.nimbusds.jose.shaded.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,7 +40,6 @@ public class kakaoService {
     private final String getAccessTokenGrandType="authorization_code";
     private final String getRefreshTokenGrandType="refresh_token";
     private final String kakao="kakao";
-    private final String cid="TC0ONETIME";
     private final String sucUrl="http://localhost:8080/api/okKakaopay";
     private final String cancleUrl="http://localhost:8080/auth/cancleKakaopay";
     private final String failUrl="http://localhost:8080/auth/failKakaopay";
@@ -46,6 +55,8 @@ public class kakaoService {
     private String apikey;
     @Value("${kakao.adminkey}")
     private String adminKey;
+    @Value("${kakao.kakaoPay.cid}")
+    private String cid;
     @Value("${oauth.pwd}")
     private String oauthPwd;
     @Value("${jwt.accessToken.name}")
@@ -59,6 +70,15 @@ public class kakaoService {
     private kakaoLoginservice kakaoLoginservice;
     @Autowired
     private kakaoMessageService kakaoMessageService;
+    @Autowired
+    private kakaopayService kakaopayService;
+    @Autowired
+    private userService userService;
+    @Autowired
+    private jwtService jwtService;
+    @Autowired
+    private paymentService paymentService;
+
     
     public String kakaoGetLoginCode() {
         System.out.println("kakaoGetLoginCode");
@@ -68,7 +88,7 @@ public class kakaoService {
         System.out.println("getMoreOk 추후 scope변수화 예정" );
         return "https://kauth.kakao.com/oauth/authorize?client_id="+apikey+"&redirect_uri="+requestMessageCallBackUrl+"&response_type=code&scope=talk_message";
     }
-    private JSONObject requestToKakao(String url) {
+    public JSONObject requestToKakao(String url) {
         System.out.println("requestToKakao");
         try {
             headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -141,9 +161,60 @@ public class kakaoService {
             e.printStackTrace();
             System.out.println("confrimTokenExprise error"+e.getMessage());
             throw new RuntimeException("갱신에 실패했습니다 다시 로그인 부탁드립니다");
-        }
-       
+        }   
     }
+    public JSONObject showPaidWindow(tryKakaoPayDto tryKakaoPayDto,HttpServletRequest request,HttpServletResponse httpServletResponse) {
+        System.out.println("doKakaoPay");
+        System.out.println(tryKakaoPayDto);
+        try {
+
+            String[][] itemArray=tryKakaoPayDto.getItemArray();
+            String kind=aboutPayEnums.valueOf(tryKakaoPayDto.getKind()).getString();
+            Map<String,Object>result=paymentService.getTotalPriceAndOther(itemArray, kind);
+            System.out.println(result+" 상품정보 가공");
+            int totalPrice=(int)result.get("totalPrice");
+            String itemName=(String)result.get("itemName");
+            int count=(int)result.get("count");
+            List<Integer>timesOrSize=(List<Integer>)result.get("timesOrSize");
+            paymentService.confrimProduct(tryKakaoPayDto.getTotalPrice(),totalPrice,count,itemName);
+            System.out.println(itemName+"/"+count);
+            String partner_order_id=utillService.GetRandomNum(10);
+            userDto userDto=userService.sendUserDto();
+            body.add("cid", cid);
+            body.add("partner_order_id",partner_order_id);
+            body.add("partner_user_id", userDto.getEmail());
+            body.add("item_name", itemName);
+            body.add("quantity", count);
+            body.add("total_amount", totalPrice);
+            body.add("tax_free_amount", 0);
+            body.add("approval_url", sucUrl);
+            body.add("cancel_url", cancleUrl);
+            body.add("fail_url", failUrl);
+            headers.add("Authorization","KakaoAK "+adminKey);
+            JSONObject response=requestToKakao(readyUrl);
+            System.out.println(response+" 카카오페이 통신요청 결과");
+            HttpSession httpSession=request.getSession();
+            httpSession.setAttribute("partner_order_id", partner_order_id);
+            httpSession.setAttribute("tid", response.get("tid"));
+            httpSession.setAttribute("item", itemName);
+            httpSession.setAttribute("totalPrice", totalPrice);
+            httpSession.setAttribute("kind", kind);
+            httpSession.setAttribute("email",userDto.getEmail());
+            httpSession.setAttribute("name", userDto.getName());
+            httpSession.setAttribute("count", count);
+            httpSession.setAttribute("itemArray", itemArray);
+            httpSession.setAttribute("other", tryKakaoPayDto.getOther());
+            httpSession.setAttribute("timesOrSize", timesOrSize);
+            jwtService.makeNewAccessToken(request, httpServletResponse);
+
+            return utillService.makeJson(true,(String)response.get("next_redirect_pc_url"));
+        }catch(Exception e){
+            e.printStackTrace();
+            System.out.println("doKakaoPay");
+            throw new RuntimeException("카카오 페이 불러오기 실패");
+        }
+    }
+  
     
 
     

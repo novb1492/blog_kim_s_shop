@@ -35,10 +35,6 @@ import org.springframework.web.client.RestTemplate;
 public class kakaopayService {
     private final String adminKey="ac5d7bd93834444767d1b59477e6f92f";
     private final String cid="TC0ONETIME";
-    private final String sucUrl="http://localhost:8080/api/okKakaopay";
-    private final String cancleUrl="http://localhost:8080/api/cancleKakaopay";
-    private final String failUrl="http://localhost:8080/api/failKakaopay";
-    private final String readyUrl="https://kapi.kakao.com/v1/payment/ready";
     private final String approveUrl="https://kapi.kakao.com/v1/payment/approve";
     private final String realCancleUrl="https://kapi.kakao.com/v1/payment/cancel";
     private final String status="paid";
@@ -50,70 +46,8 @@ public class kakaopayService {
     @Autowired
     private paymentService paymentService;
     @Autowired
-    private userService userService;
-    @Autowired
     private resevationService resevationService;
-    @Autowired
-    private jwtService jwtService;
-    
-    
-    public JSONObject doKakaoPay(tryKakaoPayDto tryKakaoPayDto,HttpServletRequest request,HttpServletResponse httpServletResponse) {
-        System.out.println("doKakaoPay");
-        System.out.println(tryKakaoPayDto);
-        try {
 
-            String[][] itemArray=tryKakaoPayDto.getItemArray();
-            String kind=aboutPayEnums.valueOf(tryKakaoPayDto.getKind()).getString();
-            Map<String,Object>result=paymentService.getTotalPriceAndOther(itemArray, kind);
-            System.out.println(result+" 상품정보 가공");
-            int totalPrice=(int)result.get("totalPrice");
-            String itemName=(String)result.get("itemName");
-            int count=(int)result.get("count");
-            List<Integer>timesOrSize=(List<Integer>)result.get("timesOrSize");
-            paymentService.confrimProduct(tryKakaoPayDto.getTotalPrice(),totalPrice,count,itemName);
-            System.out.println(itemName+"/"+count);
-            String partner_order_id=utillService.GetRandomNum(10);
-            userDto userDto=userService.sendUserDto();
-            body.add("cid", cid);
-            body.add("partner_order_id",partner_order_id);
-            body.add("partner_user_id", userDto.getEmail());
-            body.add("item_name", itemName);
-            body.add("quantity", count);
-            body.add("total_amount", totalPrice);
-            body.add("tax_free_amount", 0);
-            body.add("approval_url", sucUrl);
-            body.add("cancel_url", cancleUrl);
-            body.add("fail_url", failUrl);
-            JSONObject response=requestToKakaoPay(readyUrl);
-            System.out.println(response+" 카카오페이 통신요청 결과");
-            HttpSession httpSession=request.getSession();
-            httpSession.setAttribute("partner_order_id", partner_order_id);
-            httpSession.setAttribute("tid", response.get("tid"));
-            httpSession.setAttribute("item", itemName);
-            httpSession.setAttribute("totalPrice", totalPrice);
-            httpSession.setAttribute("kind", kind);
-            httpSession.setAttribute("email",userDto.getEmail());
-            httpSession.setAttribute("name", userDto.getName());
-            httpSession.setAttribute("count", count);
-            httpSession.setAttribute("itemArray", itemArray);
-            httpSession.setAttribute("other", tryKakaoPayDto.getOther());
-            httpSession.setAttribute("timesOrSize", timesOrSize);
-            jwtService.makeNewAccessToken(request, httpServletResponse);
-
-            return utillService.makeJson(true,(String)response.get("next_redirect_pc_url"));
-        }catch(IllegalArgumentException e){
-            e.printStackTrace();
-            System.out.println("doKakaoPay");
-            throw new RuntimeException("조건에 맞지 않는 상품선택입니다");
-        }catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("doKakaoPay");
-            throw new RuntimeException(e.getMessage());
-        }finally{
-            headers.clear();
-            body.clear();
-        }  
-    }
     @Transactional(rollbackFor = Exception.class)
     public JSONObject insertPaymentForkakao(String pgToken,HttpSession httpSession) {
         System.out.println("insertPaymentForkakao");

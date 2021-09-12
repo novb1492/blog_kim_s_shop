@@ -198,7 +198,7 @@ public class restcontroller {
     @PostMapping("/api/kakaopay")
     public JSONObject getKakaoPayLink(@Valid @RequestBody tryKakaoPayDto tryKakaoPayDto,HttpServletRequest request,HttpServletResponse response) {
         System.out.println("getKakaoPayLink");
-        return kakaopayService.doKakaoPay(tryKakaoPayDto,request,response);
+        return kakaoService.showPaidWindow(tryKakaoPayDto, request, response);
     }
     @RequestMapping("/api/okKakaopay")
     public void okKakaopay(HttpServletRequest request,HttpSession session,HttpServletResponse response) {
