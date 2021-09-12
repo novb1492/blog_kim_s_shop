@@ -244,15 +244,15 @@ public class restcontroller {
         System.out.println("sendKakaoMessage");
         kakaoService.sendMessege();
     }
-    @RequestMapping("/auth/kakaocallback")
-    public void kakaoRollback(HttpServletRequest request,HttpServletResponse response) {
+    @RequestMapping("/auth/kakaoLogincallback")
+    public void kakaoLogincallback(HttpServletRequest request,HttpServletResponse response) {
         System.out.println("kakaologin요청");   
         kakaoService.kakaoLogin(request.getParameter("code"),response);
         doRedirect(response, "http://localhost:3030/kakaoplusOkPage.html");
     }
-    @RequestMapping("/auth/kakaocallback2")
-    public void kakaocallback2(HttpServletRequest request,HttpServletResponse response) {
-        System.out.println("kakaocallback2"+request.getHeader("REFERER"));
+    @RequestMapping("/auth/kakaoMoreOkcallback")
+    public void kakaoMoreOkcallback(HttpServletRequest request,HttpServletResponse response) {
+        System.out.println("kakaoMoreOkcallback"+request.getHeader("REFERER"));
         doRedirect(response, "http://localhost:3030/kakaoPlusOkDetailPage.html");
 
     }

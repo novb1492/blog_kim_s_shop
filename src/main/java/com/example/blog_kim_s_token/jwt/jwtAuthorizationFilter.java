@@ -43,9 +43,9 @@ public class jwtAuthorizationFilter  extends BasicAuthenticationFilter {
             System.out.println("도메인이 없습니다"+uri);
             if(uri.equals("/auth/navercallback")){
                 System.out.println("네이버 로그인 시도입니다");
-            }else if(uri.equals("/auth/kakaocallback")){
+            }else if(uri.equals("/auth/kakaoLogincallback")){
                 System.out.println("카카오 로그인 시도입니다");
-            }else if(uri.equals("/auth/kakaocallback2")){
+            }else if(uri.equals("/auth/kakaoMoreOkcallback")){
                 System.out.println("카카오 추가 권한받기");
             }else if(uri.equals("/api/okKakaopay")){
                 System.out.println("카카오페이 결제 시도");

@@ -23,9 +23,9 @@ import org.springframework.web.client.RestTemplate;
 @Service
 public class kakaoService {
     private final String getTokenUrl="https://kauth.kakao.com/oauth/token";
-    private final String LoginCallBckUrl="http://localhost:8080/auth/kakaocallback";
+    private final String LoginCallBckUrl="http://localhost:8080/auth/kakaoLogincallback";
     private final String requestLoginUrl="https://kapi.kakao.com/v2/user/me";
-    private final String requestMessageCallBackUrl="http://localhost:8080/auth/kakaocallback2";
+    private final String requestMessageCallBackUrl="http://localhost:8080/auth/kakaoMoreOkcallback";
     private final String requestMessageUrl="https://kapi.kakao.com/v2/api/talk/memo/default/send";
     private final String getAccessTokenGrandType="authorization_code";
     private final String getRefreshTokenGrandType="refresh_token";
