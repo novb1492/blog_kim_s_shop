@@ -4,7 +4,6 @@ import java.sql.Timestamp;
 import java.util.Date;
 
 
-
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.example.blog_kim_s_token.config.principaldetail;
@@ -51,7 +50,7 @@ public class jwtService {
 
     public  String getJwtToken(int id) {
         System.out.println("getJwtToken 토큰 제작시작");
-        return JWT.create().withSubject(jwtTokenName).withExpiresAt(new Date(System.currentTimeMillis()+(1000))).withClaim("id",id).sign(Algorithm.HMAC512(jwtSing));
+        return JWT.create().withSubject(jwtTokenName).withExpiresAt(new Date(System.currentTimeMillis()+(1000*30))).withClaim("id",id).sign(Algorithm.HMAC512(jwtSing));
     }
     public  String getJwtToken() {
         System.out.println("getJwtToken 리프레시 토큰 제작시작");

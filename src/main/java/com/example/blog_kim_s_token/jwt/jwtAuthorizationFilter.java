@@ -39,7 +39,6 @@ public class jwtAuthorizationFilter  extends BasicAuthenticationFilter {
         System.out.println(request.getRequestURL()+" url");
         System.out.println(request.getHeader("REFERER")+" 도메인");
         String uri=request.getRequestURI();
-        System.out.println(request.getParameter("code")+" code");
         if(request.getHeader("REFERER")==null){
             System.out.println("도메인이 없습니다"+uri);
             if(uri.equals("/auth/navercallback")){
@@ -51,20 +50,15 @@ public class jwtAuthorizationFilter  extends BasicAuthenticationFilter {
                 System.out.println("카카오 추가 권한받기");
             }else if(uri.equals("/auth/payment")){
                 System.out.println("결제 시스템입니다");
-            } else if(uri.equals("/api/okKakaopay")){
+            } else if(uri.equals("/auth/okKakaopay")){
                 System.out.println("카카오결제 시스템입니다");
-                goToError("/api/okKakaopay", request, response);
             }
             else{
                 System.out.println("도메인이 없습니다");
                 return;
             }
-        }else if(request.getHeader("REFERER").startsWith("http://localhost:8080/auth/kakaocallback2")){
-            System.out.println("콜백요청");
-            goToError("/auth/kakaocallback2", request, response);
-            return;
         }
-        else if(!request.getHeader("REFERER").startsWith("http://localhost:3030/")){
+        else if(!request.getHeader("REFERER").startsWith("http://localhost:3030/")&&!request.getHeader("REFERER").startsWith("http://localhost:8080/")){
             System.out.println("도에민이 다릅니다"+request.getRequestURL());
             return;
         }
@@ -83,6 +77,7 @@ public class jwtAuthorizationFilter  extends BasicAuthenticationFilter {
             e.printStackTrace();
             System.out.println("토큰없음");
         }
+        System.out.println(uri+" uri");
         if(token==null){
             System.out.println("토큰 없음");
             chain.doFilter(request, response);

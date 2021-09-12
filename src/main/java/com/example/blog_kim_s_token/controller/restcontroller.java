@@ -32,7 +32,6 @@ import com.example.blog_kim_s_token.service.boardService;
 import com.example.blog_kim_s_token.service.priceService;
 import com.example.blog_kim_s_token.service.userService;
 import com.example.blog_kim_s_token.service.utillService;
-import com.example.blog_kim_s_token.service.ApiServies.kakao.kakaoLoginservice;
 import com.example.blog_kim_s_token.service.ApiServies.kakao.kakaoService;
 import com.example.blog_kim_s_token.service.ApiServies.kakao.kakaopayService;
 import com.example.blog_kim_s_token.service.ApiServies.kakao.tryKakaoPayDto;
@@ -61,8 +60,6 @@ public class restcontroller {
     private confrimService confrimService;
     @Autowired
     private naverLoginService naverLoingService;
-    @Autowired
-    private kakaoLoginservice kakaoLoginservice;
     @Autowired
     private kakaopayService kakaopayService;
     @Autowired
@@ -201,12 +198,13 @@ public class restcontroller {
     @PostMapping("/api/kakaopay")
     public JSONObject getKakaoPayLink(@Valid @RequestBody tryKakaoPayDto tryKakaoPayDto,HttpServletRequest request,HttpServletResponse response) {
         System.out.println("getKakaoPayLink");
-         return kakaopayService.doKakaoPay(tryKakaoPayDto,request);
+        return kakaopayService.doKakaoPay(tryKakaoPayDto,request,response);
     }
-    @RequestMapping("/api/okKakaopay")
-    public JSONObject okKakaopay(HttpServletRequest request,HttpSession session,HttpServletResponse response) {
+    @RequestMapping("/auth/okKakaopay")
+    public void okKakaopay(HttpServletRequest request,HttpSession session,HttpServletResponse response) {
         System.out.println("okKakaopay");
-        return kakaopayService.insertPaymentForkakao(request.getParameter("pg_token"),session);
+        kakaopayService.insertPaymentForkakao(request.getParameter("pg_token"),session);
+        doRedirect(response,"http://localhost:3030/doneKakaoPage.html");
     }
     @PostMapping("/api/canclePay")
     public JSONObject canclePay( @RequestBody tryCanclePayDto tryCanclePayDto,HttpServletRequest request,HttpServletResponse response) {
@@ -318,6 +316,8 @@ public class restcontroller {
         return "admin";
     }
     private void doRedirect(HttpServletResponse response,String url) {
+        System.out.println("doRedirect");
+        System.out.println(url+"리다이렉트 요청 url");
         try {
             response.sendRedirect(url);
         } catch (IOException e) {
