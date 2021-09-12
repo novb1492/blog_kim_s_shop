@@ -3,6 +3,9 @@ package com.example.blog_kim_s_token.jwt;
 import java.sql.Timestamp;
 import java.util.Date;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -12,6 +15,7 @@ import com.example.blog_kim_s_token.model.jwt.jwtDao;
 import com.example.blog_kim_s_token.model.jwt.jwtDto;
 import com.example.blog_kim_s_token.model.user.userDto;
 import com.example.blog_kim_s_token.service.utillService;
+import com.example.blog_kim_s_token.service.cookie.cookieService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,7 +60,7 @@ public class jwtService {
         System.out.println("getJwtToken 리프레시 토큰 제작시작");
         return JWT.create().withSubject(jwtTokenName).withExpiresAt(new Date(System.currentTimeMillis()+(86400*refreshTokenValidity))).sign(Algorithm.HMAC512(jwtSing));
     }
-    public String getNewJwtToken(jwtDto jwtDto) {
+    private String getNewJwtToken(jwtDto jwtDto) {
         System.out.println(jwtDto.getUserid());
         if(jwtDto.getTokenName()!=null){
             return getJwtToken(jwtDto.getUserid());
@@ -89,7 +93,7 @@ public class jwtService {
         System.out.println("setSecuritySession");
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
-    public jwtDto getRefreshToken(String refreshToken) {
+    private jwtDto getRefreshToken(String refreshToken) {
         System.out.println(refreshToken+" getRefreshToken 찾기");
         return jwtDao.findByTokenName(refreshToken);
     }
@@ -144,5 +148,23 @@ public class jwtService {
             }
         }
         return refreshToken;
+    }
+    public void makeNewAccessToken(HttpServletRequest request,HttpServletResponse response) {
+        Cookie[] cookies=request.getCookies();
+        String refreshToken=null;
+        for(Cookie c:cookies){
+            if(c.getName().equals("refreshToken")){
+                refreshToken=c.getValue();
+            }
+        }
+        System.out.println(refreshToken+" 리프레시 토큰");
+        jwtDto jwtDto=getRefreshToken(refreshToken);
+        String newJwtToken=getNewJwtToken(jwtDto);
+        System.out.println(newJwtToken+" 새 토큰");
+        String[][] cookiesNamesAndValues=new String[1][3];
+        cookiesNamesAndValues[0][0]="Authorization";
+        cookiesNamesAndValues[0][1]=newJwtToken;
+        cookiesNamesAndValues[0][2]="httponly";
+        cookieService.cookieFactory(response, cookiesNamesAndValues); 
     }
 }

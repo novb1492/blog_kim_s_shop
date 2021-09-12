@@ -35,25 +35,23 @@ public class jwtAuthorizationFilter  extends BasicAuthenticationFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)throws IOException, ServletException {
+        String uri=request.getRequestURI();
         System.out.println("doFilterInternal 입장 ");
         System.out.println(request.getRequestURL()+" url");
-        System.out.println(request.getHeader("REFERER")+" 도메인");
-        String uri=request.getRequestURI();
+        System.out.println(request.getHeader("REFERER")+" 도메인"+uri);
         if(request.getHeader("REFERER")==null){
             System.out.println("도메인이 없습니다"+uri);
             if(uri.equals("/auth/navercallback")){
                 System.out.println("네이버 로그인 시도입니다");
-            }
-            else if(uri.equals("/auth/kakaocallback")){
+            }else if(uri.equals("/auth/kakaocallback")){
                 System.out.println("카카오 로그인 시도입니다");
             }else if(uri.equals("/auth/kakaocallback2")){
                 System.out.println("카카오 추가 권한받기");
-            }else if(uri.equals("/auth/payment")){
-                System.out.println("결제 시스템입니다");
-            } else if(uri.equals("/auth/okKakaopay")){
-                System.out.println("카카오결제 시스템입니다");
-            }
-            else{
+            }else if(uri.equals("/api/okKakaopay")){
+                System.out.println("카카오페이 결제 시도");
+            }else if(uri.equals("/auth/reseponseAtImp")){
+                System.out.println("아임포트 웹훅 요청");
+            }else{
                 System.out.println("도메인이 없습니다");
                 return;
             }

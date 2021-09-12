@@ -8,18 +8,15 @@ package com.example.blog_kim_s_token.service.ApiServies.kakao;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import com.example.blog_kim_s_token.customException.failKakaoPay;
 import com.example.blog_kim_s_token.enums.aboutPayEnums;
 import com.example.blog_kim_s_token.jwt.jwtService;
-import com.example.blog_kim_s_token.model.jwt.jwtDto;
 import com.example.blog_kim_s_token.model.user.userDto;
 import com.example.blog_kim_s_token.service.userService;
 import com.example.blog_kim_s_token.service.utillService;
-import com.example.blog_kim_s_token.service.cookie.cookieService;
 import com.example.blog_kim_s_token.service.payment.paymentService;
 import com.example.blog_kim_s_token.service.payment.iamPort.nomalPayment;
 import com.example.blog_kim_s_token.service.reservation.resevationService;
@@ -38,9 +35,9 @@ import org.springframework.web.client.RestTemplate;
 public class kakaopayService {
     private final String adminKey="ac5d7bd93834444767d1b59477e6f92f";
     private final String cid="TC0ONETIME";
-    private final String sucUrl="http://localhost:8080/auth/okKakaopay";
-    private final String cancleUrl="http://localhost:8080/auth/cancleKakaopay";
-    private final String failUrl="http://localhost:8080/auth/failKakaopay";
+    private final String sucUrl="http://localhost:8080/api/okKakaopay";
+    private final String cancleUrl="http://localhost:8080/api/cancleKakaopay";
+    private final String failUrl="http://localhost:8080/api/failKakaopay";
     private final String readyUrl="https://kapi.kakao.com/v1/payment/ready";
     private final String approveUrl="https://kapi.kakao.com/v1/payment/approve";
     private final String realCancleUrl="https://kapi.kakao.com/v1/payment/cancel";
@@ -101,23 +98,7 @@ public class kakaopayService {
             httpSession.setAttribute("itemArray", itemArray);
             httpSession.setAttribute("other", tryKakaoPayDto.getOther());
             httpSession.setAttribute("timesOrSize", timesOrSize);
-
-            String refreshToken=null;
-            Cookie[] cookies=request.getCookies();
-                for(Cookie c:cookies){
-                    if(c.getName().equals("refreshToken")){
-                        refreshToken=c.getValue();
-                    }
-                }
-            System.out.println(refreshToken+" 리프레시 토큰");
-            jwtDto jwtDto=jwtService.getRefreshToken(refreshToken);
-            String newJwtToken=jwtService.getNewJwtToken(jwtDto);
-            System.out.println(newJwtToken+" 새 토큰");
-            String[][] cookiesNamesAndValues=new String[1][3];
-            cookiesNamesAndValues[0][0]="Authorization";
-            cookiesNamesAndValues[0][1]=newJwtToken;
-            cookiesNamesAndValues[0][2]="httponly";
-            cookieService.cookieFactory(httpServletResponse, cookiesNamesAndValues);
+            jwtService.makeNewAccessToken(request, httpServletResponse);
 
             return utillService.makeJson(true,(String)response.get("next_redirect_pc_url"));
         }catch(IllegalArgumentException e){

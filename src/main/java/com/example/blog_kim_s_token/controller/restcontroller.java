@@ -190,7 +190,7 @@ public class restcontroller {
         System.out.println("getClientReservation");
        return resevationService.getClientReservation(JSONObject);
     }
-    @PostMapping("/auth/payment")
+    @PostMapping("/auth/reseponseAtImp")
     public void bootPay(@RequestBody JSONObject jsonObject,HttpServletResponse response) {
         System.out.println("payment");
         paymentService.vbankOk(jsonObject);
@@ -200,7 +200,7 @@ public class restcontroller {
         System.out.println("getKakaoPayLink");
         return kakaopayService.doKakaoPay(tryKakaoPayDto,request,response);
     }
-    @RequestMapping("/auth/okKakaopay")
+    @RequestMapping("/api/okKakaopay")
     public void okKakaopay(HttpServletRequest request,HttpSession session,HttpServletResponse response) {
         System.out.println("okKakaopay");
         kakaopayService.insertPaymentForkakao(request.getParameter("pg_token"),session);
