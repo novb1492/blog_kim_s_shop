@@ -4,6 +4,8 @@ package com.example.blog_kim_s_token.controller;
 
 
 
+import java.io.IOException;
+
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -244,6 +246,24 @@ public class restcontroller {
         System.out.println("sendKakaoMessage");
         kakaoService.sendMessege();
     }
+    @RequestMapping("/auth/kakaocallback")
+    public void kakaoRollback(HttpServletRequest request,HttpServletResponse response) {
+        System.out.println("kakaologin요청");   
+        kakaoService.kakaoLogin(request.getParameter("code"),response);
+        doRedirect(response, "http://localhost:3030/kakaoplusOkPage.html");
+    }
+    @RequestMapping("/auth/kakaocallback2")
+    public void kakaocallback2(HttpServletRequest request,HttpServletResponse response) {
+        System.out.println("kakaocallback2"+request.getHeader("REFERER"));
+        doRedirect(response, "http://localhost:3030/kakaoPlusOkDetailPage.html");
+
+    }
+    @RequestMapping("/auth/navercallback")
+    public void naverRollback(HttpServletRequest request,HttpServletResponse response) {
+        System.out.println("naverlogin요청");
+        naverLoingService.LoginNaver(naverLoingService.getNaverToken(request.getParameter("code"), request.getParameter("state")),request,response);
+        doRedirect(response, "http://localhost:3030/doneNaverLogin.html");
+    }
     @PostMapping("/auth/test")
     public JSONObject test(HttpServletRequest request,HttpServletResponse response) {
         System.out.println("test");
@@ -296,6 +316,14 @@ public class restcontroller {
     public String  admin(HttpServletRequest request,HttpServletResponse response) {
         System.out.println("admin 입장");
         return "admin";
+    }
+    private void doRedirect(HttpServletResponse response,String url) {
+        try {
+            response.sendRedirect(url);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("doRedirect error"+e.getMessage());
+        }
     }
 
     
