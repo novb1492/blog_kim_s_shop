@@ -34,6 +34,9 @@ public class insertKakaoTokenDto {
     @Column(name="accessToken",nullable = false)
     private String accessToken;
 
+    @Column(name="accessTokenExpiresin",nullable = false)
+    private Timestamp accessTokenExpiresin;
+
     @Column(name="refreshToken",nullable = false)
     private String refreshToken;
 

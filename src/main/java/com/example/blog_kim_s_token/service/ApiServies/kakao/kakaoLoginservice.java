@@ -17,6 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 
 
@@ -79,6 +82,7 @@ public class kakaoLoginservice {
             if(dto==null){
                 dto=insertKakaoTokenDto.builder().accessToken((String)getToken.get("access_token"))
                                         .email(email)
+                                        .accessTokenExpiresin(Timestamp.valueOf(LocalDateTime.now().plusSeconds((int)getToken.get("expires_in"))))
                                         .refreshToken((String)getToken.get("refresh_token")).build();
                 kakaoTokenDao.save(dto);
             }

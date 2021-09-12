@@ -32,7 +32,13 @@ public class controller {
     public String kakaoRollback(HttpServletRequest request,HttpServletResponse response) {
         System.out.println("kakaologin요청");   
         kakaoService.kakaoLogin(request.getParameter("code"),response);
-       return "redirect:http://localhost:3030/index.html";
+       return "redirect:http://localhost:3030/kakaoplusOkPage.html";
+
+    }
+    @RequestMapping("/auth/kakaocallback2")
+    public String kakaocallback2(HttpServletRequest request,HttpServletResponse response) {
+        System.out.println("kakaocallback2"+request.getHeader("REFERER"));
+        return "redirect:http://localhost:3030/index.html";
 
     }
  

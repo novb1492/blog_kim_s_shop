@@ -1,11 +1,14 @@
 package com.example.blog_kim_s_token.service.ApiServies.kakao;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.example.blog_kim_s_token.config.security;
 import com.example.blog_kim_s_token.model.user.userDto;
 import com.nimbusds.jose.shaded.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +18,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -26,6 +30,8 @@ public class kakaoService {
     private final String requestLoginUrl="https://kapi.kakao.com/v2/user/me";
     private final String requestMessageCallBackUrl="http://localhost:8080/auth/kakaocallback2";
     private final String requestMessageUrl="https://kapi.kakao.com/v2/api/talk/memo/default/send";
+    private final String getAccessTokenGrandType="authorization_code";
+    private final String getRefreshTokenGrandType="refresh_token";
     private final String kakao="kakao";
     private final String cid="TC0ONETIME";
     private final String sucUrl="http://localhost:8080/api/okKakaopay";
@@ -63,9 +69,6 @@ public class kakaoService {
     }
     public String getMoreOk(HttpServletRequest request) {
         System.out.println("getMoreOk 추후 scope변수화 예정" );
-        HttpSession httpSession=request.getSession();
-        insertKakaoTokenDto dto=kakaoTokenDao.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).orElse(null);
-        httpSession.setAttribute("token",dto.getAccessToken());
         return "https://kauth.kakao.com/oauth/authorize?client_id="+apikey+"&redirect_uri="+requestMessageCallBackUrl+"&response_type=code&scope=talk_message";
     }
     private JSONObject requestToKakao(String url) {
@@ -86,7 +89,7 @@ public class kakaoService {
     }
     public void kakaoLogin(String code,HttpServletResponse response) {
         System.out.println("kakaoLogin");
-        makeBodyAndHeader(code,LoginCallBckUrl);
+        makeBodyAndHeader(code,LoginCallBckUrl,getAccessTokenGrandType);
         JSONObject getToken=requestToKakao(getTokenUrl);
         System.out.println(getToken+" 카카오통신응답");
         headers.add("Authorization","Bearer "+(String)getToken.get("access_token"));
@@ -96,18 +99,16 @@ public class kakaoService {
         userDto dto=kakaoLoginservice.kakaoLogin(profile,getToken);   
         kakaoLoginservice.makeCookie(dto, response);
      }
-     public void sendMessege(String code,HttpServletRequest request) {
+     @Transactional
+     public void sendMessege(){
         System.out.println("sendMessege");
-        HttpSession httpSession=request.getSession();
-        makeBodyAndHeader(code,requestMessageCallBackUrl);
-        String getToken=(String) httpSession.getAttribute("token");//requestToKakao(getTokenUrl);
-        System.out.println(getToken+" 카카오통신응답");
-        headers.add("Authorization","Bearer "+getToken);
+        insertKakaoTokenDto insertKakaoTokenDto=kakaoTokenDao.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).orElseThrow(()->new RuntimeException("카카오 토큰이없습니다"));
+        confrimTokenExprise(insertKakaoTokenDto);
+        System.out.println(insertKakaoTokenDto.getAccessToken()+ "카카오토큰");
+        headers.add("Authorization","Bearer "+insertKakaoTokenDto.getAccessToken());
         JSONObject jsonObject=new JSONObject();
         JSONObject jsonObject2=new JSONObject();
         jsonObject2.put("web_url","http:localhost:3030/index.html");
-
-
         jsonObject.put("object_type", "text");
         jsonObject.put("link",jsonObject2);
         System.out.println(jsonObject2.toString());
@@ -118,16 +119,35 @@ public class kakaoService {
         System.out.println(response+" 카카오통신응답");
 
      }
-     private void makeBodyAndHeader(String code,String callBackUrl) {
+     private void makeBodyAndHeader(String code,String callBackUrl,String grantType) {
         System.out.println("makeBodyAndHeader");
-        body.add("grant_type", "authorization_code");
+        body.add("grant_type", grantType);
         body.add("client_id", apikey);
         body.add("redirect_uri", callBackUrl);
         body.add("code", code);
-     }
-     public insertKakaoTokenDto selectByEmail(String email) {
+    }
+    public insertKakaoTokenDto selectByEmail(String email) {
        return  kakaoTokenDao.findByEmail(email).orElse(new insertKakaoTokenDto());
-     }
+    }
+    private void confrimTokenExprise(insertKakaoTokenDto insertKakaoTokenDto) {
+        try {
+            if(LocalDateTime.now().isAfter(insertKakaoTokenDto.getAccessTokenExpiresin().toLocalDateTime())){
+                System.out.println("카카오 토큰만료 토큰 재요청");
+                makeBodyAndHeader(null, null,getRefreshTokenGrandType);
+                body.add("refresh_token", insertKakaoTokenDto.getRefreshToken());
+                JSONObject getToken=requestToKakao(getTokenUrl);
+                System.out.println(getToken+" 카카오토큰통신결과");
+                insertKakaoTokenDto.setAccessToken((String)getToken.get("access_token"));
+                insertKakaoTokenDto.setAccessTokenExpiresin(Timestamp.valueOf(LocalDateTime.now().plusSeconds((int)getToken.get("expires_in"))));
+            } 
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("confrimTokenExprise error"+e.getMessage());
+            throw new RuntimeException("갱신에 실패했습니다 다시 로그인 부탁드립니다");
+        }
+       
+    }
+    
 
     
 
