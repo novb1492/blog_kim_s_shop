@@ -12,18 +12,16 @@ import org.springframework.stereotype.Service;
 @Service
 public class aes256 {
     public static String alg = "AES/CBC/PKCS5Padding";
-    private final String key = "pgSettle30y739r82jtd709yOfZ2yK5K";
+    private final String sKey = "pgSettle30y739r82jtd709yOfZ2yK5K";
     private final int AES_KEY_SIZE_256 = 256;
 
     public String encrypt(){
         System.out.println("ace256");
-        String sKey="trdAmt";
         String sText="500";
         try {
             byte[] key = null;
             byte[] text = null;
             byte[] encrypted = null;
-            final int AES_KEY_SIZE_256 = 256;
             // UTF-8
             key = sKey.getBytes("UTF-8");
     

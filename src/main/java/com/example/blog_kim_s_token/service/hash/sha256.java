@@ -13,7 +13,7 @@ public class sha256 {
 
     public String encrypt(){
         try {
-            String text=String.format("%s%s%s%s%s%s%s","nxca_jt_il","card","TEST0123456789","20210913","132000","500원","ST1009281328226982205");
+            String text=String.format("%s%s%s%s%s%s%s","nxca_jt_il","card","TEST0123456789","20210913","132000","500","ST1009281328226982205");
             StringBuffer sb = new StringBuffer();
             MessageDigest sh = MessageDigest.getInstance("SHA-256");
             if (text != null) {
