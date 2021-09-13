@@ -39,7 +39,7 @@ public class jwtAuthorizationFilter  extends BasicAuthenticationFilter {
         System.out.println("doFilterInternal 입장 ");
         System.out.println(request.getRequestURL()+" url");
         System.out.println(request.getHeader("REFERER")+" 도메인"+uri);
-        if(request.getHeader("REFERER")==null){
+        /*if(request.getHeader("REFERER")==null){
             System.out.println("도메인이 없습니다"+uri);
             if(uri.equals("/auth/navercallback")){
                 System.out.println("네이버 로그인 시도입니다");
@@ -58,10 +58,10 @@ public class jwtAuthorizationFilter  extends BasicAuthenticationFilter {
                 return;
             }
         }
-        else if(!request.getHeader("REFERER").startsWith("http://localhost:3030/")&&!request.getHeader("REFERER").startsWith("http://localhost:8080/")){
+        /*else if(!request.getHeader("REFERER").startsWith("https://localhost:8443/")&&!request.getHeader("REFERER").startsWith("http://localhost:3030/")&&!request.getHeader("REFERER").startsWith("http://localhost:8080/")){
             System.out.println("도에민이 다릅니다"+request.getRequestURL());
             return;
-        }
+        }*/
         String token=null;
         String csrfToken=null;
         try {
