@@ -5,6 +5,8 @@ package com.example.blog_kim_s_token.controller;
 
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -270,7 +272,9 @@ public class restcontroller {
     @PostMapping("/api/getSha256Hash")
     public JSONObject getSha256Hash(HttpServletRequest request,HttpServletResponse response) {
         System.out.println("getSha256Hash");
-        return utillService.makeJson(true,sha256.encrypt()+","+aes256.encrypt());
+       
+
+        return utillService.makeJson(true,sha256.encrypt()+","+aes256.encrypt()+","+aes256.encrypt2()+","+aes256.encrypt3());
     }
     @RequestMapping("/auth/settlebank")
     public void settlebank(HttpServletRequest request,HttpServletResponse response) {
