@@ -219,7 +219,7 @@ public class kakaoService {
         }
     }
     @Transactional(rollbackFor = Exception.class)
-    public JSONObject requestKakaopay(String pgToken,HttpSession httpSession) {
+    public void requestKakaopay(String pgToken,HttpSession httpSession) {
         System.out.println("requestKakaopay");
         String[][]itemArray=(String[][])httpSession.getAttribute("itemArray");
         String[]other=(String[])httpSession.getAttribute("other");
@@ -252,12 +252,9 @@ public class kakaoService {
             if(kind.equals(aboutPayEnums.reservation.getString())){
                 System.out.println("예약 상품 결제");
                 resevationService.doReservation(email,name, paymentid, itemArray, other,timesOrSize,status,usedKind);
-      
             }else if(kind.equals(aboutPayEnums.product.getString())){
                 System.out.println("상품결제");
             }
-  
-           return utillService.makeJson(true, "완료 되었습니다");
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("insertPaymentForkakao error"+e.getMessage());

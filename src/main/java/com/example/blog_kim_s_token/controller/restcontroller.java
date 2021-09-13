@@ -38,6 +38,8 @@ import com.example.blog_kim_s_token.service.ApiServies.kakao.tryKakaoPayDto;
 import com.example.blog_kim_s_token.service.ApiServies.naver.naverLoginService;
 import com.example.blog_kim_s_token.service.confrim.confrimService;
 import com.example.blog_kim_s_token.service.fileUpload.fileUploadService;
+import com.example.blog_kim_s_token.service.hash.aes256;
+import com.example.blog_kim_s_token.service.hash.sha256;
 import com.example.blog_kim_s_token.service.payment.paymentService;
 import com.example.blog_kim_s_token.service.payment.iamPort.tryImpPayDto;
 import com.example.blog_kim_s_token.service.reservation.reservationService;
@@ -74,6 +76,10 @@ public class restcontroller {
     private paymentService paymentService;
     @Autowired
     private boardService boardService;
+    @Autowired
+    private sha256 sha256;
+    @Autowired
+    private aes256 aes256;
 
 
     @PostMapping("/auth/confrimEmail")
@@ -204,7 +210,7 @@ public class restcontroller {
     public void okKakaopay(HttpServletRequest request,HttpSession session,HttpServletResponse response) {
         System.out.println("okKakaopay");
         kakaoService.requestKakaopay(request.getParameter("pg_token"),session);
-        doRedirect(response,"http://localhost:3030/doneKakaoPage.html");
+        doRedirect(response,"http://localhost:3030/doneKakaoPagevar1.html?nextUrl=showReservationPage.html");
     }
     @PostMapping("/api/canclePay")
     public JSONObject canclePay( @RequestBody tryCanclePayDto tryCanclePayDto,HttpServletRequest request,HttpServletResponse response) {
@@ -237,7 +243,6 @@ public class restcontroller {
     public JSONObject kakaoMore(HttpServletRequest request,HttpServletResponse response) {
         System.out.println("kakaoMore");
         return utillService.makeJson(true, kakaoService.getMoreOk(request)); 
-    
     }
     @RequestMapping("/api/sendKakaoMessage")
     public void sendKakaoMessage(HttpServletRequest request,HttpServletResponse response) {
@@ -262,40 +267,10 @@ public class restcontroller {
         naverLoingService.LoginNaver(naverLoingService.getNaverToken(request.getParameter("code"), request.getParameter("state")),request,response);
         doRedirect(response, "http://localhost:3030/doneNaverLogin.html");
     }
-    @PostMapping("/auth/test")
-    public JSONObject test(HttpServletRequest request,HttpServletResponse response) {
-        System.out.println("test");
-        Cookie[] cookies=request.getCookies();
-        if(cookies==null){
-            Cookie cookie=new Cookie("test","123");
-            response.addCookie(cookie);
-            return null;
-        }else{
-            System.out.println("기존쿠키 교체");
-            Cookie cookie=new Cookie("test","456");
-            response.addCookie(cookie);
-        }
-        if(cookies!=null){
-            for(Cookie c:cookies){
-                if(c.getName().equals("test")){
-                    System.out.println(c.getValue());
-                }
-            }
-         }
-        return null;
-    }
-    @PostMapping("/auth/test2")
-    public void test2(HttpServletRequest request,HttpServletResponse response) {
-        System.out.println("test2");
-        Cookie[] cookies=request.getCookies();
-        if(cookies!=null){
-           for(Cookie c:cookies){
-               if(c.getName().equals("test")){
-                   System.out.println(c.getValue());
-               }
-           }
-        }
-    
+    @PostMapping("/api/getSha256Hash")
+    public JSONObject getSha256Hash(HttpServletRequest request,HttpServletResponse response) {
+        System.out.println("getSha256Hash");
+        return utillService.makeJson(true,sha256.encrypt()+","+aes256.encrypt());
     }
     @PostMapping("/api/v1/user/test")
     public JSONObject  user(HttpServletRequest request,HttpServletResponse response) {
