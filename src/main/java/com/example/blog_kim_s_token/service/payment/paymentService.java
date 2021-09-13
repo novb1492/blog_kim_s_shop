@@ -25,12 +25,12 @@ import com.example.blog_kim_s_token.model.product.productDto;
 import com.example.blog_kim_s_token.model.user.userDto;
 import com.example.blog_kim_s_token.service.priceService;
 import com.example.blog_kim_s_token.service.utillService;
-import com.example.blog_kim_s_token.service.ApiServies.kakao.kakaopayService;
+import com.example.blog_kim_s_token.service.ApiServies.kakao.kakaoService;
 import com.example.blog_kim_s_token.service.payment.iamPort.iamportService;
 import com.example.blog_kim_s_token.service.payment.iamPort.nomalPayment;
 import com.example.blog_kim_s_token.service.payment.iamPort.tryImpPayDto;
 import com.example.blog_kim_s_token.service.payment.iamPort.vbankPayment;
-import com.example.blog_kim_s_token.service.reservation.resevationService;
+import com.example.blog_kim_s_token.service.reservation.reservationService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -49,7 +49,7 @@ public class paymentService {
     @Autowired
     private iamportService iamportService;
     @Autowired
-    private resevationService resevationService;
+    private reservationService resevationService;
     @Autowired
     private priceService priceService;
     @Value("${payment.period}")
@@ -59,7 +59,7 @@ public class paymentService {
     @Value("${kakao.kakaoPay.cid}")
     private String kakaoPayCid;
     @Autowired
-    private kakaopayService kakaopayService;
+    private kakaoService kakaoService;
 
     
     public vBankDto selectVbankProduct(String paymentId) {
@@ -370,7 +370,7 @@ public class paymentService {
         body.add("tid", tid);
         body.add("cancel_amount", price);
         body.add("cancel_tax_free_amount",0);
-        kakaopayService.cancleKakaopay(body);
+        kakaoService.cancleKakaopay(body);
     }
     public void canclePay(JSONObject body) {
         iamportService.cancleBuy(body);
