@@ -272,6 +272,11 @@ public class restcontroller {
         System.out.println("getSha256Hash");
         return utillService.makeJson(true,sha256.encrypt()+","+aes256.encrypt());
     }
+    @RequestMapping("/auth/settlebank")
+    public void settlebank(HttpServletRequest request,HttpServletResponse response) {
+        System.out.println("settlebank");
+        
+    }
     @PostMapping("/api/v1/user/test")
     public JSONObject  user(HttpServletRequest request,HttpServletResponse response) {
         System.out.println("user 입장");

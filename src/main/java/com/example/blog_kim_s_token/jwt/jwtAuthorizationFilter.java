@@ -51,7 +51,9 @@ public class jwtAuthorizationFilter  extends BasicAuthenticationFilter {
                 System.out.println("카카오페이 결제 시도");
             }else if(uri.equals("/auth/reseponseAtImp")){
                 System.out.println("아임포트 웹훅 요청");
-            }else{
+            }else if(uri.equals("/auth/settlebank")){
+                System.out.println("세틀뱅크 웹훅 요청");
+            } else{
                 System.out.println("도메인이 없습니다");
                 return;
             }
