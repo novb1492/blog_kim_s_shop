@@ -40,7 +40,7 @@ import com.example.blog_kim_s_token.service.confrim.confrimService;
 import com.example.blog_kim_s_token.service.fileUpload.fileUploadService;
 import com.example.blog_kim_s_token.service.payment.paymentService;
 import com.example.blog_kim_s_token.service.payment.iamPort.tryImpPayDto;
-import com.example.blog_kim_s_token.service.reservation.resevationService;
+import com.example.blog_kim_s_token.service.reservation.reservationService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -65,7 +65,7 @@ public class restcontroller {
     @Autowired
     private kakaoService kakaoService;
     @Autowired
-    private resevationService resevationService;
+    private reservationService resevationService;
     @Autowired
     private priceService priceService;
     @Autowired
@@ -203,7 +203,7 @@ public class restcontroller {
     @RequestMapping("/api/okKakaopay")
     public void okKakaopay(HttpServletRequest request,HttpSession session,HttpServletResponse response) {
         System.out.println("okKakaopay");
-        kakaopayService.insertPaymentForkakao(request.getParameter("pg_token"),session);
+        kakaoService.requestKakaopay(request.getParameter("pg_token"),session);
         doRedirect(response,"http://localhost:3030/doneKakaoPage.html");
     }
     @PostMapping("/api/canclePay")

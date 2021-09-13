@@ -13,6 +13,7 @@ import com.example.blog_kim_s_token.customException.failBuyException;
 import com.example.blog_kim_s_token.customException.failKakaoPay;
 import com.example.blog_kim_s_token.jwt.jwtService;
 import com.example.blog_kim_s_token.service.utillService;
+import com.example.blog_kim_s_token.service.ApiServies.kakao.kakaoService;
 import com.example.blog_kim_s_token.service.ApiServies.kakao.kakaopayService;
 import com.example.blog_kim_s_token.service.payment.iamPort.iamportService;
 import com.nimbusds.jose.shaded.json.JSONObject;
@@ -33,7 +34,7 @@ public class errorRestController {
     @Autowired
     private iamportService iamportService;
     @Autowired
-    private kakaopayService kakaopayService;
+    private kakaoService kakaoService;
 
     
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -104,7 +105,7 @@ public class errorRestController {
         body.add("tid", failKakaoPay.getTid());
         body.add("cancel_amount", failKakaoPay.getTotalPrice());
         body.add("cancel_tax_free_amount",0);
-        kakaopayService.cancleKakaopay(body);
+        kakaoService.cancleKakaopay(body);
         return utillService.makeJson(false, failKakaoPay.getMessage());
     }
 }

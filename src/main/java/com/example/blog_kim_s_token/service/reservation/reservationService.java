@@ -29,7 +29,7 @@ import org.springframework.stereotype.Service;
 
 
 @Service
-public class resevationService {
+public class reservationService {
 
     private final int openTime=9;
     private final int closeTime=22;

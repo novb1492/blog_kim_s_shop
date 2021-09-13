@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.example.blog_kim_s_token.customException.failKakaoPay;
 import com.example.blog_kim_s_token.enums.aboutPayEnums;
 import com.example.blog_kim_s_token.jwt.jwtService;
 import com.example.blog_kim_s_token.model.user.userDto;
@@ -17,6 +18,7 @@ import com.example.blog_kim_s_token.service.userService;
 import com.example.blog_kim_s_token.service.utillService;
 import com.example.blog_kim_s_token.service.payment.paymentService;
 import com.example.blog_kim_s_token.service.payment.iamPort.nomalPayment;
+import com.example.blog_kim_s_token.service.reservation.reservationService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -78,6 +80,8 @@ public class kakaoService {
     private jwtService jwtService;
     @Autowired
     private paymentService paymentService;
+    @Autowired
+    private reservationService resevationService;
 
     
     public String kakaoGetLoginCode() {
@@ -213,6 +217,58 @@ public class kakaoService {
             System.out.println("doKakaoPay");
             throw new RuntimeException("카카오 페이 불러오기 실패");
         }
+    }
+    @Transactional(rollbackFor = Exception.class)
+    public JSONObject requestKakaopay(String pgToken,HttpSession httpSession) {
+        System.out.println("requestKakaopay");
+        String[][]itemArray=(String[][])httpSession.getAttribute("itemArray");
+        String[]other=(String[])httpSession.getAttribute("other");
+        String email=(String)httpSession.getAttribute("email");
+        String name=(String)httpSession.getAttribute("name");
+        int totalPrice=(int)httpSession.getAttribute("totalPrice");
+        String kind=(String)httpSession.getAttribute("kind");
+        String paymentid=(String)httpSession.getAttribute("tid");
+        List<Integer>timesOrSize=(List<Integer>)httpSession.getAttribute("timesOrSize");
+        try {
+            body.add("cid", cid);
+            body.add("tid",paymentid);
+            body.add("partner_order_id",httpSession.getAttribute("partner_order_id"));
+            body.add("partner_user_id", httpSession.getAttribute("email"));
+            body.add("quantity",httpSession.getAttribute("count"));
+            body.add("pg_token", pgToken);
+            headers.add("Authorization","KakaoAK "+adminKey);
+            JSONObject response=requestToKakao(approveUrl);
+            System.out.println(response+" 카카오페이 결제완료");
+            String usedKind=aboutPayEnums.kakaoPay.getString();
+            nomalPayment nomalPayment=new nomalPayment();
+            nomalPayment.setKind(kind);
+            nomalPayment.setEmail(email);
+            nomalPayment.setPayMethod(usedKind);
+            nomalPayment.setPaymentid(paymentid);
+            nomalPayment.setStatus(status);
+            nomalPayment.setUsedKind(usedKind);
+            nomalPayment.setName(name);
+            paymentService.insertPayment(nomalPayment,totalPrice);
+            if(kind.equals(aboutPayEnums.reservation.getString())){
+                System.out.println("예약 상품 결제");
+                resevationService.doReservation(email,name, paymentid, itemArray, other,timesOrSize,status,usedKind);
+      
+            }else if(kind.equals(aboutPayEnums.product.getString())){
+                System.out.println("상품결제");
+            }
+  
+           return utillService.makeJson(true, "완료 되었습니다");
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("insertPaymentForkakao error"+e.getMessage());
+            throw new failKakaoPay(e.getMessage(),cid,paymentid,totalPrice);
+        }
+    }  
+    public void  cancleKakaopay(MultiValueMap<String,Object> body2) {
+        System.out.println("cancleKakaopay");
+        body=body2;
+        headers.add("Authorization","KakaoAK "+adminKey);
+        requestToKakao(realCancleUrl);
     }
   
     
