@@ -12,11 +12,11 @@ public class sha256 {
 
     public String encrypt(){
         try {
-             //구 가상계좌 "%s%s%s%s%s%s%s","testmchtId1","kim","test54658","500","20210913","132000","222.237.192.68"
-            //신 가상계좌 "%s%s%s%s%s%s%s","nxva_sb_il","vbank","12TEST78451223","20210913","132000","500","ST1009281328226982205"
+             //일반 가상계좌 "%s%s%s%s%s%s%s","nx_mid_il","vbank","TEST784512","20210913","132000","500","ST1009281328226982205"
            //일반nxca_jt_il ,card
+           //010가상계죄 nxva_sb_il vbank010
           
-            String text=String.format("%s%s%s%s%s%s%s","nxva_sb_il","vbank","123TEST78451223","20210913","132000","500","ST1009281328226982205");
+            String text=String.format("%s%s%s%s%s%s%s","nxva_sb_il","vbank010","TEST7845124","20210913","132000","500","ST1009281328226982205");
             StringBuffer sb = new StringBuffer();
             MessageDigest sh = MessageDigest.getInstance("SHA-256");
             if (text != null) {
