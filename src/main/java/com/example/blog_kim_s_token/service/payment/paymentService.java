@@ -401,7 +401,9 @@ public class paymentService {
         System.out.println("makeTohash");
         JSONObject response=new JSONObject();
         try {
-            String mchtTrdNo=utillService.GetRandomNum(10);
+            String kind=aboutPayEnums.valueOf(getHashInfor.getKind()).getString();
+            System.out.println(kind); 
+            String mchtTrdNo=kind+utillService.GetRandomNum(10);
             getHashInfor.setMchtTrdNo(mchtTrdNo);
             getHashInfor.setRequestDate("20210913");
             getHashInfor.setRequestTime("132000");
@@ -419,6 +421,9 @@ public class paymentService {
             System.out.println("makeTohash error"+e.getMessage());
             throw new RuntimeException("구매정보 해시화 실패");
         }
+    }
+    public void okSettle() {
+        
     }
 
 

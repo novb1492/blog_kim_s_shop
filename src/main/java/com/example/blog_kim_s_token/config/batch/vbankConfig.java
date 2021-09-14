@@ -22,7 +22,7 @@ import lombok.RequiredArgsConstructor;
 public class vbankConfig {
     private final JobBuilderFactory jobBuilderFactory;
     private final StepBuilderFactory stepBuilderFactory;
-    private final String batchName="checkNonePaidVbank";
+    private final String batchName="checkNonePaidVbank2";
 
     @Autowired
     private vbankDao vbankDao;
@@ -36,7 +36,7 @@ public class vbankConfig {
     @Bean
     protected Step doClearNonePaidReservation() {
         return stepBuilderFactory
-            .get("doClearNonePaidReservation")
+            .get("doClearNonePaidReservation2")
           .tasklet(new scanVbank(vbankDao))
           .build();
     }

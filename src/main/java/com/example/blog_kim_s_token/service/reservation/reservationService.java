@@ -47,6 +47,8 @@ public class reservationService {
     private reservationDao reservationDao;
     @Autowired
     private paymentService paymentService;
+    @Autowired
+    private tempReservationDao tempReservationDao;
 
 
 
@@ -147,6 +149,36 @@ public class reservationService {
                 reservationInsertDto.setDate(Integer.parseInt(other[2]));
                 reservationInsertDto.setTimes(times);
        confrimContents(reservationInsertDto);
+    }
+    public JSONObject insertTemp(reservationInsertDto reservationInsertDto) {
+        confrimInsert(reservationInsertDto);
+        insertTempTable(reservationInsertDto);
+        return utillService.makeJson(true, "");
+    }
+    private void insertTempTable(reservationInsertDto reservationInsertDto) {
+        System.out.println("insertTempTable");
+        List<Integer>times=reservationInsertDto.getTimes();
+        try {  
+            System.out.println(Timestamp.valueOf(reservationInsertDto.getYear()+"-"+reservationInsertDto.getMonth()+"-"+reservationInsertDto.getDate()+" 00:00:00")+" 사용예정일");
+            for(int i=0;i<times.size();i++){
+                tempReservationDto dto=tempReservationDto.builder()
+                                        .tremail(reservationInsertDto.getEmail())
+                                        .trname(reservationInsertDto.getName())
+                                        .trtime(times.get(i))
+                                        .trseat(reservationInsertDto.getSeat())
+                                        .trpaymentId(reservationInsertDto.getPaymentId())
+                                        .trrDate(Timestamp.valueOf(reservationInsertDto.getYear()+"-"+reservationInsertDto.getMonth()+"-"+reservationInsertDto.getDate()+" 00:00:00"))
+                                        .trdateAndTime(Timestamp.valueOf(reservationInsertDto.getYear()+"-"+reservationInsertDto.getMonth()+"-"+reservationInsertDto.getDate()+" "+times.get(i)+":00:00"))
+                                        .trstatus("temp")
+                                        .trusedPayKind(reservationInsertDto.getUsedKind())
+                                        .build();
+                                        tempReservationDao.save(dto);
+            }
+        } catch (Exception e) {
+           e.printStackTrace();
+           System.out.println("insertTempTable error");
+           throw new RuntimeException("예약 저장 실패");
+        }
     }
     private void confrimContents(reservationInsertDto reservationInsertDto) {
         confrimInsert(reservationInsertDto);

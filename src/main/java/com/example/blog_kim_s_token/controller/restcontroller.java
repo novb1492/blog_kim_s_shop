@@ -22,10 +22,12 @@ import com.example.blog_kim_s_token.model.confrim.emailCofrimDto;
 import com.example.blog_kim_s_token.model.confrim.phoneCofrimDto;
 import com.example.blog_kim_s_token.model.payment.getHashInfor;
 import com.example.blog_kim_s_token.model.payment.getVankDateDto;
+import com.example.blog_kim_s_token.model.payment.reseponseSettleDto;
 import com.example.blog_kim_s_token.model.payment.tryCanclePayDto;
 import com.example.blog_kim_s_token.model.product.getPriceDto;
 import com.example.blog_kim_s_token.model.reservation.getDateDto;
 import com.example.blog_kim_s_token.model.reservation.getTimeDto;
+import com.example.blog_kim_s_token.model.reservation.reservationInsertDto;
 import com.example.blog_kim_s_token.model.user.addressDto;
 import com.example.blog_kim_s_token.model.user.phoneDto;
 import com.example.blog_kim_s_token.model.user.pwdDto;
@@ -83,6 +85,8 @@ public class restcontroller {
     private sha256 sha256;
     @Autowired
     private aes256 aes256;
+    @Autowired
+    private reservationService reservationService;
 
 
     @PostMapping("/auth/confrimEmail")
@@ -275,10 +279,21 @@ public class restcontroller {
         System.out.println("getSha256Hash");
         return paymentService.makeTohash(getHashInfor);
     }
+    @PostMapping("/api/tempInsertReservation")
+    public JSONObject tempInsertReservation(@RequestBody reservationInsertDto reservationInsertDto,HttpServletResponse response) {
+        System.out.println("tempInsertReservation");
+        System.out.println(reservationInsertDto.toString());
+        return reservationService.insertTemp(reservationInsertDto);
+    }
     @RequestMapping("/auth/settlebank")
-    public void settlebank(HttpServletRequest request,HttpServletResponse response) {
+    public void settlebank(reseponseSettleDto reseponseSettleDto,HttpServletResponse response) {
         System.out.println("settlebank");
-        
+        System.out.println(reseponseSettleDto.toString());
+        if(reseponseSettleDto.getOutRsltCd()==0021){
+            System.out.println("결제 완료");
+        }else{
+            System.out.println("결제 실패");
+        }  
     }
     @PostMapping("/api/v1/user/test")
     public JSONObject  user(HttpServletRequest request,HttpServletResponse response) {

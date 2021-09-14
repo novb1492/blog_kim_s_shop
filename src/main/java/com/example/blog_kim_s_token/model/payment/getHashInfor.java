@@ -18,9 +18,13 @@ public class getHashInfor {
     @NotBlank(message = "method가 공백입니다")
     private String method;
 
+    @NotBlank(message = "kind가 공백입니다")
+    private String kind;
+
     private String mchtTrdNo;
     private String requestDate;
     private String requestTime;
+
     
 
 }
