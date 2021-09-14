@@ -10,11 +10,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.amazonaws.services.managedblockchain.model.IllegalActionException;
 import com.example.blog_kim_s_token.enums.aboutPayEnums;
 import com.example.blog_kim_s_token.enums.reservationEnums;
 
 import com.example.blog_kim_s_token.model.payment.paidDto;
-
+import com.example.blog_kim_s_token.model.payment.reseponseSettleDto;
 import com.example.blog_kim_s_token.model.payment.vBankDto;
 
 import com.example.blog_kim_s_token.model.reservation.*;
@@ -178,6 +179,36 @@ public class reservationService {
            e.printStackTrace();
            System.out.println("insertTempTable error");
            throw new RuntimeException("예약 저장 실패");
+        }
+    }
+    public void tempToMain(reseponseSettleDto reseponseSettleDto) {
+        System.out.println("tempToMain");
+        try {
+            List<tempReservationDto>tempReservationDtos=tempReservationDao.findByTrpaymentId(reseponseSettleDto.getMchtTrdNo()).orElseThrow(()->new IllegalActionException("주문요청을 찾을 수없습니다"));
+           for(tempReservationDto t: tempReservationDtos){
+                mainReservationDto dto=mainReservationDto.builder().dateAndTime(t.getTrdateAndTime())
+                .email(t.getTremail())
+                .mainpgpaymentId(reseponseSettleDto.getTrdNo())
+                .name(t.getTrname())
+                .paymentId(t.getTrpaymentId())
+                .rDate(t.getTrrDate())
+                .seat(t.getTrseat())
+                .status("paid")
+                .time(t.getTrtime())
+                .usedPayKind(reseponseSettleDto.getCardNm())
+                .build();
+                reservationDao.save(dto);
+                tempReservationDao.delete(t);
+           }
+         
+
+            
+        }catch (IllegalActionException e){
+            throw new IllegalActionException(e.getMessage());
+        } 
+        catch (Exception e) {
+            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
     }
     private void confrimContents(reservationInsertDto reservationInsertDto) {

@@ -43,6 +43,9 @@ public class mainReservationDto {
     @Column(name="paymentId")
     private String paymentId;
 
+    @Column(name="mainpaymentId")
+    private String mainpgpaymentId;
+
     @Column(name = "status",nullable = false)
     private String status;
 

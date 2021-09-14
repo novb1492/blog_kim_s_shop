@@ -14,10 +14,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class aes256 {
     public static String alg = "AES/CBC/PKCS5Padding";
-    private final String sKey = "pgSettle30y739r82jtd709yOfZ2yK5K";
-    private final int AES_KEY_SIZE_256 = 256;
+    private static final String sKey = "pgSettle30y739r82jtd709yOfZ2yK5K";
+    private static final int AES_KEY_SIZE_256 = 256;
 
-    public String encrypt(String price){
+    public static String encrypt(String price){
         System.out.println("ace256");
         try {
             byte[] key = null;
@@ -90,5 +90,23 @@ public class aes256 {
 		Base64DecMap = new byte[128];
 		for (int i = 0; i < Base64EncMap.length; i++)
 			Base64DecMap[Base64EncMap[i]] = (byte) i;
+	}
+	public static byte[] aes256DecryptEcb(String sKey, byte[] encrypted) throws Exception {
+		byte[] key = null;
+		byte[] decrypted = null;
+		final int AES_KEY_SIZE_256 = 256;
+
+		// UTF-8
+		key = sKey.getBytes("UTF-8");
+
+		// Key size (256bit, 16byte)
+		key = Arrays.copyOf(key, AES_KEY_SIZE_256 / 8);
+
+		// AES/EBC/PKCS5Padding
+		Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+		cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(key, "AES"));
+		decrypted = cipher.doFinal(encrypted);
+
+		return decrypted;
 	}
 }

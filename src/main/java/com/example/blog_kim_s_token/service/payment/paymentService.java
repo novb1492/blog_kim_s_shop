@@ -19,6 +19,7 @@ import com.example.blog_kim_s_token.model.payment.getHashInfor;
 import com.example.blog_kim_s_token.model.payment.getVankDateDto;
 import com.example.blog_kim_s_token.model.payment.paidDao;
 import com.example.blog_kim_s_token.model.payment.paidDto;
+import com.example.blog_kim_s_token.model.payment.reseponseSettleDto;
 import com.example.blog_kim_s_token.model.payment.tryCanclePayDto;
 import com.example.blog_kim_s_token.model.payment.vBankDto;
 import com.example.blog_kim_s_token.model.payment.vbankDao;
@@ -65,8 +66,7 @@ public class paymentService {
     private kakaoService kakaoService;
     @Autowired
     private sha256 sha256;
-    @Autowired
-    private aes256 aes256;
+
 
     
     public vBankDto selectVbankProduct(String paymentId) {
@@ -422,9 +422,20 @@ public class paymentService {
             throw new RuntimeException("구매정보 해시화 실패");
         }
     }
-    public void okSettle() {
-        
+    public void okSettle(reseponseSettleDto reseponseSettleDto ) {
+        System.out.println("okSettle");
+        try {
+            String mchtTrdNo=reseponseSettleDto.getMchtTrdNo();
+            if(mchtTrdNo.startsWith(aboutPayEnums.reservation.getString())){
+                System.out.println("예약 상품웹훅");
+                resevationService.tempToMain(reseponseSettleDto);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("okSettle error"+e.getMessage());
+        }
     }
+  
 
 
 }

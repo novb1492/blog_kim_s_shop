@@ -289,11 +289,20 @@ public class restcontroller {
     public void settlebank(reseponseSettleDto reseponseSettleDto,HttpServletResponse response) {
         System.out.println("settlebank");
         System.out.println(reseponseSettleDto.toString());
-        if(reseponseSettleDto.getOutRsltCd()==0021){
+ 
+        if(reseponseSettleDto.getOutStatCd().equals("21") ||reseponseSettleDto.getOutStatCd().equals("0021")){
             System.out.println("결제 완료");
+            paymentService.okSettle(reseponseSettleDto);
         }else{
             System.out.println("결제 실패");
         }  
+    }
+    @PostMapping("/api/confrimSettle")
+    public void confrimSettle(@RequestBody reseponseSettleDto reseponseSettleDto,HttpServletResponse response) {
+        System.out.println("confrimSettle");
+        System.out.println(reseponseSettleDto.toString());
+ 
+      
     }
     @PostMapping("/api/v1/user/test")
     public JSONObject  user(HttpServletRequest request,HttpServletResponse response) {
