@@ -15,4 +15,5 @@ public abstract class paymentabstract {
     private String status;
     private String usedKind;
     private String kind;
+    private String mchtTrdNo;
 }

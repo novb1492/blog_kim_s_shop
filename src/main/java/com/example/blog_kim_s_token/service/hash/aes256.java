@@ -91,7 +91,7 @@ public class aes256 {
 		for (int i = 0; i < Base64EncMap.length; i++)
 			Base64DecMap[Base64EncMap[i]] = (byte) i;
 	}
-	public static byte[] aes256DecryptEcb(String sKey, byte[] encrypted) throws Exception {
+	public static byte[] aes256DecryptEcb(byte[] encrypted) throws Exception {
 		byte[] key = null;
 		byte[] decrypted = null;
 		final int AES_KEY_SIZE_256 = 256;
@@ -108,5 +108,40 @@ public class aes256 {
 		decrypted = cipher.doFinal(encrypted);
 
 		return decrypted;
+	}
+	public static final byte[] decodeBase64(String s) throws Exception {
+		if (s == null) {
+			return null;
+		} else {
+			byte abyte0[] = s.getBytes("UTF-8");
+			return decodeBase64(abyte0);
+		}
+	}
+	public static final byte[] decodeBase64(byte abyte0[]) throws Exception {
+		if (abyte0 == null)
+			return null;
+		int i;
+		for (i = abyte0.length; abyte0[i - 1] == 61; i--)
+			;
+		byte abyte1[] = new byte[i - abyte0.length / 4];
+		for (int j = 0; j < abyte0.length; j++)
+			abyte0[j] = Base64DecMap[abyte0[j]];
+
+		int k = 0;
+		int l;
+		for (l = 0; l < abyte1.length - 2; l += 3) {
+			abyte1[l] = (byte) (abyte0[k] << 2 & 0xff | abyte0[k + 1] >>> 4 & 0x3);
+			abyte1[l + 1] = (byte) (abyte0[k + 1] << 4 & 0xff | abyte0[k + 2] >>> 2 & 0xf);
+			abyte1[l + 2] = (byte) (abyte0[k + 2] << 6 & 0xff | abyte0[k + 3] & 0x3f);
+			k += 4;
+		}
+
+		if (l < abyte1.length) {
+			abyte1[l] = (byte) (abyte0[k] << 2 & 0xff | abyte0[k + 1] >>> 4 & 0x3);
+		}
+		if (++l < abyte1.length) {
+			abyte1[l] = (byte) (abyte0[k + 1] << 4 & 0xff | abyte0[k + 2] >>> 2 & 0xf);
+		}
+		return abyte1;
 	}
 }

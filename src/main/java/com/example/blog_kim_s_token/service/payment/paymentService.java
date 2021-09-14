@@ -13,6 +13,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.example.blog_kim_s_token.config.security;
 import com.example.blog_kim_s_token.customException.failBuyException;
 import com.example.blog_kim_s_token.enums.aboutPayEnums;
 import com.example.blog_kim_s_token.model.payment.getHashInfor;
@@ -26,6 +27,7 @@ import com.example.blog_kim_s_token.model.payment.vbankDao;
 import com.example.blog_kim_s_token.model.product.productDto;
 import com.example.blog_kim_s_token.model.user.userDto;
 import com.example.blog_kim_s_token.service.priceService;
+import com.example.blog_kim_s_token.service.userService;
 import com.example.blog_kim_s_token.service.utillService;
 import com.example.blog_kim_s_token.service.ApiServies.kakao.kakaoService;
 import com.example.blog_kim_s_token.service.hash.aes256;
@@ -34,10 +36,13 @@ import com.example.blog_kim_s_token.service.payment.iamPort.iamportService;
 import com.example.blog_kim_s_token.service.payment.iamPort.nomalPayment;
 import com.example.blog_kim_s_token.service.payment.iamPort.tryImpPayDto;
 import com.example.blog_kim_s_token.service.payment.iamPort.vbankPayment;
+import com.example.blog_kim_s_token.service.payment.model.tempPaid.tempPaidDao;
+import com.example.blog_kim_s_token.service.payment.model.tempPaid.tempPaidDto;
 import com.example.blog_kim_s_token.service.reservation.reservationService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
@@ -66,6 +71,10 @@ public class paymentService {
     private kakaoService kakaoService;
     @Autowired
     private sha256 sha256;
+    @Autowired
+    private userService userService;
+    @Autowired
+    private tempPaidDao tempPaidDao;
 
 
     
@@ -100,6 +109,7 @@ public class paymentService {
                                     .status(nomalPayment.getStatus())
                                     .usedKind(nomalPayment.getUsedKind())
                                     .totalPrice(totalPrice)
+                                    .paidmchtTrdNoId(nomalPayment.getMchtTrdNo())
                                     .build();
                                     paidDao.save(dto);
                                     System.out.println("결제테이블 저장 완료");
@@ -403,18 +413,27 @@ public class paymentService {
         try {
             String kind=aboutPayEnums.valueOf(getHashInfor.getKind()).getString();
             System.out.println(kind); 
+            String email=SecurityContextHolder.getContext().getAuthentication().getName();
+            String price=getHashInfor.getTotalPrice()+"";
             String mchtTrdNo=kind+utillService.GetRandomNum(10);
             getHashInfor.setMchtTrdNo(mchtTrdNo);
             getHashInfor.setRequestDate("20210913");
             getHashInfor.setRequestTime("132000");
             String pktHash=sha256.encrypt(getHashInfor);
-            String hashPrice=aes256.encrypt(getHashInfor.getTotalPrice()+"");
-
+            String hashPrice=aes256.encrypt(price);
+            String mchtCustId=aes256.encrypt(email);
+            response.put("mchtCustId", mchtCustId);
             response.put("mchtTrdNo", mchtTrdNo);
             response.put("trdAmt", hashPrice);
             response.put("trdDt", getHashInfor.getRequestDate());
             response.put("trdTm", getHashInfor.getRequestTime());
             response.put("pktHash", pktHash);
+            tempPaidDto dto=tempPaidDto.builder()
+                                        .tpEmail(email)
+                                        .tpPaymentid(mchtTrdNo)
+                                        .tpPrice(price)
+                                        .build();
+                                        tempPaidDao.save(dto);
             return response;
         } catch (Exception e) {
             e.printStackTrace();
@@ -433,6 +452,36 @@ public class paymentService {
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("okSettle error"+e.getMessage());
+        }
+    }
+    public void confrimSettle(reseponseSettleDto reseponseSettleDto) {
+        System.out.println("confrimSettle");
+        try {
+            String outStatCd=reseponseSettleDto.getOutStatCd();
+            byte[] aesCipherRaw=aes256.decodeBase64(reseponseSettleDto.getTrdAmt());
+            String trdAmt =new String(aes256.aes256DecryptEcb(aesCipherRaw),"UTF-8");
+            reseponseSettleDto.setTrdAmt(trdAmt);
+            userDto userDto=userService.sendUserDto();
+            if(outStatCd.equals("0021")){
+                System.out.println("일반 결제 상품입니다");
+                /*nomalPayment nomalPayment=new nomalPayment();
+                nomalPayment.setEmail(userDto.getEmail());
+                nomalPayment.setKind(aboutPayEnums.reservation.getString());
+                nomalPayment.setName(userDto.getName());
+                nomalPayment.setPayMethod(reseponseSettleDto.getMethod());
+                nomalPayment.setStatus(aboutPayEnums.statusPaid.getString());
+                nomalPayment.setUsedKind(reseponseSettleDto.getFnNm());
+                nomalPayment.setMchtTrdNo(reseponseSettleDto.getMchtTrdNo());
+                nomalPayment.setPaymentid(reseponseSettleDto.getTrdNo());
+                insertPayment(nomalPayment,Integer.parseInt(trdAmt));*/
+            }else if(outStatCd.equals("0051")){
+                System.out.println("가상계좌 채번완료");
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("confrimSettle error"+e.getMessage());
+            throw new RuntimeException("결제 검증에 실패했습니다");
         }
     }
   

@@ -24,7 +24,6 @@ public class getHashInfor {
     private String mchtTrdNo;
     private String requestDate;
     private String requestTime;
-
     
 
 }

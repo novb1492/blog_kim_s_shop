@@ -48,6 +48,7 @@ import com.example.blog_kim_s_token.service.hash.sha256;
 import com.example.blog_kim_s_token.service.payment.paymentService;
 import com.example.blog_kim_s_token.service.payment.iamPort.tryImpPayDto;
 import com.example.blog_kim_s_token.service.reservation.reservationService;
+import com.example.blog_kim_s_token.service.reservation.tryTempDto;
 import com.nimbusds.jose.shaded.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -301,8 +302,7 @@ public class restcontroller {
     public void confrimSettle(@RequestBody reseponseSettleDto reseponseSettleDto,HttpServletResponse response) {
         System.out.println("confrimSettle");
         System.out.println(reseponseSettleDto.toString());
- 
-      
+        paymentService.confrimSettle(reseponseSettleDto);
     }
     @PostMapping("/api/v1/user/test")
     public JSONObject  user(HttpServletRequest request,HttpServletResponse response) {

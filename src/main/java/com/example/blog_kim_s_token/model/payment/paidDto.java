@@ -31,6 +31,9 @@ public class paidDto {
     @Column(name = "paymentId",nullable = false,unique = true)
     private String paymentId;
 
+    @Column(name = "paidmchtTrdNoId",unique = true)
+    private String paidmchtTrdNoId;
+
     @Column(name = "email",nullable = false)
     private String email;
 
