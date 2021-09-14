@@ -20,6 +20,7 @@ import com.example.blog_kim_s_token.model.article.getArticleDto;
 import com.example.blog_kim_s_token.model.article.insertArticleDto;
 import com.example.blog_kim_s_token.model.confrim.emailCofrimDto;
 import com.example.blog_kim_s_token.model.confrim.phoneCofrimDto;
+import com.example.blog_kim_s_token.model.payment.getHashInfor;
 import com.example.blog_kim_s_token.model.payment.getVankDateDto;
 import com.example.blog_kim_s_token.model.payment.tryCanclePayDto;
 import com.example.blog_kim_s_token.model.product.getPriceDto;
@@ -270,11 +271,9 @@ public class restcontroller {
         doRedirect(response, "http://localhost:3030/doneNaverLogin.html");
     }
     @PostMapping("/api/getSha256Hash")
-    public JSONObject getSha256Hash(HttpServletRequest request,HttpServletResponse response) {
+    public JSONObject getSha256Hash(@RequestBody getHashInfor getHashInfor,HttpServletRequest request,HttpServletResponse response) {
         System.out.println("getSha256Hash");
-       
-
-        return utillService.makeJson(true,sha256.encrypt()+","+aes256.encrypt()+","+aes256.encrypt2()+","+aes256.encrypt3());
+        return paymentService.makeTohash(getHashInfor);
     }
     @RequestMapping("/auth/settlebank")
     public void settlebank(HttpServletRequest request,HttpServletResponse response) {

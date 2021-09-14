@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.example.blog_kim_s_token.customException.failBuyException;
 import com.example.blog_kim_s_token.enums.aboutPayEnums;
+import com.example.blog_kim_s_token.model.payment.getHashInfor;
 import com.example.blog_kim_s_token.model.payment.getVankDateDto;
 import com.example.blog_kim_s_token.model.payment.paidDao;
 import com.example.blog_kim_s_token.model.payment.paidDto;
@@ -26,6 +27,8 @@ import com.example.blog_kim_s_token.model.user.userDto;
 import com.example.blog_kim_s_token.service.priceService;
 import com.example.blog_kim_s_token.service.utillService;
 import com.example.blog_kim_s_token.service.ApiServies.kakao.kakaoService;
+import com.example.blog_kim_s_token.service.hash.aes256;
+import com.example.blog_kim_s_token.service.hash.sha256;
 import com.example.blog_kim_s_token.service.payment.iamPort.iamportService;
 import com.example.blog_kim_s_token.service.payment.iamPort.nomalPayment;
 import com.example.blog_kim_s_token.service.payment.iamPort.tryImpPayDto;
@@ -60,6 +63,10 @@ public class paymentService {
     private String kakaoPayCid;
     @Autowired
     private kakaoService kakaoService;
+    @Autowired
+    private sha256 sha256;
+    @Autowired
+    private aes256 aes256;
 
     
     public vBankDto selectVbankProduct(String paymentId) {
@@ -388,6 +395,29 @@ public class paymentService {
             e.printStackTrace();
             System.out.println("getVankInforInDb errpr"+e.getMessage());
             throw new RuntimeException("가상계좌 정보 추출에 실패했습니다");
+        }
+    }
+    public JSONObject makeTohash(getHashInfor getHashInfor) {
+        System.out.println("makeTohash");
+        JSONObject response=new JSONObject();
+        try {
+            String mchtTrdNo=utillService.GetRandomNum(10);
+            getHashInfor.setMchtTrdNo(mchtTrdNo);
+            getHashInfor.setRequestDate("20210913");
+            getHashInfor.setRequestTime("132000");
+            String pktHash=sha256.encrypt(getHashInfor);
+            String hashPrice=aes256.encrypt(getHashInfor.getTotalPrice()+"");
+
+            response.put("mchtTrdNo", mchtTrdNo);
+            response.put("trdAmt", hashPrice);
+            response.put("trdDt", getHashInfor.getRequestDate());
+            response.put("trdTm", getHashInfor.getRequestTime());
+            response.put("pktHash", pktHash);
+            return response;
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("makeTohash error"+e.getMessage());
+            throw new RuntimeException("구매정보 해시화 실패");
         }
     }
 

@@ -17,9 +17,8 @@ public class aes256 {
     private final String sKey = "pgSettle30y739r82jtd709yOfZ2yK5K";
     private final int AES_KEY_SIZE_256 = 256;
 
-    public String encrypt(){
+    public String encrypt(String price){
         System.out.println("ace256");
-        String sText="500";
         try {
             byte[] key = null;
             byte[] text = null;
@@ -31,67 +30,7 @@ public class aes256 {
             key = Arrays.copyOf(key, AES_KEY_SIZE_256 / 8);
     
             // UTF-8
-            text = sText.getBytes("UTF-8");
-    
-            // AES/EBC/PKCS5Padding
-            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
-            cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(key, "AES"));
-            encrypted = cipher.doFinal(text);
-            return encodeBase64(encrypted);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("aes256암호화 실패");
-        }
-       
-    }
-	public String encrypt2(){
-        System.out.println("ace256");
-		String encodeResult=null;
-        try {
-             encodeResult = URLEncoder.encode("kim", "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-
-            e.printStackTrace();
-        }
-        try {
-            byte[] key = null;
-            byte[] text = null;
-            byte[] encrypted = null;
-            // UTF-8
-            key = sKey.getBytes("UTF-8");
-    
-            // Key size (256bit, 16byte)
-            key = Arrays.copyOf(key, AES_KEY_SIZE_256 / 8);
-    
-            // UTF-8
-            text = encodeResult.getBytes("UTF-8");
-    
-            // AES/EBC/PKCS5Padding
-            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
-            cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(key, "AES"));
-            encrypted = cipher.doFinal(text);
-            return encodeBase64(encrypted);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("aes256암호화 실패");
-        }
-       
-    }
-	public String encrypt3(){
-        System.out.println("ace256");
-        String sText="kim";
-        try {
-            byte[] key = null;
-            byte[] text = null;
-            byte[] encrypted = null;
-            // UTF-8
-            key = sKey.getBytes("UTF-8");
-    
-            // Key size (256bit, 16byte)
-            key = Arrays.copyOf(key, AES_KEY_SIZE_256 / 8);
-    
-            // UTF-8
-            text = sText.getBytes("UTF-8");
+            text = price.getBytes("UTF-8");
     
             // AES/EBC/PKCS5Padding
             Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
